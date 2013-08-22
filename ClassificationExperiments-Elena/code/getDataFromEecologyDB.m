@@ -25,13 +25,13 @@
 % data- the output data structure retrieved from the DB
 %
 % EXAMPLE
-% [data] = getDataFromEecologyDB(<your-user-name>, <your-password>,...
+% [tracks] = getDataFromEecologyDB(<your-user-name>, <your-password>,...
 %                               '../data/eecologyqueries.mat', 'sql_gps_acc',...
 %                                754, '2013-06-08 06:20:00', ...
 %                                '2013-06-08 07:20:00')
 %
 % SEE ALSO
-% DBAcc_Texel.m script from W. Bouten (legacy)
+% DBAcc_Texel/FEBO.m scripts from W. Bouten (legacy)
 %
 % REFERENCES
 
