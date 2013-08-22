@@ -23,7 +23,7 @@
 % windowing (same file)
 %
 % REFERENCES
-% "Automatic Classification of Bird Behaiviour on the baes of Accelerometer
+% "Automatic Classification of Bird Behaviour on the base of Accelerometer
 % Data", Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
 %
 % NOTES: 
@@ -65,10 +65,10 @@ windows = {WM{:,1}}';
 if ~isempty(windows)
 
     %position features (e.g. pitch, roll, etc.)
-    SPRM = cellfun(@calPosition, {WM{:,1}}', 'uniformoutput', false);
+    SPRM = cellfun(@calcPosition, {WM{:,1}}', 'uniformoutput', false);
 
     %correlation features
-    CM = cellfun(@calCorrelation, {WM{:,1}}', 'uniformoutput', false);
+    CM = cellfun(@calcCorrelation, {WM{:,1}}', 'uniformoutput', false);
 
     %motionlessness feature matrix for window set
     MLM = cellfun(@calcMotionlessness, {WM{:,1}}', 'uniformoutput', false);
