@@ -1,27 +1,53 @@
 %% prepareData4FeatExtraction - preparation of data for feature extraction
 %
 % author: Elena Ranguelova, NLeSc
-% date creation:
+% date creation: 22-08-2013
 % last modification date:
 % modification details:
 % -----------------------------------------------------------------------
 % SYNTAX
-% [output]=function/scriptName(input)
+% [feat_data]=prepareData4FeatExtraction(formatted_data, ind, offset)
 %
 % INPUT
-% inpuargument- each of the input arguments should be described
+% formatted_data- formatted DB GPS and accelerometer data 
+% ind- the index of the data point in the birds' trajectory
+% offset - index offset- number of measurements
 %
 % OUPTPUT
-% outputargument- each of the output arguments should be described
+% feat_data- each of the output arguments should be described
 %
 % EXAMPLE
-% An example of the application can be given here. Preferably in a form
-% that can be copied to the Matlab commandline to work.
+% [tracks] = getDataFromEecologyDB(<your-user-name>, <your-password>,...
+%                               '../data/eecologyqueries.mat', 'sql_gps_acc',...
+%                                754, '2013-06-08 06:20:00', ...
+%                                '2013-06-08 07:20:00');
+% [formatted_tracks] = formatDataStructure(tracks);
+% j =  1; na = 40; na1 = na - 1;
+% [feat_data] = prepareData4FeatExtraction(formatted_data, j, na1)
 % 
 % SEE ALSO
-% relatedFunction1, relatedFunction2, relatedScript1
+% getDataFromEecologyDB.m, formatDataStructure.m
+% DBAcc_Texel/FEBO.m scripts from W. Bouten (legacy)
 %
 % REFERENCES
-% Any publications or resources used
+
+function [feat_data] = prepareData4FeatExtraction(formatted_data, ind, offset)
+ 
+% index limits
+start = ind; stop = ind + offset;
+limits = start:stop;
+
+% get the relevant data
+device = formatted_data.device(limits); 
+datatime = formatted_data.datatime(limits);
+index = formatted_data.index(limits);
+x = formatted_data.x(limits);
+y = formatted_data.y(limits);
+z = formatted_data.z(limits);
+speed = formatted_data.ispd(limits);
+
+% construct data suitable for feature calsulations
+feat_data = [device, datatime, index, x, y, z, speed];
+
 
 
