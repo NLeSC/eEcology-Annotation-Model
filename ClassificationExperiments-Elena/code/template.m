@@ -26,5 +26,3 @@
 %
 % NOTES
 % extra notes
-
-
