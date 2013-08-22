@@ -23,7 +23,7 @@
 %                                '2013-06-08 07:20:00');
 % [formatted_tracks] = formatDataStructure(tracks);
 % j =  1; na = 40; na1 = na - 1;
-% [feat_data] = prepareData4FeatExtraction(formatted_data, j, na1)
+% [feat_data] = prepareData4FeatExtraction(formatted_tracks, j, na1);
 % 
 % SEE ALSO
 % getDataFromEecologyDB.m, formatDataStructure.m
@@ -39,7 +39,7 @@ limits = start:stop;
 
 % get the relevant data
 device = formatted_data.device(limits); 
-datatime = formatted_data.datatime(limits);
+datetime = formatted_data.datetime(limits);
 index = formatted_data.index(limits);
 x = formatted_data.x(limits);
 y = formatted_data.y(limits);
@@ -47,7 +47,7 @@ z = formatted_data.z(limits);
 speed = formatted_data.ispd(limits);
 
 % construct data suitable for feature calsulations
-feat_data = [device, datatime, index, x, y, z, speed];
+feat_data = [device, datetime, index, x, y, z, speed];
 
 
 
