@@ -23,5 +23,8 @@
 %
 % REFERENCES
 % Any publications or resources used
+%
+% NOTES
+% extra notes
 
 
