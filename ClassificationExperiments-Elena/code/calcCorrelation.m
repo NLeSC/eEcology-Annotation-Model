@@ -21,6 +21,8 @@
 % calcFeatureVectors
 %
 % REFERENCES
+% "Automatic Classification of Bird Behaiviour on the baes of Accelerometer
+% Data", Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
 %
 % NOTE 
 % Preferably, the windows are firstly subjected to a low-pass filter!

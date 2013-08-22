@@ -21,6 +21,8 @@
 % calFeatureVectors.m
 %
 % REFERENCES
+% "Automatic Classification of Bird Behaiviour on the baes of Accelerometer
+% Data", Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
 % position.m- original code by M. de Bakker
 
 

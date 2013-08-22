@@ -23,6 +23,8 @@
 % windowing (same file)
 %
 % REFERENCES
+% "Automatic Classification of Bird Behaiviour on the baes of Accelerometer
+% Data", Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
 %
 % NOTES: 
 %   1. Function based on functions makeFeaturesNSpd and windowingNSpd. This 

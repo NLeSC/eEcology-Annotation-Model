@@ -21,6 +21,8 @@
 %
 % REFERENCES
 % FaFoTr.m- original file by M. de Bakker
+% "Automatic Classification of Bird Behaiviour on the baes of Accelerometer
+% Data", Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
 %
 % NOTES
 % Preferably, the windows are firstly subjected to a hamming filter in order

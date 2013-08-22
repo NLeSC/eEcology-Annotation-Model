@@ -22,6 +22,8 @@
 % REFERENCES
 % Adapted from Gyllensten, I.C. (2010) Physical Activity Recognition in
 % Daily Life using a triaxial accelerometer. MSc Thesis KTH.
+% "Automatic Classification of Bird Behaiviour on the baes of Accelerometer
+% Data", Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
 %
 % NOTES
 % Calculates maximum motionless time in a window, based on motion in X
