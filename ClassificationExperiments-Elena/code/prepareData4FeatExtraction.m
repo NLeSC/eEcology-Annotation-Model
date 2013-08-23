@@ -26,7 +26,7 @@
 % [feat_data] = prepareData4FeatExtraction(formatted_tracks, j, na1);
 % 
 % SEE ALSO
-% getDataFromEecologyDB.m, formatDataStructure.m
+% getDataFromEecologyDB.m, formatDataStructure.m, classifyAccMeas.m
 % DBAcc_Texel/FEBO.m scripts from W. Bouten (legacy)
 %
 % REFERENCES
