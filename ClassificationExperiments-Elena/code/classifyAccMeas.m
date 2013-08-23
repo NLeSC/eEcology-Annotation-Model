@@ -96,7 +96,7 @@ for i = 2:len_long - 1
              out_data.lat(j) out_data.long(j) ...
              out_data.time(j) j ...
              out_data.ispd(j) out_data.tspd(j)];
-            
+            j=j+1;
          elseif inp_data.index(i)==0
             out_data.class(j)=num_classes + 1;
             out_data.predictions(j)=num_classes + 1;
@@ -107,6 +107,7 @@ for i = 2:len_long - 1
              out_data.lat(j) out_data.long(j) ...
              out_data.time(j) j ...
              out_data.ispd(j) out_data.tspd(j)];            
+            j=j+1;
           end
     else
         out_data.class(j)=num_classes + 1;
@@ -118,6 +119,7 @@ for i = 2:len_long - 1
          out_data.lat(j) out_data.long(j) ...
          out_data.time(j) j ...
          out_data.ispd(j) out_data.tspd(j)];
+        j=j+1;
     end   
 %     FTVstor=[FTVstor; FTV(1,:) ...
 %              out_data.class(j) ...
@@ -125,5 +127,5 @@ for i = 2:len_long - 1
 %              out_data.time(j) j ...
 %              out_data.ispd(j) out_data.tspd(j)];
     
-    j=j+1;
+   
 end
