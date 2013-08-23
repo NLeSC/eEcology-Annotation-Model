@@ -21,6 +21,8 @@
 %
 % applyModel - classification of feature data according to a given model
 % hierarchClass - hierarchical classification
+%
+% classifyAccMeas - classify accelerometer measurements
 %--------------------------------------------------------------------------
 % SCRIPTS
 %--------------------------------------------------------------------------
