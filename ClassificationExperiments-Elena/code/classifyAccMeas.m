@@ -17,7 +17,7 @@
 % num_classes - number of recognisable classes (behavoiurs)
 %
 % OUPTPUT
-% out_data- relevant measurements and their classification
+% out_data- structure with the relevant measurements and their classification
 % FTVstor-  feature vectors store(?)
 %
 % EXAMPLE
@@ -32,6 +32,7 @@
 % SEE ALSO
 % calcFeatureVectors.m, hierarchClass.m, formatDataStructrure.m,
 % prepareData4FeatExtraction.m
+% createDatacube.m, createAnot.m
 % DBAcc_Texel/FEBO.m- scripts by W.Bouten (legacy)
 %
 % REFERENCES
@@ -39,10 +40,11 @@
 % NOTES
 % the classifiers are stored for now in  ../data/classifiers.mat
 
+
 function [out_data, FTVstor]=classifyAccMeas(inp_data, num_meas,  classifiers, ...
                                     num_features, num_classes)
 % initializations
-out_data =[];
+out_data =[]; 
 FTVstor =[];
 FTV = []; INFO =[];
 
