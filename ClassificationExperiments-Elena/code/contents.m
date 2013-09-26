@@ -35,3 +35,4 @@
 % addEecologyqueries - example  script for adding an SQL query to a MAT file
 % DBAcc_Texel_new- classification and vizualization of Texel bird data
 % DBAcc_FEBO_new- classification and vizualization of FEBO bird data
+% DBAcc_meeuw_al
