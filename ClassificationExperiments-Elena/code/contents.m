@@ -30,7 +30,7 @@
 %
 % writeAccPNG - generates KMZ file from anotated accelerometer data
 %--------------------------------------------------------------------------
-%% SCRIPTS
+%% SCRIPTS (in /scripts directory)
 %--------------------------------------------------------------------------
 % addEecologyqueries - example  script for adding an SQL query to a MAT file
 % DBAcc_Texel_new- classification and vizualization of Texel bird data
