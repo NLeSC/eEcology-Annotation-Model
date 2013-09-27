@@ -2,14 +2,15 @@
 %
 % author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc
 % date creation: 11-2011
-% last modification date: 22-08-2013
-% modification details:
+% last modification date: 27-09-2013
+% modification details: added new parameter
 % -----------------------------------------------------------------------
 % SYNTAX
-% Mmotionless = calcMotionlessness(M)
+% Mmotionless = calcMotionlessness(M, epsilon)
 %
 % INPUT
-% M- 3D matrix with windows, tolarance value epsilon
+% M- 2D matrix with accelerometer data
+% epsilon- tolarance value
 %
 % OUPTPUT
 % Mmotionless- 3D matrix with for each window time of max motionless period
@@ -29,9 +30,8 @@
 % Calculates maximum motionless time in a window, based on motion in X
 % direction
 
-function Mmotionless = calcMotionlessness(M)
+function Mmotionless = calcMotionlessness(M, epsilon)
 
-epsilon = 0.3;
 nOfFrames = size(M,1);
 longl = 1;
 

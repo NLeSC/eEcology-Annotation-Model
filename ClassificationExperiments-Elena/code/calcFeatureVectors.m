@@ -2,15 +2,18 @@
 %
 % author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc
 % date creation: 11-2011
-% last modification date: 22-08-2013
-% modification details:
+% last modification date: 27-09-2013
+% modification details: added extra parameters
 % -----------------------------------------------------------------------
 % SYNTAX
-% [FTV, INFO]=calFeatureVectors(data)
+% [FTV, INFO]=calFeatureVectors(data, windowSize, overlap, epsilon)
 %
 % INPUT
 % data- NxM matrix containing unlabelled data. Format:
 %       [device,datetime,index,x,y,z,spd]
+% windowSize- thesegmentaiton window size
+% overlap- the overlap ofthe windows
+% epsilon- tolerance parameter for the motionlessness feature
 %
 % OUPTPUT
 % FTV- NxM matrix containing N vectors with M features
@@ -34,7 +37,7 @@
 %   4. ! Important: Model is trained using 2D speed instead of 3D speed.
 
 
-function [FTV,INFO] = calcFeatureVectors(data)
+function [FTV,INFO] = calcFeatureVectors(data,  windowSize, overlap, epsilon)
 
 r1 = find(data(:,3)==0);
 r2 = find(diff(data(:,3))~=1)+1;
@@ -42,8 +45,9 @@ r = unique(sort([1;r1;r2]));
 
 WM = {};
 
-windowSize = 20;
-overlap = 0;
+% windowSize = 20;
+% overlap = 0;
+% epsilon = 0.3;
 
 for i=1:length(r)-1
     seriesLength = r(i+1)-r(i);
@@ -65,16 +69,16 @@ windows = {WM{:,1}}';
 if ~isempty(windows)
 
     %position features (e.g. pitch, roll, etc.)
-    SPRM = cellfun(@calcPosition, {WM{:,1}}', 'uniformoutput', false);
+    SPRM = cellfun(@calcPosition, windows, 'uniformoutput', false);
 
     %correlation features
-    CM = cellfun(@calcCorrelation, {WM{:,1}}', 'uniformoutput', false);
+    CM = cellfun(@calcCorrelation, windows, 'uniformoutput', false);
 
     %motionlessness feature matrix for window set
-    MLM = cellfun(@calcMotionlessness, {WM{:,1}}', 'uniformoutput', false);
-
+    MLM = cellfun(@(x) calcMotionlessness(x,epsilon), windows, 'uniformoutput', false);
+    
     %fourier transform feature matrix for window set
-    FM = cellfun(@calcFrequency, {WM{:,1}}', 'uniformoutput', false);
+    FM = cellfun(@calcFrequency, windows, 'uniformoutput', false);
 
     %wavelet features
     %WAV = wav(WM,3);
@@ -83,10 +87,10 @@ if ~isempty(windows)
     SPD = {WM{:,8}}';
 
     %'noise'
-    SN = cellfun(@calcNoise, {WM{:,1}}', 'uniformoutput', false);
+    SN = cellfun(@calcNoise, windows, 'uniformoutput', false);
 
     %ODBA
-    ODBA = cellfun(@calcODBA, {WM{:,1}}', 'uniformoutput', false);
+    ODBA = cellfun(@(x) calcODBA(x,windowSize/2), windows, 'uniformoutput', false);
 
     FTV = [cell2mat(SPRM), cell2mat(CM), cell2mat(MLM),...
         cell2mat(FM), cell2mat(SPD),cell2mat(SN),cell2mat(ODBA)];

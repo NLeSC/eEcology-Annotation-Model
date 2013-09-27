@@ -2,12 +2,15 @@
 %
 % author: Elena Ranguelova, NLeSc
 % date creation: 23-08-2013
-% last modification date:
-% modification details:
+% last modification date: 27-09-2013
+% modification details: added INFO structure to the output and more
+% parameters
 % -----------------------------------------------------------------------
 % SYNTAX
-% [out_data, FTVstor]=classifyAccMeas(inp_data, num_meas,  classifiers,...
-%                               num_features, num_classes)
+% [out_data, FTVstor, INFO]=classifyAccMeas(inp_data, num_meas,  ...
+%                               classifiers,...
+%                               num_features, num_classes
+%                               windowSize, overlap, epsilon)
 %
 % INPUT
 % inp_data- formatted data sreuctureretrieved from the DB
@@ -15,10 +18,14 @@
 % classifiers - classifiers is cell array with model structures.
 % num_features  - number of features
 % num_classes - number of recognisable classes (behavoiurs)
+% winsowSize- the windows size when static segmentation is done
+% overlap - the window overlap
+% epsilon- tolerance parameter for the motionlessness featuew
 %
 % OUPTPUT
 % out_data- structure with the relevant measurements and their classification
 % FTVstor-  feature vectors store(?)
+% INFO - information structure
 %
 % EXAMPLE
 % [tracks] = getDataFromEecologyDB(<your-username-str>, <your-password-str>,...
@@ -27,7 +34,7 @@
 %                                '2013-06-08 07:20:00');
 % [formatted_tracks] = formatDataStructure(tracks);
 % load ../data/classifiers.mat
-% [out_data, FTVstor]=classifyAccMeas(formatted_tracks, 40,  classifiers, 58, 7);
+% [out_data, FTVstor, INFO]=classifyAccMeas(formatted_tracks, 40,  classifiers, 58, 7, 20, 10, 0.3);
 % 
 % SEE ALSO
 % calcFeatureVectors.m, hierarchClass.m, formatDataStructrure.m,
@@ -41,8 +48,10 @@
 % the classifiers are stored for now in  ../data/classifiers.mat
 
 
-function [out_data, FTVstor]=classifyAccMeas(inp_data, num_meas,  classifiers, ...
-                                    num_features, num_classes)
+function [out_data, FTVstor, INFO] = classifyAccMeas(inp_data, num_meas, ...
+                                                      classifiers, ...
+                                                      num_features, num_classes, ...
+                                                       windowSize, overlap, epsilon)
 % initializations
 out_data =[]; 
 FTVstor =[];
@@ -82,7 +91,7 @@ for i = 2:len_long - 1
                  sum(isnan(inp_data.z(i:i+number)))<1)
             
             data = prepareData4FeatExtraction(inp_data, i, number);
-            [FTV,INFO] = calcFeatureVectors(data);
+            [FTV,INFO] = calcFeatureVectors(data, windowSize, overlap, epsilon);
            
             dum = hierarchClass(classifiers, FTV);
            

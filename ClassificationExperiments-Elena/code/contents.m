@@ -18,6 +18,8 @@
 % calcCorrelation - calculates correlation features
 % calcMotionlessness - calculates motionlessness features
 % calcFrequency - calculates frequency spectral features
+% calcNoise - calculates the noise content feature
+% calcODBA - calculates the Overall Dynamic Body Acceleration feature
 %
 % applyModel - classification of feature data according to a given model
 % hierarchClass - hierarchical classification
@@ -35,4 +37,4 @@
 % addEecologyqueries - example  script for adding an SQL query to a MAT file
 % DBAcc_Texel_new- classification and vizualization of Texel bird data
 % DBAcc_FEBO_new- classification and vizualization of FEBO bird data
-% DBAcc_meeuw_al
+% DBAcc_meeuw_all- classification of the meeuw data obtained from the DB
