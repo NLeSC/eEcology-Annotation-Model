@@ -36,7 +36,7 @@ IDdate=[num2str(IDevice) '_' starttime(1:4) starttime(6:7) starttime(9:10)...
     '__' stoptime(1:4) stoptime(6:7) stoptime(9:10)...
     '_' stoptime(12:13) stoptime(15:16) stoptime(18:19)];
 
-fileName=['./results/S' IDdate '.kmz'];
+fileName=[fullfile(results_path, 'S') IDdate '.kmz'];
 iconStr = ['http://maps.google.com/','mapfiles/kml/pal2/icon26.png']; 
 iconSize = 0.4;
 classText='stand flap soar walk sit XFl  float NoCl';
@@ -96,7 +96,7 @@ toc
 %% Make kmz
 disp('Creating KMZ file...');
 tic
- makeKMZanot(class_data, iconStr, iconSize, ...
+makeKMZanot(class_data, iconStr, iconSize, ...
                           classText, dateTimeFormat, dirName, fileName);
 disp('Done.');                                
 toc
