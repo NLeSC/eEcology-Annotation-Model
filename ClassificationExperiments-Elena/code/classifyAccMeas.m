@@ -13,11 +13,11 @@
 %                               windowSize, overlap, epsilon)
 %
 % INPUT
-% inp_data- formatted data sreuctureretrieved from the DB
+% inp_data- formatted data sructure retrieved from the DB
 % num_meas- number of accelerometer measurements (in 1 sec.?)
 % classifiers - classifiers is cell array with model structures.
 % num_features  - number of features
-% num_classes - number of recognisable classes (behavoiurs)
+% num_classes - number of recognisable classes (behaviours)
 % winsowSize- the windows size when static segmentation is done
 % overlap - the window overlap
 % epsilon- tolerance parameter for the motionlessness featuew
@@ -41,6 +41,7 @@
 % prepareData4FeatExtraction.m
 % createDatacube.m, createAnot.m
 % DBAcc_Texel/FEBO.m- scripts by W.Bouten (legacy)
+% copyData.m- subfunciton in the same file
 %
 % REFERENCES
 %
@@ -62,79 +63,89 @@ len_long  = length(inp_data.long);
 len_ind = length(inp_data.index);
 
 number = num_meas - 1;
-j = 1;
+j = 0;
 
 for i = 2:len_long - 1
-    % assignmens in all cases
-    out_data.device(j)=inp_data.device(i);
-    out_data.datetime(j)=inp_data.datetime(i);
-    out_data.index(j)=j;
-    out_data.ispd(j)=inp_data.ispd(i);
-    out_data.tspd(j)=inp_data.tspd(i);
-    out_data.long(j)=inp_data.long(i);
-    out_data.lat(j)=inp_data.lat(i);
-    out_data.alt(j)=inp_data.alt(i);
-    out_data.year(j)=inp_data.year(i); 
-    out_data.month(j)=inp_data.month(i); 
-    out_data.day(j)=inp_data.day(i); 
-    out_data.hour(j)=inp_data.hour(i); 
-    out_data.min(j)=inp_data.minute(i); 
-    out_data.sec(j)=inp_data.second(i);
-    out_data.time(j)=datenum(out_data.year(j),out_data.month(j),...
-                             out_data.day(j),out_data.hour(j),...
-                             out_data.min(j),out_data.sec(j))-735235;
+   
     % check for availability of 1 second of accelerometer measurements
-    if (~isnan(inp_data.index(i))==1) && ((i+number) <= len_ind)
-         if (inp_data.index(i)==1) && (inp_data.index(i+number)==num_meas) & ...
+    if (~isnan(inp_data.index(i))==1) && ((i+number) < len_ind)
+        % assignmens in all cases
+        if (inp_data.index(i)==0) && (inp_data.index(i+number)==number) && ...
                  (sum(isnan(inp_data.x(i:i+number)))+...
                  sum(isnan(inp_data.y(i:i+number)))+...
                  sum(isnan(inp_data.z(i:i+number)))<1)
-            
+            j= j+1; 
+
             data = prepareData4FeatExtraction(inp_data, i, number);
+
             [FTV,INFO] = calcFeatureVectors(data, windowSize, overlap, epsilon);
-           
+
+
             dum = hierarchClass(classifiers, FTV);
-           
             out_data.data(j,:)=[inp_data.x(i:i+number)' ...
                                 inp_data.y(i:i+number)' ...
                                 inp_data.z(i:i+number)' ];
             out_data.predictions(j)=dum(1);
             out_data.class(j)=out_data.predictions(j);
+            out_data = copyDeviceAndTimeData(inp_data, out_data, i, j);           
+            
             FTVstor=[FTVstor; FTV(1,:) ...
              out_data.class(j) ...
              out_data.lat(j) out_data.long(j) ...
              out_data.time(j) j ...
              out_data.ispd(j) out_data.tspd(j)];
-            j=j+1;
-         elseif inp_data.index(i)==0
+           
+        elseif inp_data.index(i)==0
+            j = j+1;
+        
             out_data.class(j)=num_classes + 1;
             out_data.predictions(j)=num_classes + 1;
             out_data.data(j,:)=zeros(1,3*num_meas);
             FTV(1,1:num_features)=NaN;
+            out_data = copyDeviceAndTimeData(inp_data, out_data, i, j);
+            
             FTVstor=[FTVstor; FTV(1,:) ...
              out_data.class(j) ...
              out_data.lat(j) out_data.long(j) ...
              out_data.time(j) j ...
              out_data.ispd(j) out_data.tspd(j)];            
-            j=j+1;
-          end
+           
+        end
     else
+        j =j+1;
+        
         out_data.class(j)=num_classes + 1;
         out_data.predictions(j)=num_classes + 1;
         out_data.data(j,:)=zeros(1,3*num_meas);
         FTV(1,1:num_features)=NaN;
+        out_data = copyDeviceAndTimeData(inp_data, out_data, i, j);
+        
         FTVstor=[FTVstor; FTV(1,:) ...
          out_data.class(j) ...
          out_data.lat(j) out_data.long(j) ...
          out_data.time(j) j ...
-         out_data.ispd(j) out_data.tspd(j)];
-        j=j+1;
+         out_data.ispd(j) out_data.tspd(j)];     
     end   
-%     FTVstor=[FTVstor; FTV(1,:) ...
-%              out_data.class(j) ...
-%              out_data.lat(j) out_data.long(j) ...
-%              out_data.time(j) j ...
-%              out_data.ispd(j) out_data.tspd(j)];
-    
-   
+ 
 end
+
+function out_data = copyDeviceAndTimeData(inp_data, out_data, i, j)
+
+        out_data.device(j)=inp_data.device(i);
+        out_data.datetime(j)=inp_data.datetime(i);
+        out_data.index(j)=j;
+        out_data.ispd(j)=inp_data.ispd(i);
+        out_data.tspd(j)=inp_data.tspd(i);
+        out_data.long(j)=inp_data.long(i);
+        out_data.lat(j)=inp_data.lat(i);
+        out_data.alt(j)=inp_data.alt(i);
+        out_data.year(j)=inp_data.year(i); 
+        out_data.month(j)=inp_data.month(i); 
+        out_data.day(j)=inp_data.day(i); 
+        out_data.hour(j)=inp_data.hour(i); 
+        out_data.min(j)=inp_data.minute(i); 
+        out_data.sec(j)=inp_data.second(i);
+        out_data.time(j)=datenum(out_data.year(j),out_data.month(j),...
+                                 out_data.day(j),out_data.hour(j),...
+                                 out_data.min(j),out_data.sec(j))-735235;
+                                           

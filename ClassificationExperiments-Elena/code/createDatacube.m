@@ -46,7 +46,7 @@ if nargin < 3
     end
 end
 
-Datacube={}
+Datacube={};
 
 Datacube{1}=inp_data.device;
 Datacube{2}=inp_data.datetime;

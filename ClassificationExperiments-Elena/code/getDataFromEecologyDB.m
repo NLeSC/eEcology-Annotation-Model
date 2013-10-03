@@ -43,12 +43,12 @@ function [data] = getDataFromEecologyDB(username, password, ...
 IDevice = num2str(device);    
 start = strcat('''',starttime,''''); 
 stop = strcat('''',stoptime,'''');
-load(querystorefname, queryid)
+load(querystorefname, queryid);
 
  %% Connect to the DB using jdbc
  connection = database('eecology', username, password,...
                        'org.postgresql.Driver', ...
-           'jdbc:postgresql://db.e-ecology.sara.nl:5432/eecology?ssl=true')  
+           'jdbc:postgresql://db.e-ecology.sara.nl:5432/eecology?ssl=true');  
  % set db preferences    
  setdbprefs('DataReturnFormat','structure');    
     
@@ -63,7 +63,7 @@ cursor = fetch(cursor);
 
 %% Get the data from the cursor
 data = cursor.Data;
-cursor.message
+%cursor.message;
 
 %% Close the database connection
 close(connection); 

@@ -12,9 +12,10 @@ load(classifiers_fname)
 eco_queries =  fullfile(data_path,'eecologyqueries.mat'); 
 query_id = 'sql_gps_acc';
 
-username = <your-name>;  % put your user name and password here. 
-password = <your-passwd>;
-
+% primpt the user for username and password
+disp('Login credentials for access to eEcologyDB are needed.');
+username = input('Please, enter your user name: ','s');  
+password = input('Please, enter your password: ','s');
 set(0, 'DefaultFigureRenderer', 'zbuffer');
 
 IDevice = 754;
@@ -25,12 +26,16 @@ num_meas = 60;
 num_features= 58;
 num_classes= 7;
 windowSize=20;
-overlap=10;
+overlap=0;
 epsilon = 0.3;
 
 
 %filename for kmz file
-IDdate=[num2str(IDevice) '_' starttime(1:4) starttime(6:7) starttime(9:10) '_' stoptime(1:4) stoptime(6:7) stoptime(9:10)];
+IDdate=[num2str(IDevice) '_' starttime(1:4) starttime(6:7) starttime(9:10)...
+    '_' starttime(12:13) starttime(15:16) starttime(18:19) ...
+    '__' stoptime(1:4) stoptime(6:7) stoptime(9:10)...
+    '_' stoptime(12:13) stoptime(15:16) stoptime(18:19)];
+
 fileName=['./results/S' IDdate '.kmz'];
 iconStr = ['http://maps.google.com/','mapfiles/kml/pal2/icon26.png']; 
 iconSize = 0.4;
@@ -50,26 +55,51 @@ if ~exist(dirName,'dir')
     mkdir(dirName);
 end
 
-
 %% get the data from the DB
+t=clock;
+disp('Retrieving data from the DB...');
+tic
 [tracks] = getDataFromEecologyDB(username, password,...
                                eco_queries, query_id,...
-                               IDevice, starttime, stoptime)
+                               IDevice, starttime, stoptime);
+disp('Done.');
+toc                           
 %% format the data
+disp('Formatting the data...');
+tic
 [formatted_tracks] = formatDataStructure(tracks);
-
+disp('Done.');                                
+toc
 
 %% classify the data
+disp('Classification...');
+tic
 [class_data, FTVstor, INFO]=classifyAccMeas(formatted_tracks, num_meas, classifiers, ...
                                     num_features, num_classes, windowSize, overlap, epsilon);
+disp('Done.');                                
+toc                                
 
 %% create Datacube
+disp('Creating Datacube...');
+tic
 Datacube = createDatacube(class_data,1,DCubeName);
+disp('Done.');                                
+toc
 
 %% create Anotations
+disp('Creating Annotations...');
+tic
 FTVanot = createAnot(FTVstor,num_features,1,AnotName);
-
+disp('Done.');                                
+toc
 
 %% Make kmz
+disp('Creating KMZ file...');
+tic
  makeKMZanot(class_data, iconStr, iconSize, ...
                           classText, dateTimeFormat, dirName, fileName);
+disp('Done.');                                
+toc
+
+disp('Total elapsed time: ');
+etime(clock, t)
