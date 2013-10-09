@@ -60,6 +60,7 @@ end
 t=clock;
 disp('Retrieving data from the DB...');
 tic
+% TODO pass dbName, databaseHost so script can be used against other databases
 [tracks] = getDataFromEecologyDB(dbUsername, dbPassword,...
                                eco_queries, query_id,...
                                TrackerIdentifier, startTime, stopTime);
@@ -101,6 +102,10 @@ makeKMZanot(class_data, iconStr, iconSize, ...
                           classText, dateTimeFormat, dirName, fileName);
 disp('Done.');
 toc
+
+disp('Cleaning up...');
+% TODO remove intermediate results
+disp('Done.');
 
 disp('Total elapsed time: ');
 etime(clock, t)
