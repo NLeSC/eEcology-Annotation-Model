@@ -13,12 +13,12 @@
 %
 % INPUT
 % username, password- the string credentials for logging to the eEcology DB
-% querystorefname- filename where common queries are stored as parametreised 
+% querystorefname- filename where common queries are stored as parametreised
 %                  strings (currenlty it's in ../data/eecologyqueries.mat)
 % queryid- a query idenifier- variable name under which the query was
 %          stored in the querystorefname
 % device - device ID for which the data are to be  retrieved
-% starttime and stoptime- define the time strip of interest. 
+% starttime and stoptime- define the time strip of interest.
 %                         Strings of format 'yyy-mm-dd hh:mm:ss'
 %
 % OUPTPUT
@@ -40,31 +40,18 @@ function [data] = getDataFromEecologyDB(username, password, ...
                                         device, starttime, stoptime)
 
 %% Paramters
-IDevice = num2str(device);    
-start = strcat('''',starttime,''''); 
+IDevice = num2str(device);
+start = strcat('''',starttime,'''');
 stop = strcat('''',stoptime,'''');
 load(querystorefname, queryid);
 
- %% Connect to the DB using jdbc
- connection = database('eecology', username, password,...
-                       'org.postgresql.Driver', ...
-           'jdbc:postgresql://db.e-ecology.sara.nl:5432/eecology?ssl=true');  
- % set db preferences    
- setdbprefs('DataReturnFormat','structure');    
-    
-%% Generate/load query  
+%% Generate/load query
 sql_query = sprintf(eval(queryid), IDevice, start, stop, IDevice, start, stop);
-  
-%% Execute the query  
-cursor = exec(connection,sql_query);
 
-% this fetch command actually transfers the data from database table to matlab
-cursor = fetch(cursor);
-
-%% Get the data from the cursor
-data = cursor.Data;
-%cursor.message;
-
-%% Close the database connection
-close(connection); 
+% Find jdbc driver
+pg_settings()
+% Connect
+connection = pg_connectdb('eecology?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory', 'host', 'db.e-ecology.sara.nl', 'user', username, 'pass', password, 'database_toolbox', 0)
+% Run query
+data = pg_fetch_struct(connection, sql_query)
 
