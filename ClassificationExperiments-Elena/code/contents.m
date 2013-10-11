@@ -31,6 +31,8 @@
 % makeKMZanot - function to generate KMZ files with anotations
 %
 % writeAccPNG - generates KMZ file from anotated accelerometer data
+%
+% dtc_e - the PRTools dtc- decision tree classifier with small enhanecement
 %--------------------------------------------------------------------------
 %% SCRIPTS (in /scripts directory)
 %--------------------------------------------------------------------------
