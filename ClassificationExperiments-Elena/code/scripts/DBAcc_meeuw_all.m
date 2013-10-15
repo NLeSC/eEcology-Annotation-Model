@@ -12,8 +12,10 @@ load(classifiers_fname)
 eco_queries =  fullfile(data_path,'eecologyqueries.mat'); 
 query_id = 'sql_gps_acc';
 
-username = '';  % put your user name and password here. 
-password = '';
+% prompt the user for username and password
+disp('Login credentials for access to eEcologyDB are needed.');
+username = input('Please, enter your user name: ','s');  
+password = input('Please, enter your password: ','s');
 
 % IDevice = [320];
 % starttime = '2010-06-08 02:09:36';
@@ -22,6 +24,7 @@ password = '';
 IDevice = [325];
 starttime = '2010-06-09 00:13:48';
 stoptime  = '2010-06-09 11:01:05';
+
 num_meas = 60;
 num_features= 58;
 num_classes= 7;
