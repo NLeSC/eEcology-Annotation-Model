@@ -10,7 +10,7 @@
 %                classText, dateTimeFormat, dirName, fileName)
 %
 % INPUT
-% inp_data- anotated data as output by the classification 
+% inp_data- anotated data as output by the classification
 % iconStr- string with value the location of the icon to be used
 % iconSize- the size of the icon
 % classText- the classification legend string
@@ -22,7 +22,7 @@
 %
 % EXAMPLE
 % see DBAcc_Texel_New.m
-% 
+%
 % SEE ALSO
 % DBAcc_Texel_New.m, MakeKMZanot.m (legacy)
 % writeAccPNG.m
@@ -55,13 +55,13 @@ Lat = inp_data.lat;
 Alt = inp_data.alt;
 
 %Set colour table
-stand= 'ff0000ff'; 
-flap= 'ff00ffff'; 
-soar= 'ff9900ff'; 
-walk= 'ffccccff'; 
-sit= 'ff00ff00'; 
-Xfl= 'ffffff00'; 
-float= 'ffff0000';  
+stand= 'ff0000ff';
+flap= 'ff00ffff';
+soar= 'ff9900ff';
+walk= 'ffccccff';
+sit= 'ff00ff00';
+Xfl= 'ffffff00';
+float= 'ffff0000';
 NoCl= '83000000';
 
 %%%Set time
@@ -69,7 +69,7 @@ numTime = datenum(Year,Month,Day,Hour,Min,Sec);
 time=datenum(Year,Month,Day,Hour,Min,Sec)-735235;
 
 Ix = find(Year<1900|Year>2015);
-numTime(Ix)=NaN; 
+numTime(Ix)=NaN;
 clear Ix;
 
 kmlStr = [kmlStr,ge_plot(Long,...
@@ -109,7 +109,7 @@ for j=2:length(Long)-1
         clear tStop
         continue
     end
-                 
+
     switch Class(j)
         case 1
             behaviorclass= stand;
@@ -139,14 +139,14 @@ for j=2:length(Long)-1
                  'T-P Speed [m/s]',[num2str(TSpd(j)) '  ' num2str(ISpd(j))];...
                  'Class', classText(5*(Class(j)-1)+1:5*(Class(j)-1)+5);...
                  'record index',num2str(j)};
-                
+
         bgColor = {'#D0D0D0';'#F0F0F0'};
         htmlStr = ['<TABLE border="0px">',char(10)];
         clear pngFileName
         if isnan(Class(j))==0
-            pngFileName = [dirName '/accelero',num2str(j,'%04d'),'B  .png'];
-
-            htmlStr = [htmlStr,'<TR><TD colspan="2"><img src="',pngFileName,'"></TD></TR>',char(10)];                
+            pngFileName = [dirName '/accelero',num2str(j,'%04d'),'B.png'];
+            writeAccPNG(pngFileName, inp_data, j, classText);
+            htmlStr = [htmlStr,'<TR><TD colspan="2"><img src="',pngFileName,'"></TD></TR>',char(10)];
 
         end
         for iRow = 1:size(extraData,1)
@@ -188,4 +188,11 @@ end;
 
 % Save
 kml_all = [ge_folder('points', kmlStr)];
-ge_output(fileName,kml_all);
+% Create kml
+newfilename = fileName(1:(end-4));
+newfilename = strcat(fileName,'.kml');
+ge_output(newfilename,kml_all);
+% Create kmz = kml + dir with pngs
+zip(fileName, {newfilename, dirName});
+
+

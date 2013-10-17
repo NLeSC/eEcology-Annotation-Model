@@ -35,7 +35,7 @@
 % [formatted_tracks] = formatDataStructure(tracks);
 % load ../data/classifiers.mat
 % [out_data, FTVstor, INFO]=classifyAccMeas(formatted_tracks, 40,  classifiers, 58, 7, 20, 10, 0.3);
-% 
+%
 % SEE ALSO
 % calcFeatureVectors.m, hierarchClass.m, formatDataStructrure.m,
 % prepareData4FeatExtraction.m
@@ -54,7 +54,7 @@ function [out_data, FTVstor, INFO] = classifyAccMeas(inp_data, num_meas, ...
                                                       num_features, num_classes, ...
                                                        windowSize, overlap, epsilon)
 % initializations
-out_data =[]; 
+out_data =[];
 FTVstor =[];
 FTV = []; INFO =[];
 
@@ -66,7 +66,7 @@ number = num_meas - 1;
 j = 0;
 
 for i = 2:len_long - 1
-   
+
     % check for availability of 1 second of accelerometer measurements
     if (~isnan(inp_data.index(i))==1) && ((i+number) < len_ind)
         % assignmens in all cases
@@ -74,7 +74,7 @@ for i = 2:len_long - 1
                  (sum(isnan(inp_data.x(i:i+number)))+...
                  sum(isnan(inp_data.y(i:i+number)))+...
                  sum(isnan(inp_data.z(i:i+number)))<1)
-            j= j+1; 
+            j= j+1;
 
             data = prepareData4FeatExtraction(inp_data, i, number);
 
@@ -87,46 +87,46 @@ for i = 2:len_long - 1
                                 inp_data.z(i:i+number)' ];
             out_data.predictions(j)=dum(1);
             out_data.class(j)=out_data.predictions(j);
-            out_data = copyDeviceAndTimeData(inp_data, out_data, i, j);           
-            
+            out_data = copyDeviceAndTimeData(inp_data, out_data, i, j);
+
             FTVstor=[FTVstor; FTV(1,:) ...
              out_data.class(j) ...
              out_data.lat(j) out_data.long(j) ...
              out_data.time(j) j ...
              out_data.ispd(j) out_data.tspd(j)];
-           
+
         elseif inp_data.index(i)==0
             j = j+1;
-        
+
             out_data.class(j)=num_classes + 1;
             out_data.predictions(j)=num_classes + 1;
             out_data.data(j,:)=zeros(1,3*num_meas);
             FTV(1,1:num_features)=NaN;
             out_data = copyDeviceAndTimeData(inp_data, out_data, i, j);
-            
+
             FTVstor=[FTVstor; FTV(1,:) ...
              out_data.class(j) ...
              out_data.lat(j) out_data.long(j) ...
              out_data.time(j) j ...
-             out_data.ispd(j) out_data.tspd(j)];            
-           
+             out_data.ispd(j) out_data.tspd(j)];
+
         end
     else
         j =j+1;
-        
+
         out_data.class(j)=num_classes + 1;
         out_data.predictions(j)=num_classes + 1;
         out_data.data(j,:)=zeros(1,3*num_meas);
         FTV(1,1:num_features)=NaN;
         out_data = copyDeviceAndTimeData(inp_data, out_data, i, j);
-        
+
         FTVstor=[FTVstor; FTV(1,:) ...
          out_data.class(j) ...
          out_data.lat(j) out_data.long(j) ...
          out_data.time(j) j ...
-         out_data.ispd(j) out_data.tspd(j)];     
-    end   
- 
+         out_data.ispd(j) out_data.tspd(j)];
+    end
+
 end
 
 function out_data = copyDeviceAndTimeData(inp_data, out_data, i, j)
@@ -139,13 +139,13 @@ function out_data = copyDeviceAndTimeData(inp_data, out_data, i, j)
         out_data.long(j)=inp_data.long(i);
         out_data.lat(j)=inp_data.lat(i);
         out_data.alt(j)=inp_data.alt(i);
-        out_data.year(j)=inp_data.year(i); 
-        out_data.month(j)=inp_data.month(i); 
-        out_data.day(j)=inp_data.day(i); 
-        out_data.hour(j)=inp_data.hour(i); 
-        out_data.min(j)=inp_data.minute(i); 
+        out_data.year(j)=inp_data.year(i);
+        out_data.month(j)=inp_data.month(i);
+        out_data.day(j)=inp_data.day(i);
+        out_data.hour(j)=inp_data.hour(i);
+        out_data.min(j)=inp_data.minute(i);
         out_data.sec(j)=inp_data.second(i);
         out_data.time(j)=datenum(out_data.year(j),out_data.month(j),...
                                  out_data.day(j),out_data.hour(j),...
                                  out_data.min(j),out_data.sec(j))-735235;
-                                           
+

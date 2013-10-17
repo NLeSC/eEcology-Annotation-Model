@@ -21,7 +21,7 @@
 %                                754, '2013-06-08 06:20:00', ...
 %                                '2013-06-08 07:20:00');
 % [formatted_tracks] = formatDataStructure(tracks);
-% 
+%
 % SEE ALSO
 % getDataFromEecologyDB.m
 % DBAcc_Texel/FEBO.m scripts from W. Bouten (legacy)
@@ -30,23 +30,15 @@
 
 function [formatted_data] = formatDataStructure(input_data)
 
-% format or copy each the field of the structure
-    formatted_data.device=input_data.device_info_serial;
-    formatted_data.datetime=datenum(input_data.date_time);
-    formatted_data.index=input_data.index;
-    formatted_data.year=input_data.year;
-    formatted_data.month=input_data.month;
-    formatted_data.day=input_data.day;
-    formatted_data.hour=input_data.hour;
-    formatted_data.minute=input_data.minute;
-    formatted_data.second=input_data.second;
-    formatted_data.long=input_data.longitude;
-    formatted_data.lat=input_data.latitude;
-    formatted_data.alt=input_data.altitude;
-    formatted_data.x=input_data.x_cal;
-    formatted_data.y=input_data.y_cal;
-    formatted_data.z=input_data.z_cal;
-    formatted_data.ispd=input_data.speed;
-    formatted_data.tspd=input_data.tspeed;
+    % format or copy each the field of the structure
+    formatted_data=input_data;
+    formatted_data.datetime=input_data.date_time;
+    datavecs = datevec(formatted_data.datetime);
+    formatted_data.year=datavecs(:,1);
+    formatted_data.month=datavecs(:,2);
+    formatted_data.day=datavecs(:,3);
+    formatted_data.hour=datavecs(:,4);
+    formatted_data.minute=datavecs(:,5);
+    formatted_data.second=datavecs(:,6);
 
 

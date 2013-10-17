@@ -15,11 +15,11 @@
 % classText - classification legend
 %
 % OUPTPUT
-% 
+%
 %
 % EXAMPLE
 % seeDBAcc_Texel_New.m
-% 
+%
 % SEE ALSO
 % DBAcc_Texel_New.m, MakeKMZanot.m (legacy)
 %
@@ -34,6 +34,7 @@ function writeAccPNG(pngFileName, inp_data, index, classText)
 
 DataRec =inp_data.data(index,:);
 Month = inp_data.month;
+Day = inp_data.day;
 Hour = inp_data.hour;
 Min = inp_data.min;
 Sec = inp_data.sec;
@@ -42,7 +43,7 @@ TSpd = inp_data.tspd;
 Class = inp_data.class;
 
 
-scrsz = get(0,'ScreenSize');
+scrsz = [0, 0, 320, 200];
 L=length(DataRec);L=3*floor(L/3);
 X=DataRec(1:L/3); Y=DataRec(L/3+1:2*L/3); Z=DataRec(2*L/3+1:L);
 L=length(Z);
@@ -71,7 +72,7 @@ plot((1:length(Y))*0.05,Y, 'bo-','LineWidth',2,  'MarkerSize',8)
 plot((1:length(Z))*0.05,Z, 'go-','LineWidth',2,  'MarkerSize',8)
 title(['D',dstr,', T', hstr,':',mstr,':',sstr, ', R',num2str(index),', TSp',num2str(TSpd(index)), ...
      ' ISp',num2str(ISpd(index)), ' m/s, Class=', classText(5*(Class(index)-1)+1:5*(Class(index)-1)+5)],'fontsize',16);
-xlabel('time (sec)','fontsize',16); 
+xlabel('time (sec)','fontsize',16);
 
 drawnow
 print ('-dpng', pngFileName,'-r72')

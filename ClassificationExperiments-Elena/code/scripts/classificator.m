@@ -12,17 +12,17 @@ function classificator(dbUsername, dbPassword, dbName, databaseHost, TrackerIden
 % data_path is string of a directory where classifiers.mat and eecologyqueries.mat reside
 %
 % Command to compile:
-% mcc -mv -R -nodisplay -I openearth/io/postgresql -I openearth -I openearth/general -I openearth/general/io_fun -I code code/scripts/classificator.m
+% mcc -mv -R -nodisplay -I googlearth -I openearth/io/postgresql -I openearth -I openearth/general -I openearth/general/io_fun -I code code/scripts/classificator.m
 %
 % Usage:
 % ./run_classificator.sh /opt/matlab2009b '****' '****' eecology db.e-ecology.sara.nl 800 2010-07-01T00:00:00 2010-09-01T00:00:00 /data/classifiers
 
-results_path = '.';
+TrackerIdentifier = str2double(TrackerIdentifier);
 
-classifiers_fname = fullfile(data_path,'classifiers.mat')
-load(classifiers_fname)
-eco_queries =  fullfile(data_path,'eecologyqueries.mat');
-query_id = 'sql_gps_acc';
+results_path = './';
+
+classifiers_fname = fullfile(data_path,'classifiers.mat');
+load(classifiers_fname);
 
 num_meas = 60;
 num_features= 58;
@@ -51,7 +51,7 @@ DCubeName= [fullfile(results_path,'Datacube') IDdate];
 % name annotation file
 AnotName= [fullfile(results_path,'Anot') IDdate];
 % create png directory
-dirName=[results_path IDdate 'png'];
+dirName=[results_path IDdate '.png'];
 if ~exist(dirName,'dir')
     mkdir(dirName);
 end
@@ -62,10 +62,10 @@ disp('Retrieving data from the DB...');
 tic
 % TODO pass dbName, databaseHost so script can be used against other databases
 [tracks] = getDataFromEecologyDB(dbUsername, dbPassword,...
-                               eco_queries, query_id,...
-                               TrackerIdentifier, startTime, stopTime);
+                                 TrackerIdentifier, startTime, stopTime);
 disp('Done.');
 toc
+
 %% format the data
 disp('Formatting the data...');
 tic
