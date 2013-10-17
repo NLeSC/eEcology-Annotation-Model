@@ -33,6 +33,8 @@
 % writeAccPNG - generates KMZ file from anotated accelerometer data
 %
 % dtc_e - the PRTools dtc- decision tree classifier with small enhanecement
+% tree_mapc_e - the PRTools tree_map- map a dataset by binary decision tree 
+%               with small enhanecement
 %--------------------------------------------------------------------------
 %% SCRIPTS (in /scripts directory)
 %--------------------------------------------------------------------------
