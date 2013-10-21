@@ -19,7 +19,7 @@ function classificator(dbUsername, dbPassword, dbName, databaseHost, TrackerIden
 
 TrackerIdentifier = str2double(TrackerIdentifier);
 
-results_path = './';
+results_path = '';
 
 classifiers_fname = fullfile(data_path,'classifiers.mat');
 load(classifiers_fname);
@@ -104,7 +104,8 @@ disp('Done.');
 toc
 
 disp('Cleaning up...');
-% TODO remove intermediate results
+delete(strcat(AnotName, '.mat'));
+delete(strcat(DCubeName, '.mat'));
 disp('Done.');
 
 disp('Total elapsed time: ');

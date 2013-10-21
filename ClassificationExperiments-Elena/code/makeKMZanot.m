@@ -194,5 +194,7 @@ newfilename = strcat(fileName,'.kml');
 ge_output(newfilename,kml_all);
 % Create kmz = kml + dir with pngs
 zip(fileName, {newfilename, dirName});
-
-
+% Clean up
+movefile(strcat(fileName, '.zip'), fileName);
+delete(newfilename);
+rmdir(dirName, 's');
