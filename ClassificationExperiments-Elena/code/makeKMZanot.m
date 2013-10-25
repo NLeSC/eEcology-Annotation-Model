@@ -40,6 +40,11 @@ function []= makeKMZanot(inp_data, iconStr, iconSize, ...
 kmlStr ='';
 behaviorclass=0;
 
+% create png directory
+if ~exist(dirName,'dir')
+    mkdir(dirName);
+end
+
 Year = inp_data.year;
 Month = inp_data.month;
 Day = inp_data.day;

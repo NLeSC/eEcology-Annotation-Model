@@ -52,10 +52,6 @@ DCubeName= [fullfile(results_path,'Datacube') IDdate];
 AnotName= [fullfile(results_path,'Anot') IDdate];
 % create png directory
 dirName=[results_path IDdate '.png'];
-if ~exist(dirName,'dir')
-    mkdir(dirName);
-end
-
 %% get the data from the DB
 t=clock;
 disp('Retrieving data from the DB...');
@@ -97,6 +93,7 @@ toc
 
 %% Make kmz
 disp('Creating KMZ file...');
+
 tic
 makeKMZanot(class_data, iconStr, iconSize, ...
                           classText, dateTimeFormat, dirName, fileName);
