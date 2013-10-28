@@ -38,6 +38,7 @@ IDdate=[num2str(TrackerIdentifier) '_' startTime(1:4) startTime(6:7) startTime(9
     '_' stopTime(12:13) stopTime(15:16) stopTime(18:19)];
 
 fileName=[fullfile(results_path, 'S') IDdate '.kmz'];
+fileCSVName=[fullfile(results_path, 'S') IDdate '.csv'];
 iconStr = ['http://maps.google.com/','mapfiles/kml/pal2/icon26.png'];
 iconSize = 0.4;
 classText='stand flap soar walk sit XFl  float NoCl';
@@ -96,9 +97,17 @@ disp('Creating KMZ file...');
 
 tic
 makeKMZanot(class_data, iconStr, iconSize, ...
-                          classText, dateTimeFormat, dirName, fileName);
+            classText, dateTimeFormat, dirName, fileName);
 disp('Done.');
 toc
+
+disp('Creating CSV file...');
+tic
+makeCSVanot(class_data, ...
+            classText, dateTimeFormat,  fileCSVName);
+disp('Done.');
+toc
+
 
 disp('Cleaning up...');
 delete(strcat(AnotName, '.mat'));
