@@ -40,7 +40,7 @@ sql_query_tpl = [
 if limited
     sql_query_tpl = [
         'SELECT \n',...
-        'max(index)+1 \n',...
+        'max(index)+1 AS num_meas\n',...
         'FROM gps.uva_acceleration_limited\n',...
         'WHERE device_info_serial = %d \n',...
         'AND date_time BETWEEN ''%s'' AND ''%s'' \n'
@@ -48,9 +48,11 @@ if limited
 end
 
 %% Generate/load query
-sql_query = sprintf(sql_query_tpl, device, starttime, stoptime, device, starttime, stoptime);
+sql_query = sprintf(sql_query_tpl, device, starttime, stoptime);
 
 % Run query
 data = pg_fetch_struct(connection, sql_query);
+
+num_meas = data.num_meas(1)
 
 

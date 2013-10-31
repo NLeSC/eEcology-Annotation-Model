@@ -22,7 +22,7 @@ function connection = connectEecologyDB(username, password)
 
 % TODO make dbname, dbhost optional function arguments
 dbname = 'eecology?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory';
-dbhost = 'db.e-ecology.sara.nl'
+dbhost = 'db.e-ecology.sara.nl';
 
 % Find jdbc driver
 pg_settings();
