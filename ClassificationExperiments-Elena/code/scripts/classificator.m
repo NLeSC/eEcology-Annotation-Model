@@ -24,7 +24,7 @@ results_path = '';
 classifiers_fname = fullfile(data_path,'classifiers.mat');
 load(classifiers_fname);
 
-num_meas = 60;
+num_meas = 40;
 num_features= 58;
 num_classes= 7;
 windowSize=20;
