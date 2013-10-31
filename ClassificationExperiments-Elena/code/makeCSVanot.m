@@ -39,6 +39,6 @@ dateTimes = datestr(inp_data.datetime, dateTimeFormat);
 fid = fopen(fileName, 'wt');
 fprintf(fid, 'id,datetime,class\n');
 for row=1:nrows
-    fprintf(fid, '%d,%s,%s\n', inp_data.device(row), dateTimes(row), classText(5*(inp_data.class(row)-1)+1:5*(inp_data.class(row)-1)+5));
+    fprintf(fid, '%d,%s,%s\n', inp_data.device(row), dateTimes(row,:), classText(5*(inp_data.class(row)-1)+1:5*(inp_data.class(row)-1)+5));
 end
 fclose(fid);
