@@ -24,7 +24,10 @@ results_path = '';
 classifiers_fname = fullfile(data_path,'classifiers.mat');
 load(classifiers_fname);
 
-num_meas = 40;
+connection = connectEecologyDB(dbUsername, dbPassword);
+num_meas = getAccelerometerSize(connection, ...
+                                device, starttime, stoptime,...
+                                true);
 num_features= 58;
 num_classes= 7;
 windowSize=20;
@@ -58,8 +61,9 @@ t=clock;
 disp('Retrieving data from the DB...');
 tic
 % TODO pass dbName, databaseHost so script can be used against other databases
-[tracks] = getDataFromEecologyDB(dbUsername, dbPassword,...
-                                 TrackerIdentifier, startTime, stopTime);
+[tracks] = getDataFromEecologyDB(connection,...
+                                 TrackerIdentifier, startTime, stopTime,...
+                                 true);
 disp('Done.');
 toc
 
