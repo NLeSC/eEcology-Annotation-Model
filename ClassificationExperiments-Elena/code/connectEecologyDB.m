@@ -27,4 +27,4 @@ dbhost = 'db.e-ecology.sara.nl';
 % Find jdbc driver
 pg_settings();
 % Connect
-connection = pg_connectdb(dbname, 'host', dbhost, 'user', username, 'pass', password, 'database_toolbox', 0);
+connection = pg_connectdb(dbname, 'host', dbhost, 'user', username, 'pass', password, 'database_toolbox', 1);

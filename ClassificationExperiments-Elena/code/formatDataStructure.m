@@ -32,7 +32,7 @@ function [formatted_data] = formatDataStructure(input_data)
 
     % format or copy each the field of the structure
     formatted_data=input_data;
-    formatted_data.datetime=input_data.date_time;
+    formatted_data.datetime=datenum(input_data.date_time);    
     datavecs = datevec(formatted_data.datetime);
     formatted_data.year=datavecs(:,1);
     formatted_data.month=datavecs(:,2);
