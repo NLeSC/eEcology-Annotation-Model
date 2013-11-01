@@ -53,6 +53,4 @@ sql_query = sprintf(sql_query_tpl, device, starttime, stoptime);
 % Run query
 data = pg_fetch_struct(connection, sql_query);
 
-num_meas = data.num_meas(1)
-
-
+num_meas = data.num_meas(1);
