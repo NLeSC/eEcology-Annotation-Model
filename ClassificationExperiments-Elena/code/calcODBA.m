@@ -9,7 +9,7 @@
 % [ODBA]=calcODBA(M,w)
 %
 % INPUT
-% M- 2-D matrix with accelerometer data (frames are rows)
+% M- 3-D matrix with accelerometer data (frames are rows)
 % w- window size
 %
 % OUPTPUT

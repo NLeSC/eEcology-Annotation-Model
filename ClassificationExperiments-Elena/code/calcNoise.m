@@ -9,7 +9,7 @@
 % [noise]=calNoise(M)
 %
 % INPUT
-% M- 2-D matrix with accelerometer data (frames are rows)
+% M- 3-D matrix with accelerometer data (frames are rows)
 %
 % OUPTPUT
 % noise- measure forthe noise in the signal
