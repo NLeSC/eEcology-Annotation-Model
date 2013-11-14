@@ -6,6 +6,7 @@
 %
 % INPUT
 % username, password- the string credentials for logging to the eEcology DB
+% dbhost - Hostname of database
 %
 % OUPTPUT
 % connection - Database connection object
@@ -18,13 +19,13 @@
 %
 % REFERENCES
 
-function connection = connectEecologyDB(username, password)
+function connection = connectEecologyDB(dbhost, username, password)
 
 % TODO make dbname, dbhost optional function arguments
 dbname = 'eecology?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory';
-dbhost = 'db.e-ecology.sara.nl';
+% dbhost = 'db.e-ecology.sara.nl';
 
 % Find jdbc driver
 pg_settings();
 % Connect
-connection = pg_connectdb(dbname, 'host', dbhost, 'user', username, 'pass', password, 'database_toolbox', 0);
+connection = pg_connectdb(dbname, 'host', dbhost, 'user', username, 'pass', password);

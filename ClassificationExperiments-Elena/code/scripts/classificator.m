@@ -24,7 +24,7 @@ results_path = '';
 classifiers_fname = fullfile(data_path,'classifiers.mat');
 load(classifiers_fname);
 
-connection = connectEecologyDB(dbUsername, dbPassword);
+connection = connectEecologyDB(databaseHost, dbUsername, dbPassword);
 num_meas = getAccelerometerSize(connection, ...
                                 TrackerIdentifier, startTime, stopTime,...
                                 true);
