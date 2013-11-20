@@ -17,6 +17,7 @@
 % dateTimeFormat- the format for the date and time to be displayed
 % dirName- the directory name to save the PNG files
 % fileName - the filename of the kmz file
+% plotAccel - boolean whether or not to create accelerometer plots
 %
 % OUPTPUT
 %
@@ -34,7 +35,7 @@
 % extra notes
 
 function []= makeKMZanot(inp_data, iconStr, iconSize, ...
-                         classText, dateTimeFormat, dirName, fileName)
+                         classText, dateTimeFormat, dirName, fileName, plotAccel)
 
 % initializations
 kmlStr ='';
@@ -148,7 +149,7 @@ for j=2:length(Long)-1
         bgColor = {'#D0D0D0';'#F0F0F0'};
         htmlStr = ['<TABLE border="0px">',char(10)];
         clear pngFileName
-        if isnan(Class(j))==0
+        if plotAcc && isnan(Class(j))==0
             pngFileName = [dirName '/accelero',num2str(j,'%04d'),'B.png'];
             writeAccPNG(pngFileName, inp_data, j, classText);
             htmlStr = [htmlStr,'<TR><TD colspan="2"><img src="',pngFileName,'"></TD></TR>',char(10)];

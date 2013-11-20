@@ -1,4 +1,4 @@
-function classificator(dbUsername, dbPassword, dbName, databaseHost, TrackerIdentifier, startTime, stopTime, data_path)
+function classificator(dbUsername, dbPassword, dbName, databaseHost, TrackerIdentifier, startTime, stopTime, data_path, plotAccel)
 % classification and vizualization of a track for adding to script wrapper
 %
 % INPUT
@@ -10,14 +10,16 @@ function classificator(dbUsername, dbPassword, dbName, databaseHost, TrackerIden
 % startTime is a string in ISO8601 time format, eg. '2013-07-01T00:00:00'
 % stopTime is a string in ISO8601 time format, eg. '2013-07-01T00:00:00'
 % data_path is string of a directory where classifiers.mat and eecologyqueries.mat reside
+% plotAccel is string 'true' or 'false' whether or not to create accelerometer plots
 %
 % Command to compile:
 % mcc -mv -R -nodisplay -I googlearth -I openearth/io/postgresql -I openearth -I openearth/general -I openearth/general/io_fun -I code code/scripts/classificator.m
 %
 % Usage:
-% ./run_classificator.sh /opt/matlab2009b '****' '****' eecology db.e-ecology.sara.nl 800 2010-07-01T00:00:00 2010-09-01T00:00:00 /data/classifiers
+% ./run_classificator.sh /opt/matlab2009b '****' '****' eecology db.e-ecology.sara.nl 800 2010-07-01T00:00:00 2010-09-01T00:00:00 /data/classifiers true
 
 TrackerIdentifier = str2double(TrackerIdentifier);
+plotAccel = eval(plotAccel);
 
 results_path = '';
 
@@ -101,7 +103,7 @@ disp('Creating KMZ file...');
 
 tic
 makeKMZanot(class_data, iconStr, iconSize, ...
-            classText, dateTimeFormat, dirName, fileName);
+            classText, dateTimeFormat, dirName, fileName, plotAccel);
 disp('Done.');
 toc
 
