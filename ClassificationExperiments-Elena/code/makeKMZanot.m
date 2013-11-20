@@ -149,7 +149,7 @@ for j=2:length(Long)-1
         bgColor = {'#D0D0D0';'#F0F0F0'};
         htmlStr = ['<TABLE border="0px">',char(10)];
         clear pngFileName
-        if plotAcc && isnan(Class(j))==0
+        if plotAccel && isnan(Class(j))==0
             pngFileName = [dirName '/accelero',num2str(j,'%04d'),'B.png'];
             writeAccPNG(pngFileName, inp_data, j, classText);
             htmlStr = [htmlStr,'<TR><TD colspan="2"><img src="',pngFileName,'"></TD></TR>',char(10)];
