@@ -3,25 +3,26 @@
 %labvec is a vector containing the desired labels in the dataset. an empty
 %vector means that all labels will be included to the dataset.
 
-function prepareData(dataStructs,frac,labvec)
+function prepareData(dataStruct,frac,labvec)
 
-assignin('base', 'files', dataStructs);
+%assignin('base', 'files', dataStructs);
 data = [];
 dataInfo = [];
 windowingMode = 'd';
 ws=20;
 olap = 0;
 
-for j = 1:length(dataStructs)
+%for j = 1:length(dataStructs)
     
-    dataStruct = char(dataStructs(j));
-    [~,fname,~] = fileparts(dataStruct);
+    %dataStruct = char(dataStructs(j));
+    %[~,fname,~] = fileparts(dataStruct);
     
     %retrieve all labelled data from the input
     alldata = getLabsFromStruct(dataStruct);
 
     %group by label
-    allLabels = groupD2Label(alldata,8,j);
+    %allLabels = groupD2Label(alldata,8,j);
+    allLabels = groupD2Label(alldata,8);
 
     %only add the selected labels to the dataset.
     if isempty(labvec)
@@ -37,22 +38,26 @@ for j = 1:length(dataStructs)
         
         thisLab = labels(i);
         
-        labDat = evalin('base', strcat('f',num2str(j),'_label_',num2str(thisLab)));
+        %labDat = evalin('base', strcat('f',num2str(j),'_label_',num2str(thisLab)));
+        labDat = evalin('base', strcat('label_',num2str(thisLab)));
 
         [ft, info] = makeFeaturesNSpd(labDat, ws, olap,0,8, 'norm', windowingMode);
 
         data = [data;ft];
         dataInfo = [dataInfo;info];
         
-        assignin('base', strcat('f',num2str(j),'_fts_', num2str(labels(i))), ft);
-        assignin('base', strcat('f',num2str(j),'_inf_', num2str(labels(i))), info);
+        %assignin('base', strcat('f',num2str(j),'_fts_', num2str(labels(i))), ft);
+        %assignin('base', strcat('f',num2str(j),'_inf_', num2str(labels(i))), info);
+        
+        assignin('base', strcat('_fts_', num2str(labels(i))), ft);
+        assignin('base', strcat('_inf_', num2str(labels(i))), info)        
        
     end   
 
-end
+%end
 
 [train,test,permutation] = splitset(data,frac);
-metadata = struct('data',{datestr(today)},'author', {'merijn'},...
+metadata = struct('data',{datestr(today)},'author', {'Elena'},...
     'files',{dataStructs},'mode',{windowingMode}, 'wSize', {ws}, 'step', {olap},...
     'filter',{''},'ftSet',{''});
 

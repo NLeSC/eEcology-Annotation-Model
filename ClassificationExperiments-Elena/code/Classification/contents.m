@@ -13,14 +13,6 @@
 % formatDataStructure - formatting the data retrieved from the EcologyDB
 % prepareData4FeatExtraction - preparation of data for feature extraction
 %
-% calcFeatureVectors - feature vectors computaion for classifiers
-% calcPosition - calculates function position features
-% calcCorrelation - calculates correlation features
-% calcMotionlessness - calculates motionlessness features
-% calcFrequency - calculates frequency spectral features
-% calcNoise - calculates the noise content feature
-% calcODBA - calculates the Overall Dynamic Body Acceleration feature
-%
 % applyModel - classification of feature data according to a given model
 % hierarchClass - hierarchical classification
 %

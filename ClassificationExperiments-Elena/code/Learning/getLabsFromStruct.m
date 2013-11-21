@@ -1,10 +1,10 @@
  %Merijn de Bakker || merijn.debakker@gmail.com
 
-function alldata = getLabsFromStruct(file)
+function alldata = getLabsFromStruct(str)
 
-lf = load(file);
-sn = fieldnames(lf);
-str = lf.(sn{1});
+% lf = load(file);
+% sn = fieldnames(lf);
+% str = lf.(sn{1});
 
 %make alldata
 alldata = [];
@@ -25,7 +25,8 @@ for i = 1:str.nOfSamples
     id(1:maxN,1) = str.sampleID(i);
     da(1:maxN,1) = d;
        
-    sp(1:maxN,1) = str.gpsSpd2D(i);
+    %sp(1:maxN,1) = str.gpsSpd2D(i);
+    sp(1:maxN,1) = str.gpsSpd(i);
     index1 = 0:maxN-1;
  
     alldata = [alldata; id da index1' str.accX{i}' str.accY{i}' str.accZ{i}' sp str.tags{i}];

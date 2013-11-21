@@ -12,7 +12,8 @@
 %NOTES: the label should be at the 7th column.
 
 
-function labels = groupD2Label(data, label,j)
+%function labels = groupD2Label(data, label,j)
+function labels = groupD2Label(data, label)
 
     
     fmat = [];
@@ -31,7 +32,8 @@ function labels = groupD2Label(data, label,j)
         %[r,~] = find(isnan(labelMat(:,4:6)));
         %labelMat(r,4:6)=0;
             
-        assignin('base',strcat('f',num2str(j),'_label_',num2str(labels(i))), labelMat);
+        %assignin('base',strcat('f',num2str(j),'_label_',num2str(labels(i))), labelMat);
+        assignin('base',strcat('label_',num2str(labels(i))), labelMat);
     end
     
 %     if size(varargin,2)==2
