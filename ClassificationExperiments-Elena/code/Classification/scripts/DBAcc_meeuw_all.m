@@ -3,12 +3,13 @@
 %% initializations
 clear all,close all, clc
 
+databaseHost = 'db.e-ecology.sara.nl';
 project_path = fullfile('/','home','elena','LifeWatch','eEcology-Annotation-Model','ClassificationExperiments-Elena');
-data_path = fullfile(project_path,'data')
-results_path = fullfile(project_path,'results')
+data_path = fullfile(project_path,'data');
+results_path = fullfile(project_path,'results');
 
-classifiers_fname = fullfile(data_path,'classifiers.mat')
-load(classifiers_fname)
+classifiers_fname = fullfile(data_path,'classifiers.mat');
+load(classifiers_fname);
 eco_queries =  fullfile(data_path,'eecologyqueries.mat'); 
 query_id = 'sql_gps_acc';
 
@@ -25,7 +26,7 @@ IDevice = [325];
 starttime = '2010-06-09 00:13:48';
 stoptime  = '2010-06-09 11:01:05';
 
-num_meas = 60;
+%num_meas = 60;
 num_features= 58;
 num_classes= 7;
 windowSize=20;
@@ -41,8 +42,18 @@ StorName=[fullfile(results_path,'Stor') IDdate '.mat'];
 DCubeName= [fullfile(results_path,'Datacube') IDdate];
 
 %% get the data from the DB
-[tracks] = getDataFromEecologyDB(username, password,...
-                              eco_queries, 'sql_gps_acc', IDevice, starttime, stoptime)
+% [tracks] = getDataFromEecologyDB(username, password,...
+%                               eco_queries, query_id, IDevice, starttime, stoptime)
+connection = connectEecologyDB(databaseHost, username, password);
+[tracks] = getAccelerometerData(connection,...
+                                 IDevice, starttime, stoptime,...
+                                 false);
+
+num_meas = getAccelerometerSize(connection, ...
+                                IDevice, starttime, stoptime,...
+                                false);
+
+
 %% format the data
 [formatted_tracks] = formatDataStructure(tracks);
 

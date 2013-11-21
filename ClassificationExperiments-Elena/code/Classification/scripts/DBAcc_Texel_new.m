@@ -3,11 +3,12 @@
 %% initializations
 clear all,close all, clc
 
+databaseHost = 'db.e-ecology.sara.nl';
 project_path = fullfile('/','home','elena','LifeWatch','eEcology-Annotation-Model','ClassificationExperiments-Elena');
 data_path = fullfile(project_path,'data');
 results_path = fullfile(project_path,'results');
 
-classifiers_fname = fullfile(data_path,'classifiers.mat')
+classifiers_fname = fullfile(data_path,'classifiers.mat');
 load(classifiers_fname)
 eco_queries =  fullfile(data_path,'eecologyqueries.mat'); 
 query_id = 'sql_gps_acc';
@@ -22,7 +23,7 @@ IDevice = 754;
 starttime = '2013-06-08 06:20:00';
 stoptime  = '2013-06-08 07:00:00';
 
-num_meas = 60;
+%num_meas = 60;
 num_features= 58;
 num_classes= 7;
 windowSize=20;
@@ -59,9 +60,21 @@ end
 t=clock;
 disp('Retrieving data from the DB...');
 tic
-[tracks] = getDataFromEecologyDB(username, password,...
-                               eco_queries, query_id,...
-                               IDevice, starttime, stoptime);
+% [tracks] = getDataFromEecologyDB(username, password,...
+%                                eco_queries, query_id,...
+%                                IDevice, starttime, stoptime);
+
+connection = connectEecologyDB(databaseHost, username, password);
+[tracks] = getAccelerometerData(connection,...
+                                 IDevice, starttime, stoptime,...
+                                 false);
+
+num_meas = getAccelerometerSize(connection, ...
+                                IDevice, starttime, stoptime,...
+                                false);
+
+
+
 disp('Done.');
 toc                           
 %% format the data
@@ -97,7 +110,7 @@ toc
 disp('Creating KMZ file...');
 tic
 makeKMZanot(class_data, iconStr, iconSize, ...
-                          classText, dateTimeFormat, dirName, fileName);
+                          classText, dateTimeFormat, dirName, fileName, true);
 disp('Done.');                                
 toc
 

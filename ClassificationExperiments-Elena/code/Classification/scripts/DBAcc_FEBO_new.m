@@ -3,7 +3,7 @@
 %% initializations
 clear all,close all, clc
 
-
+databaseHost = 'db.e-ecology.sara.nl';
 project_path = fullfile('/','home','elena','LifeWatch','eEcology-Annotation-Model','ClassificationExperiments-Elena');
 data_path = fullfile(project_path,'data');
 results_path = fullfile(project_path,'results');
@@ -24,7 +24,7 @@ IDevice = 355;
 starttime = '2010-06-28 00:02:00';
 stoptime  = '2010-06-28 18:15:00';
 
-num_meas = 40;
+%num_meas = 40;
 num_features= 58;
 num_classes= 7;
 windowSize=20;
@@ -49,10 +49,20 @@ t=clock;
 
 disp('Retrieving data from the DB...');
 tic
-[tracks] = getDataFromEecologyDB(username, password,...
-                               eco_queries, query_id,...
-                               IDevice, starttime, stoptime);
+% [tracks] = getDataFromEecologyDB(username, password,...
+%                                eco_queries, query_id,...
+%                                IDevice, starttime, stoptime);
+
+connection = connectEecologyDB(databaseHost, username, password);
+[tracks] = getAccelerometerData(connection,...
+                                 IDevice, starttime, stoptime,...
+                                 false);
+
+num_meas = getAccelerometerSize(connection, ...
+                                IDevice, starttime, stoptime,...
+                                false);
 disp('Done.');
+
 toc
 %% format the data
 disp('Formatting the data...');
