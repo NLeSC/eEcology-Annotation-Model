@@ -41,7 +41,8 @@ olap = 0;
         %labDat = evalin('base', strcat('f',num2str(j),'_label_',num2str(thisLab)));
         labDat = evalin('base', strcat('label_',num2str(thisLab)));
 
-        [ft, info] = makeFeaturesNSpd(labDat, ws, olap,0,8, 'norm', windowingMode);
+        %[ft, info] = makeFeaturesNSpd(labDat, ws, olap,0,8, 'norm', windowingMode);
+        [ft, info] = calcFeatureVectors(labDat, ws, olap,0.3);
 
         data = [data;ft];
         dataInfo = [dataInfo;info];
@@ -49,8 +50,8 @@ olap = 0;
         %assignin('base', strcat('f',num2str(j),'_fts_', num2str(labels(i))), ft);
         %assignin('base', strcat('f',num2str(j),'_inf_', num2str(labels(i))), info);
         
-        assignin('base', strcat('_fts_', num2str(labels(i))), ft);
-        assignin('base', strcat('_inf_', num2str(labels(i))), info)        
+        assignin('base', strcat('fts_', num2str(labels(i))), ft);
+        assignin('base', strcat('inf_', num2str(labels(i))), info)        
        
     end   
 

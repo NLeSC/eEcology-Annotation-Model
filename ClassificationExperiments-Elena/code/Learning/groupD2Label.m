@@ -22,8 +22,11 @@ function labels = groupD2Label(data, label)
     frameIndex = [];
     
     for i=1:length(labels)
+        %disp('---------------label----------------');
+        %disp(i);
         labelMat = [];
         [row, col] = find(data(:,label)==labels(i));
+        %disp(row)
         frameIndex = 0:size(col,1)-1;
         
         labelMat = data(row,:);
