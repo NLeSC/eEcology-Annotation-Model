@@ -1,6 +1,29 @@
-dirNames = {fullfile('code'), ...
-            fullfile('code','scripts')};
+%% startTesting - Matlab script for testing Matlab's code functionality
+%
+% author: Elena Ranguelova & Stefan Verhoeven, NLeSc
+% date creation: 14/11/2013
+% last modification date: 28/11/2013
+% modification details:
+% -----------------------------------------------------------------------
+% SYNTAX
+% startTetsing
+%
+% INPUT
+%
+% OUPTPUT
+%
+% EXAMPLE
+%
+% SEE ALSO
+% subdir, startTesting.sh
+%
+% REFERENCES
+%
+% NOTES
 
+% dirNames = {fullfile('code'), ...
+%             fullfile('code','scripts')};
+dirNames = subdir;
     
 nDirs = numel(dirNames);
 

@@ -1,5 +1,29 @@
-dirNames = {fullfile('code'), ...
-            fullfile('code','scripts')};
+%% startCheckcode - Matlab script for testing Matlab's code quality
+%
+% author: Elena Ranguelova & Stefan Verhoeven, NLeSc
+% date creation: 14/11/2013
+% last modification date: 28/11/2013
+% modification details:
+% -----------------------------------------------------------------------
+% SYNTAX
+% startCheckcode
+%
+% INPUT
+%
+% OUPTPUT
+%
+% EXAMPLE
+%
+% SEE ALSO
+% subdir, startCheckcode.sh
+%
+% REFERENCES
+%
+% NOTES
+
+%dirNames = {fullfile('code'), ...
+%            fullfile('code','scripts')};
+dirNames =subdir;
 
     
 nDirs = numel(dirNames);
