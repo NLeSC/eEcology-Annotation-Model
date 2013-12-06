@@ -3,7 +3,7 @@
 %labvec is a vector containing the desired labels in the dataset. an empty
 %vector means that all labels will be included to the dataset.
 
-function prepareData(dataStruct,frac,labvec)
+function [train,test,permutation] = prepareData(dataStruct,frac,labvec)
 
 %assignin('base', 'files', dataStructs);
 data = [];
@@ -41,8 +41,8 @@ olap = 0;
         %labDat = evalin('base', strcat('f',num2str(j),'_label_',num2str(thisLab)));
         labDat = evalin('base', strcat('label_',num2str(thisLab)));
 
-        %[ft, info] = makeFeaturesNSpd(labDat, ws, olap,0,8, 'norm', windowingMode);
-        [ft, info] = calcFeatureVectors(labDat, ws, olap,0.3);
+        [ft, info] = makeFeaturesNSpd(labDat, ws, olap,0,8, 'norm', windowingMode);
+        %[ft, info] = calcFeatureVectors(labDat, ws, olap,0.3);
 
         data = [data;ft];
         dataInfo = [dataInfo;info];
@@ -58,17 +58,17 @@ olap = 0;
 %end
 
 [train,test,permutation] = splitset(data,frac);
-metadata = struct('data',{datestr(today)},'author', {'Elena'},...
-    'files',{dataStructs},'mode',{windowingMode}, 'wSize', {ws}, 'step', {olap},...
-    'filter',{''},'ftSet',{''});
-
-assignin('base', 'dataFeatures', data);
-assignin('base', 'dataInfo', dataInfo);
-assignin('base', strcat('train_',num2str(frac*100)), train);
-assignin('base', strcat('test_',num2str((1-frac)*100)), test);
-assignin('base', 'IDtrain', permutation(1:size(train,1)));
-assignin('base', 'IDtest', permutation(size(train,1)+1:end));
-assignin('base', 'metaData', metadata);
+% metadata = struct('data',{datestr(today)},'author', {'Elena'},...
+%     'files',{dataStructs},'mode',{windowingMode}, 'wSize', {ws}, 'step', {olap},...
+%     'filter',{''},'ftSet',{''});
+% 
+% assignin('base', 'dataFeatures', data);
+% assignin('base', 'dataInfo', dataInfo);
+% assignin('base', strcat('train_',num2str(frac*100)), train);
+% assignin('base', strcat('test_',num2str((1-frac)*100)), test);
+% assignin('base', 'IDtrain', permutation(1:size(train,1)));
+% assignin('base', 'IDtest', permutation(size(train,1)+1:end));
+% assignin('base', 'metaData', metadata);
 
 
 

@@ -59,12 +59,16 @@ for i=1:length(r)-1
 
     %make windows. see for variable input (for filtering) the windowing function!
     windows = windowing(data(r(i):r(i+1)-1,:),windowSize,overlap);
- 
+       
+    
     WM = [WM;windows];            
 end
 
 WM = [WM;windowing(data(r(end):end,:),windowSize,overlap)];
 windows = {WM{:,1}}';
+
+% % debug display
+% disp('calFeatureVectors: after windowing: '), size(windows) 
     
 if ~isempty(windows)
 

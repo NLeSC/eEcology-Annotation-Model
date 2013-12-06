@@ -34,6 +34,7 @@ r = unique(sort([1;r1;r2]));
 %windowSize = 20;
 %overlap = 0.5;
 nOfWindows = 0;
+epsilon = 0.3;
 
 featureMatrix = [];
 infoMatrix = [];
@@ -60,6 +61,7 @@ switch windowingMode
             end
 
             windows = windowingNSpd(M(r(i):r(i+1)-1,:),windowSize,overlap,perSample);
+           
             nOfS = size(windows,1);
             
             WM = [WM;windows];
@@ -82,36 +84,49 @@ switch windowingMode
         WM = windowingNSpd(M(1:end,:),windowSize,overlap,perSample);
 
         nOfWindows = nOfWindows + size(WM,1);
-    end
+end
 
+
+windows = {WM{:,1}}';
+
+% % debug display
+% disp('makeFeaturesNSpd: after windowingNSpd: '), size(windows)
 
     if ~isempty(WM)
 
         %create pitch/roll feature matrix for window set
-        SPRM = position(WM);
+        %SPRM = position(WM);
+        SPRM = cellfun(@calcPosition, windows, 'uniformoutput', false);
 
         %correlation features
-        CM = correlation(WM);
+        %CM = correlation(WM);
+        CM = cellfun(@calcCorrelation, windows, 'uniformoutput', false);
 
         %motionlessness feature matrix for window set
-        MLM = motionlessness(WM,0.3);
+        %MLM = motionlessness(WM,0.3);
+        MLM = cellfun(@(x) calcMotionlessness(x,epsilon), windows, 'uniformoutput', false);
 
         %fourier transform feature matrix for window set
-        FM = FaFoTr(WM);
+        %FM = FaFoTr(WM);
+        FM = cellfun(@calcFrequency, windows, 'uniformoutput', false);
 
         %wavelet features
         %WAV = wav(WM,3);
 
         %retrieve the speed from the data
-        for j = 1:size(WM,1)
-            SPD{j,1} = WM{j,8};
-        end
+%         for j = 1:size(WM,1)
+%             SPD{j,1} = WM{j,8};
+%         end
+        SPD = {WM{:,8}}';
 
         %'signal to noise'
-        SN = siToNo(WM);
+        %SN = siToNo(WM);
+        SN = cellfun(@calcNoise, windows, 'uniformoutput', false);
         
         %ODBA
-        ODBA = calcODBA(WM,20);
+        %ODBA = calcODBA(WM,20);
+        ODBA = cellfun(@(x) calcODBA(x,windowSize/2), windows, 'uniformoutput', false);
+
 
     % 
     %     featureMatrix = [WM{:,2}, SPRM, CM, MLM, FM, SPD];
