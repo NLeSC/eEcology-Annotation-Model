@@ -3,7 +3,7 @@
 %labvec is a vector containing the desired labels in the dataset. an empty
 %vector means that all labels will be included to the dataset.
 
-function [train,test,permutation] = prepareData(dataStruct,frac,labvec)
+function [train,test,permutation] = prepareData(annot_struct,frac,labvec)
 
 %assignin('base', 'files', dataStructs);
 data = [];
@@ -18,8 +18,9 @@ olap = 0;
     %[~,fname,~] = fileparts(dataStruct);
     
     %retrieve all labelled data from the input
-    alldata = getLabsFromStruct(dataStruct);
-
+    %alldata = getLabsFromStruct(dataStruct);
+    [alldata]=getDataFromAnnotStruct(annot_struct);
+    
     %group by label
     %allLabels = groupD2Label(alldata,8,j);
     allLabels = groupD2Label(alldata,8);
