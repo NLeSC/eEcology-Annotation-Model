@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of classifyAccMeas</title>
+  <meta name="keywords" content="classifyAccMeas">
+  <meta name="description" content="% classifyAccMeas - classify accelerometer measurements">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Classification</a> &gt; classifyAccMeas.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>classifyAccMeas
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% classifyAccMeas - classify accelerometer measurements</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [out_data, FTVstor, INFO] = classifyAccMeas(inp_data, num_meas,classifiers,num_features, num_classes,windowSize, overlap, epsilon) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% classifyAccMeas - classify accelerometer measurements
+
+ author: Elena Ranguelova, NLeSc
+ date creation: 23-08-2013
+ last modification date: 27-09-2013
+ modification details: added INFO structure to the output and more
+ parameters
+ -----------------------------------------------------------------------
+ SYNTAX
+ [out_data, FTVstor, INFO]=classifyAccMeas(inp_data, num_meas,  ...
+                               classifiers,...
+                               num_features, num_classes
+                               windowSize, overlap, epsilon)
+
+ INPUT
+ inp_data- formatted data sructure retrieved from the DB
+ num_meas- number of accelerometer measurements (in 1 sec.?)
+ classifiers - classifiers is cell array with model structures.
+ num_features  - number of features
+ num_classes - number of recognisable classes (behaviours)
+ winsowSize- the windows size when static segmentation is done
+ overlap - the window overlap
+ epsilon- tolerance parameter for the motionlessness featuew
+
+ OUPTPUT
+ out_data- structure with the relevant measurements and their classification
+ FTVstor-  feature vectors store(?)
+ INFO - information structure
+
+ EXAMPLE
+ [tracks] = getDataFromEecologyDB(&lt;your-username-str&gt;, &lt;your-password-str&gt;,...
+                               '../data/eecologyqueries.mat', 'sql_gps_acc',...
+                                754, '2013-06-08 06:20:00', ...
+                                '2013-06-08 07:20:00');
+ [formatted_tracks] = formatDataStructure(tracks);
+ load ../data/classifiers.mat
+ [out_data, FTVstor, INFO]=classifyAccMeas(formatted_tracks, 40,  classifiers, 58, 7, 20, 10, 0.3);
+
+ SEE ALSO
+ calcFeatureVectors.m, <a href="hierarchClass.html" class="code" title="function class = hierarchClass(classifiers, data)">hierarchClass</a>.m, formatDataStructrure.m,
+ <a href="prepareData4FeatExtraction.html" class="code" title="function [feat_data] = prepareData4FeatExtraction(formatted_data, ind, offset)">prepareData4FeatExtraction</a>.m
+ <a href="createDatacube.html" class="code" title="function Datacube = createDatacube(inp_data, save_flag, save_fname)">createDatacube</a>.m, <a href="createAnot.html" class="code" title="function FTVanot=createAnot(FTVstor, num_features, save_flag, save_fname)">createAnot</a>.m
+ DBAcc_Texel/FEBO.m- scripts by W.Bouten (legacy)
+ copyData.m- subfunciton in the same file
+
+ REFERENCES
+
+ NOTES
+ the classifiers are stored for now in  ../data/classifiers.mat</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="hierarchClass.html" class="code" title="function class = hierarchClass(classifiers, data)">hierarchClass</a>	% hierarchClass - hierarchical classification</li><li><a href="prepareData4FeatExtraction.html" class="code" title="function [feat_data] = prepareData4FeatExtraction(formatted_data, ind, offset)">prepareData4FeatExtraction</a>	% prepareData4FeatExtraction - preparation of data for feature extraction</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function out_data = copyDeviceAndTimeData(inp_data, out_data, i, j)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% classifyAccMeas - classify accelerometer measurements</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 23-08-2013</span>
+0005 <span class="comment">% last modification date: 27-09-2013</span>
+0006 <span class="comment">% modification details: added INFO structure to the output and more</span>
+0007 <span class="comment">% parameters</span>
+0008 <span class="comment">% -----------------------------------------------------------------------</span>
+0009 <span class="comment">% SYNTAX</span>
+0010 <span class="comment">% [out_data, FTVstor, INFO]=classifyAccMeas(inp_data, num_meas,  ...</span>
+0011 <span class="comment">%                               classifiers,...</span>
+0012 <span class="comment">%                               num_features, num_classes</span>
+0013 <span class="comment">%                               windowSize, overlap, epsilon)</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% INPUT</span>
+0016 <span class="comment">% inp_data- formatted data sructure retrieved from the DB</span>
+0017 <span class="comment">% num_meas- number of accelerometer measurements (in 1 sec.?)</span>
+0018 <span class="comment">% classifiers - classifiers is cell array with model structures.</span>
+0019 <span class="comment">% num_features  - number of features</span>
+0020 <span class="comment">% num_classes - number of recognisable classes (behaviours)</span>
+0021 <span class="comment">% winsowSize- the windows size when static segmentation is done</span>
+0022 <span class="comment">% overlap - the window overlap</span>
+0023 <span class="comment">% epsilon- tolerance parameter for the motionlessness featuew</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% OUPTPUT</span>
+0026 <span class="comment">% out_data- structure with the relevant measurements and their classification</span>
+0027 <span class="comment">% FTVstor-  feature vectors store(?)</span>
+0028 <span class="comment">% INFO - information structure</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% EXAMPLE</span>
+0031 <span class="comment">% [tracks] = getDataFromEecologyDB(&lt;your-username-str&gt;, &lt;your-password-str&gt;,...</span>
+0032 <span class="comment">%                               '../data/eecologyqueries.mat', 'sql_gps_acc',...</span>
+0033 <span class="comment">%                                754, '2013-06-08 06:20:00', ...</span>
+0034 <span class="comment">%                                '2013-06-08 07:20:00');</span>
+0035 <span class="comment">% [formatted_tracks] = formatDataStructure(tracks);</span>
+0036 <span class="comment">% load ../data/classifiers.mat</span>
+0037 <span class="comment">% [out_data, FTVstor, INFO]=classifyAccMeas(formatted_tracks, 40,  classifiers, 58, 7, 20, 10, 0.3);</span>
+0038 <span class="comment">%</span>
+0039 <span class="comment">% SEE ALSO</span>
+0040 <span class="comment">% calcFeatureVectors.m, hierarchClass.m, formatDataStructrure.m,</span>
+0041 <span class="comment">% prepareData4FeatExtraction.m</span>
+0042 <span class="comment">% createDatacube.m, createAnot.m</span>
+0043 <span class="comment">% DBAcc_Texel/FEBO.m- scripts by W.Bouten (legacy)</span>
+0044 <span class="comment">% copyData.m- subfunciton in the same file</span>
+0045 <span class="comment">%</span>
+0046 <span class="comment">% REFERENCES</span>
+0047 <span class="comment">%</span>
+0048 <span class="comment">% NOTES</span>
+0049 <span class="comment">% the classifiers are stored for now in  ../data/classifiers.mat</span>
+0050 
+0051 
+0052 <a name="_sub0" href="#_subfunctions" class="code">function [out_data, FTVstor, INFO] = classifyAccMeas(inp_data, num_meas, </a><span class="keyword">...</span>
+0053                                                       classifiers, <span class="keyword">...</span>
+0054                                                       num_features, num_classes, <span class="keyword">...</span>
+0055                                                        windowSize, overlap, epsilon)
+0056 <span class="comment">% initializations</span>
+0057 out_data =[];
+0058 FTVstor =[];
+0059 FTV = []; INFO =[];
+0060 
+0061 <span class="comment">%  get the length of the tracks</span>
+0062 len_long  = length(inp_data.long);
+0063 len_ind = length(inp_data.index);
+0064 
+0065 number = num_meas - 1;
+0066 j = 0;
+0067 
+0068 <span class="keyword">for</span> i = 2:len_long - 1
+0069 
+0070     <span class="comment">% check for availability of 1 second of accelerometer measurements</span>
+0071     <span class="keyword">if</span> (~isnan(inp_data.index(i))==1) &amp;&amp; ((i+number) &lt; len_ind)
+0072         <span class="comment">% assignmens in all cases</span>
+0073         <span class="keyword">if</span> (inp_data.index(i)==0) &amp;&amp; (inp_data.index(i+number)==number) &amp;&amp; <span class="keyword">...</span>
+0074                  (sum(isnan(inp_data.x(i:i+number)))+<span class="keyword">...</span>
+0075                  sum(isnan(inp_data.y(i:i+number)))+<span class="keyword">...</span>
+0076                  sum(isnan(inp_data.z(i:i+number)))&lt;1)
+0077             j= j+1;
+0078 
+0079             data = <a href="prepareData4FeatExtraction.html" class="code" title="function [feat_data] = prepareData4FeatExtraction(formatted_data, ind, offset)">prepareData4FeatExtraction</a>(inp_data, i, number);
+0080 
+0081             [FTV,INFO] = calcFeatureVectors(data, windowSize, overlap, epsilon);
+0082 
+0083 
+0084             dum = <a href="hierarchClass.html" class="code" title="function class = hierarchClass(classifiers, data)">hierarchClass</a>(classifiers, FTV);
+0085             out_data.data(j,:)=[inp_data.x(i:i+number)' <span class="keyword">...</span>
+0086                                 inp_data.y(i:i+number)' <span class="keyword">...</span>
+0087                                 inp_data.z(i:i+number)' ];
+0088             out_data.predictions(j)=dum(1);
+0089             out_data.class(j)=out_data.predictions(j);
+0090             out_data = <a href="#_sub1" class="code" title="subfunction out_data = copyDeviceAndTimeData(inp_data, out_data, i, j)">copyDeviceAndTimeData</a>(inp_data, out_data, i, j);
+0091 
+0092             FTVstor=[FTVstor; FTV(1,:) <span class="keyword">...</span>
+0093              out_data.class(j) <span class="keyword">...</span>
+0094              out_data.lat(j) out_data.long(j) <span class="keyword">...</span>
+0095              out_data.time(j) j <span class="keyword">...</span>
+0096              out_data.ispd(j) out_data.tspd(j)];
+0097 
+0098         <span class="keyword">elseif</span> inp_data.index(i)==0
+0099             j = j+1;
+0100 
+0101             out_data.class(j)=num_classes + 1;
+0102             out_data.predictions(j)=num_classes + 1;
+0103             out_data.data(j,:)=zeros(1,3*num_meas);
+0104             FTV(1,1:num_features)=NaN;
+0105             out_data = <a href="#_sub1" class="code" title="subfunction out_data = copyDeviceAndTimeData(inp_data, out_data, i, j)">copyDeviceAndTimeData</a>(inp_data, out_data, i, j);
+0106 
+0107             FTVstor=[FTVstor; FTV(1,:) <span class="keyword">...</span>
+0108              out_data.class(j) <span class="keyword">...</span>
+0109              out_data.lat(j) out_data.long(j) <span class="keyword">...</span>
+0110              out_data.time(j) j <span class="keyword">...</span>
+0111              out_data.ispd(j) out_data.tspd(j)];
+0112 
+0113         <span class="keyword">end</span>
+0114     <span class="keyword">else</span>
+0115         j =j+1;
+0116 
+0117         out_data.class(j)=num_classes + 1;
+0118         out_data.predictions(j)=num_classes + 1;
+0119         out_data.data(j,:)=zeros(1,3*num_meas);
+0120         FTV(1,1:num_features)=NaN;
+0121         out_data = <a href="#_sub1" class="code" title="subfunction out_data = copyDeviceAndTimeData(inp_data, out_data, i, j)">copyDeviceAndTimeData</a>(inp_data, out_data, i, j);
+0122 
+0123         FTVstor=[FTVstor; FTV(1,:) <span class="keyword">...</span>
+0124          out_data.class(j) <span class="keyword">...</span>
+0125          out_data.lat(j) out_data.long(j) <span class="keyword">...</span>
+0126          out_data.time(j) j <span class="keyword">...</span>
+0127          out_data.ispd(j) out_data.tspd(j)];
+0128     <span class="keyword">end</span>
+0129 
+0130 <span class="keyword">end</span>
+0131 
+0132 <a name="_sub1" href="#_subfunctions" class="code">function out_data = copyDeviceAndTimeData(inp_data, out_data, i, j)</a>
+0133 
+0134         out_data.device(j)=inp_data.device(i);
+0135         out_data.datetime(j)=inp_data.datetime(i);
+0136         out_data.index(j)=j;
+0137         out_data.ispd(j)=inp_data.ispd(i);
+0138         out_data.tspd(j)=inp_data.tspd(i);
+0139         out_data.long(j)=inp_data.long(i);
+0140         out_data.lat(j)=inp_data.lat(i);
+0141         out_data.alt(j)=inp_data.alt(i);
+0142         out_data.year(j)=inp_data.year(i);
+0143         out_data.month(j)=inp_data.month(i);
+0144         out_data.day(j)=inp_data.day(i);
+0145         out_data.hour(j)=inp_data.hour(i);
+0146         out_data.min(j)=inp_data.minute(i);
+0147         out_data.sec(j)=inp_data.second(i);
+0148         out_data.time(j)=datenum(out_data.year(j),out_data.month(j),<span class="keyword">...</span>
+0149                                  out_data.day(j),out_data.hour(j),<span class="keyword">...</span>
+0150                                  out_data.min(j),out_data.sec(j))-735235;
+0151</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

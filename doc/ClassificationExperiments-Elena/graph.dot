@@ -1,0 +1,7 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+
+  contents [URL="contents.html"];
+  startCheckcode [URL="startCheckcode.html"];
+  startTesting [URL="startTesting.html"];
+}

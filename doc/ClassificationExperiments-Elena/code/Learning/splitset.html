@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of splitset</title>
+  <meta name="keywords" content="splitset">
+  <meta name="description" content="merijn de bakker">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; splitset.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>splitset
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>merijn de bakker</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [trainSet, validationSet, P] = splitset(featureM, validationSize) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">merijn de bakker
+03-04-2010
+
+bird-project | FEATURE SERIES
+
+FUNCTION SPLITSET
+randomly splits a given dataset into a trainset and a validationset
+INPUT: a matrix with N-examples and M-features, trainsize (e.g. 0.66)).
+varargin: train-filename (csv), test-filename (csv)
+OUTPUT: train- validationset as a matrix, and if desired as a csv-file.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="prepareData.html" class="code" title="function [train,test,permutation] = prepareData(annot_struct,frac,labvec)">prepareData</a>	wrapper function for preparing annotated data for classification.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%merijn de bakker</span>
+0002 <span class="comment">%03-04-2010</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%bird-project | FEATURE SERIES</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%FUNCTION SPLITSET</span>
+0007 <span class="comment">%randomly splits a given dataset into a trainset and a validationset</span>
+0008 <span class="comment">%INPUT: a matrix with N-examples and M-features, trainsize (e.g. 0.66)).</span>
+0009 <span class="comment">%varargin: train-filename (csv), test-filename (csv)</span>
+0010 <span class="comment">%OUTPUT: train- validationset as a matrix, and if desired as a csv-file.</span>
+0011 
+0012 <a name="_sub0" href="#_subfunctions" class="code">function [trainSet, validationSet, P] = splitset(featureM, validationSize)</a>
+0013 
+0014 trainsetSize = round(validationSize*size(featureM,1));
+0015 
+0016 P = randperm(size(featureM,1));
+0017 RandomFeatureM = featureM(P,:);
+0018 
+0019 trainSet = RandomFeatureM(1:trainsetSize,:);
+0020 validationSet = RandomFeatureM(trainsetSize+1:<span class="keyword">end</span>,:);
+0021 
+0022 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

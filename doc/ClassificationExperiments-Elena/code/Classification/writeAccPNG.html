@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of writeAccPNG</title>
+  <meta name="keywords" content="writeAccPNG">
+  <meta name="description" content="% writeAccPNG - generates KMZ file from anotated accelerometer data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Classification</a> &gt; writeAccPNG.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>writeAccPNG
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% writeAccPNG - generates KMZ file from anotated accelerometer data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function writeAccPNG(pngFileName, inp_data, index, classText) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% writeAccPNG - generates KMZ file from anotated accelerometer data
+
+ author: Elena Ranguelova, NLeSc
+ date creation: 23-08-2013
+ last modification date:
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ []=writeAccPNG(pngFileName, inp_data, index, classText)
+
+ INPUT
+ pngFileName - filename (PNG) for saving
+ inp_data - anotated accelerometer data
+ index- data point index
+ classText - classification legend
+
+ OUPTPUT
+
+
+ EXAMPLE
+ seeDBAcc_Texel_New.m
+
+ SEE ALSO
+ DBAcc_Texel_New.m, <a href="makeKMZanot.html" class="code" title="function []= makeKMZanot(inp_data, iconStr, iconSize,classText, dateTimeFormat, dirName, fileName, plotAccel)">MakeKMZanot</a>.m (legacy)
+
+ REFERENCES
+ Any publications or resources used
+
+ NOTES
+ extra notes</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="makeKMZanot.html" class="code" title="function []= makeKMZanot(inp_data, iconStr, iconSize,classText, dateTimeFormat, dirName, fileName, plotAccel)">makeKMZanot</a>	% makeKMZanot - function to generate KMZ files with anotations</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% writeAccPNG - generates KMZ file from anotated accelerometer data</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 23-08-2013</span>
+0005 <span class="comment">% last modification date:</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% []=writeAccPNG(pngFileName, inp_data, index, classText)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% INPUT</span>
+0012 <span class="comment">% pngFileName - filename (PNG) for saving</span>
+0013 <span class="comment">% inp_data - anotated accelerometer data</span>
+0014 <span class="comment">% index- data point index</span>
+0015 <span class="comment">% classText - classification legend</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% OUPTPUT</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% EXAMPLE</span>
+0021 <span class="comment">% seeDBAcc_Texel_New.m</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% SEE ALSO</span>
+0024 <span class="comment">% DBAcc_Texel_New.m, MakeKMZanot.m (legacy)</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% REFERENCES</span>
+0027 <span class="comment">% Any publications or resources used</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% NOTES</span>
+0030 <span class="comment">% extra notes</span>
+0031 
+0032 
+0033 <a name="_sub0" href="#_subfunctions" class="code">function writeAccPNG(pngFileName, inp_data, index, classText)</a>
+0034 
+0035 DataRec =inp_data.data(index,:);
+0036 Month = inp_data.month;
+0037 Day = inp_data.day;
+0038 Hour = inp_data.hour;
+0039 Min = inp_data.min;
+0040 Sec = inp_data.sec;
+0041 ISpd = inp_data.ispd;
+0042 TSpd = inp_data.tspd;
+0043 Class = inp_data.class;
+0044 
+0045 
+0046 scrsz = [0, 0, 320, 200];
+0047 L=length(DataRec);L=3*floor(L/3);
+0048 X=DataRec(1:L/3); Y=DataRec(L/3+1:2*L/3); Z=DataRec(2*L/3+1:L);
+0049 L=length(Z);
+0050 dstr=[num2str(Day(index)),<span class="string">'-'</span>,num2str(Month(index))];
+0051 
+0052 <span class="keyword">if</span> Hour(index) &gt;= 10
+0053    hstr=num2str(Hour(index));
+0054 <span class="keyword">else</span>
+0055    hstr=[<span class="string">'0'</span>,num2str(Hour(index))];
+0056 <span class="keyword">end</span>
+0057 <span class="keyword">if</span> Min(index) &gt;= 10
+0058    mstr=num2str(Min(index));
+0059 <span class="keyword">else</span>
+0060    mstr=[<span class="string">'0'</span>,num2str(Min(index))];
+0061 <span class="keyword">end</span>
+0062 <span class="keyword">if</span> Sec(index) &gt;= 10
+0063    sstr=num2str(Sec(index));
+0064 <span class="keyword">else</span>
+0065    sstr=[<span class="string">'0'</span>,num2str(Sec(index))];
+0066 <span class="keyword">end</span>
+0067 
+0068 set(figure(2), <span class="string">'Position'</span>,[50 50 scrsz(3)/5 scrsz(4)/6]);    axes(<span class="string">'fontsize'</span>,16);
+0069 plot((1:length(X))*0.05,X, <span class="string">'ro-'</span>,<span class="string">'LineWidth'</span>,2,  <span class="string">'MarkerSize'</span>,8); ylim([-1.5 2.5]); grid on
+0070 hold on
+0071 plot((1:length(Y))*0.05,Y, <span class="string">'bo-'</span>,<span class="string">'LineWidth'</span>,2,  <span class="string">'MarkerSize'</span>,8)
+0072 plot((1:length(Z))*0.05,Z, <span class="string">'go-'</span>,<span class="string">'LineWidth'</span>,2,  <span class="string">'MarkerSize'</span>,8)
+0073 title([<span class="string">'D'</span>,dstr,<span class="string">', T'</span>, hstr,<span class="string">':'</span>,mstr,<span class="string">':'</span>,sstr, <span class="string">', R'</span>,num2str(index),<span class="string">', TSp'</span>,num2str(TSpd(index)), <span class="keyword">...</span>
+0074      <span class="string">' ISp'</span>,num2str(ISpd(index)), <span class="string">' m/s, Class='</span>, classText(5*(Class(index)-1)+1:5*(Class(index)-1)+5)],<span class="string">'fontsize'</span>,16);
+0075 xlabel(<span class="string">'time (sec)'</span>,<span class="string">'fontsize'</span>,16);
+0076 
+0077 drawnow
+0078 print (<span class="string">'-dpng'</span>, pngFileName,<span class="string">'-r72'</span>)
+0079 close(figure(2))
+0080</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

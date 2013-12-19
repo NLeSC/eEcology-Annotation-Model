@@ -39,68 +39,67 @@
 %
 %
 
-function  [errorTest,confM] = treeExperimenter(fM,testd,crit, pruning, cv, ft, reject,ftList,structName)
+function  [errorTest,confM] = treeExperimenter(trainSet,testSet,crit, pruning, crossValidation, ft, reject,featureSelection,structName)
 
-nOfI = size(fM,1);
-if isempty(ftList)
-    nOfFt = size(fM,2)-1;
-    ftList = 2:nOfFt+1;
-else
-    nOfFt = length(ftList);
-    ftList = ftList+1;
-end
+if isempty(featureSelection)
+    nFeatures = size(trainSet,2)-1;
+    featureSelection = 2:nFeatures+1;
+else    
+    featureSelection = featureSelection+1;
+end    
 
-    %generate traindata
-    dat = fM(:,ftList);
-    %dat = normc(dat);
-    labels = fM(:,1);
-    train = dataset(dat,labels);
+    %Prepare train dataset
+    trainInstances = trainSet(:,featureSelection);    
+    trainLabels = trainSet(:,1);
+    trainDataSet = dataset(trainInstances,trainLabels);
 
-    %generate testdata
-    %testd = testd(:,2:end);
-    %testd = normc(testd);
-    testdata = dataset(testd(:,ftList),testd(:,1));
+    %Prepare test dataset
+    testInstances = testSet(:,featureSelection);
+    testLabels = testSet(:,1);
+    testDataSet = dataset(testInstances,testLabels);
 
     %add noise in order to avoid error (see
     %http://prsdstudio.com/index.php/forums/viewthread/90/)
+    %summary: add noise to prevent 2 instances with different labels have
+    %identical features.
     %train = data+randn(nOfI,nOfFt)*1e-8;
  
     %crit = 'infcrit';
 
-        if cv== 0
+        if crossValidation== 0
 
             %[train,testdata, Itrain, Itest] = gendat(data,0.66);
            
             
             if strcmp(char(ft),'')==0
-                [Wft,R] = FEATSELF(train,treec([],crit,pruning),0,10);
-                train = train*Wft;
-                testdata = testdata*Wft;
+                [Wft,R] = FEATSELF(trainDataSet,treec([],crit,pruning),0,10);
+                trainDataSet = trainDataSet*Wft;
+                testDataSet = testDataSet*Wft;
                 %train the tree
-                W = treec(train,crit,pruning,testdata);
+                W = treec(trainDataSet,crit,pruning,testDataSet);
             else
-                W = treec(train,crit,pruning,testdata); 
+                W = treec(trainDataSet,crit,pruning,testDataSet); 
                 R = NaN;
                 Wft = NaN;
               
             end
             
             if reject==1
-                W = rejectc(train, W, 0.1);  
+                W = rejectc(trainDataSet, W, 0.1);  
                 NNtest = NaN;
                 NNtrain = NaN;
                 treeInfo = NaN;
             else
-                [~,~,NNtrain, treeInfo] = tree_map(train,W);
-                [~,~,NNtest,~] = tree_map(testdata,W); 
+                [~,~,NNtrain, treeInfo] = tree_map(trainDataSet,W);
+                [~,~,NNtest,~] = tree_map(testDataSet,W); 
             end
             
             
             %assigned labels trainset
-            trainClasses = labeld(train*W);
+            trainClasses = labeld(trainDataSet*W);
             
             %testset
-            T = testdata*W;
+            T = testDataSet*W;
             
             %assigned labels testset
             classes = T*labeld;
@@ -112,10 +111,10 @@ end
             confmat(T)
             confM = confmat(T);
             
-       elseif cv~=0
+       elseif crossValidation~=0
 
             [errorTest,CERR,NLAB_OUT] =...
-                crossval(data,treec([],crit,pruning),cv);
+                crossval(data,treec([],crit,pruning),crossValidation);
             %[errorTest,CERR,NLAB_OUT] =...
             %    crossval(data,SVC([],'r',1),cv);
             
@@ -135,8 +134,11 @@ end
         end
     
 resultStruct = struct('classP','multiclass', 'classN', 'multiclass',...
-    'settings',[pruning, cv, ft],'criterium', {crit}, 'traindata', train, 'testdata', testdata,'mapping',W, 'testLabs', classes, 'trainLabs', trainClasses, 'treeInfo',treeInfo, ...
-    'confM', confM, 'errorTest', errorTest, 'Wft', Wft, 'Rft', R, 'NNtrain', NNtrain, 'NNtest', NNtest,'features',ftList-1);
+    'settings',[pruning, crossValidation, ft],'criterium', {crit}, ...
+    'traindata', trainDataSet, 'testdata', testDataSet,'mapping',W, ...
+    'testLabs', classes, 'trainLabs', trainClasses, 'treeInfo',treeInfo, ...
+    'confM', confM, 'errorTest', errorTest, 'Wft', Wft, 'Rft', R,...
+    'NNtrain', NNtrain, 'NNtest', NNtest,'features',featureSelection-1);
 name = strcat('multiclass_results');
 assignin('base',structName, resultStruct);
 

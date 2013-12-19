@@ -1,0 +1,270 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calcFrequency</title>
+  <meta name="keywords" content="calcFrequency">
+  <meta name="description" content="% calcFrequency - calculates frequency spectral features">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Features</a> &gt; calcFrequency.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Features&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>calcFrequency
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% calcFrequency - calculates frequency spectral features</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function FFTM = calcFrequency(M) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% calcFrequency - calculates frequency spectral features
+
+ author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc
+ date creation: 11-2011
+ last modification date: 22-08-2013
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ FFTM = calcFrequency(M)
+
+ INPUT
+ M-  a 3D matrix of X,Y,Z signals of j windows. 
+
+ OUPTPUT
+ FFTM- a 3D matrix with the spectrum-powers in dB for X,Y,Z signal.
+
+ EXAMPLE
+ 
+ SEE ALSO
+ <a href="calcFeatureVectors.html" class="code" title="function [FTV,INFO] = calcFeatureVectors(data,  windowSize, overlap, epsilon)">calcFeatureVectors</a>.m
+
+ REFERENCES
+ FaFoTr.m- original file by M. de Bakker
+ &quot;Automatic Classification of Bird Behaiviour on the baes of Accelerometer
+ Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
+
+ NOTES
+ Preferably, the windows are firstly subjected to a hamming filter in order
+ to prevent spectral leakage!</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="calcFeatureVectors.html" class="code" title="function [FTV,INFO] = calcFeatureVectors(data,  windowSize, overlap, epsilon)">calcFeatureVectors</a>	% calcFeatureVectors - feature vectors computaion for classifiers</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function features = fEnergy(Vector,fourierSamples, signalLength, sampleFreq, nOfBins)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% calcFrequency - calculates frequency spectral features</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 11-2011</span>
+0005 <span class="comment">% last modification date: 22-08-2013</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% FFTM = calcFrequency(M)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% INPUT</span>
+0012 <span class="comment">% M-  a 3D matrix of X,Y,Z signals of j windows.</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% OUPTPUT</span>
+0015 <span class="comment">% FFTM- a 3D matrix with the spectrum-powers in dB for X,Y,Z signal.</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% EXAMPLE</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% SEE ALSO</span>
+0020 <span class="comment">% calcFeatureVectors.m</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% REFERENCES</span>
+0023 <span class="comment">% FaFoTr.m- original file by M. de Bakker</span>
+0024 <span class="comment">% &quot;Automatic Classification of Bird Behaiviour on the baes of Accelerometer</span>
+0025 <span class="comment">% Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% NOTES</span>
+0028 <span class="comment">% Preferably, the windows are firstly subjected to a hamming filter in order</span>
+0029 <span class="comment">% to prevent spectral leakage!</span>
+0030 
+0031 <a name="_sub0" href="#_subfunctions" class="code">function FFTM = calcFrequency(M)</a>
+0032 
+0033 <span class="comment">%init</span>
+0034 FM = [];
+0035 FFTM = [];
+0036 FFTM = {};
+0037 nOfWindows = size(M,1);
+0038 
+0039 <span class="comment">%fourier parameters</span>
+0040 sampleFreq = 20;
+0041 
+0042 signalLength = size(M,1);
+0043 fourierSamples = 2^(nextpow2(signalLength));
+0044 
+0045 <span class="comment">%fast fourier transform and feature calcultation for X-axis</span>
+0046 <span class="comment">%FM(:,1,j) = fft(M(:,1,j),fourierSamples);</span>
+0047 fftftX = <a href="#_sub1" class="code" title="subfunction features = fEnergy(Vector,fourierSamples, signalLength, sampleFreq, nOfBins)">fEnergy</a>(M(:,1), fourierSamples, signalLength, sampleFreq, 4);
+0048 
+0049 <span class="comment">%fast fourier transform and feature calcultation for Y-axis</span>
+0050 <span class="comment">%FM(:,2,j) = fft(M(:,2,j),fourierSamples);</span>
+0051 fftftY = <a href="#_sub1" class="code" title="subfunction features = fEnergy(Vector,fourierSamples, signalLength, sampleFreq, nOfBins)">fEnergy</a>(M(:,2), fourierSamples, signalLength, sampleFreq, 4);
+0052 
+0053 <span class="comment">%fast fourier transform and feature calcultation for Z-axis</span>
+0054 <span class="comment">%FM(:,3,j) = fft(M(:,3,j),fourierSamples);</span>
+0055 fftftZ = <a href="#_sub1" class="code" title="subfunction features = fEnergy(Vector,fourierSamples, signalLength, sampleFreq, nOfBins)">fEnergy</a>(M(:,3), fourierSamples, signalLength, sampleFreq, 4);
+0056 
+0057 FFTM = [fftftX,fftftY,fftftZ];
+0058 <span class="comment">%FFTM(1,:,j) = [fftftX,fftftY,fftftZ];</span>
+0059 
+0060 <span class="keyword">end</span>
+0061 
+0062 <a name="_sub1" href="#_subfunctions" class="code">function features = fEnergy(Vector,fourierSamples, signalLength, sampleFreq, nOfBins)</a>
+0063 <span class="comment">%creates and analyses periodogram, derived from FaFoTr</span>
+0064 <span class="comment">%INPUT: vector with complex fourier numbers</span>
+0065 <span class="comment">%OUTPUT: fourier features</span>
+0066 
+0067 hper = spectrum.periodogram(<span class="string">'hamming'</span>);
+0068 pd = psd(hper,Vector,<span class="string">'Fs'</span>, sampleFreq, <span class="string">'NFFT'</span>, length(Vector));
+0069 <span class="comment">%pd = msspectrum(hper,Vector,'Fs', sampleFreq, 'spectrumtype','onesided');</span>
+0070 
+0071 pdData = pd.Data;
+0072 pdFreqs = pd.Frequencies;
+0073 
+0074 <span class="comment">%exclude zero frequency component (DC)</span>
+0075 [nonzeros,~] = find(pdFreqs&gt;0);
+0076 pdData = pdData(nonzeros);
+0077 pdFreqs = pdFreqs(nonzeros);
+0078 
+0079 <span class="comment">%maximum amplitude and frequency at maximum amplitude</span>
+0080 <span class="comment">%[maxAmp, maxI] = max(abs(pd.Data(nonzeros)));</span>
+0081 [maxAmp, maxI] = max(pdData);
+0082 argmaxAmp = pdFreqs(maxI);
+0083 
+0084 sumEnergy = sum(pd.Data);
+0085 
+0086 <span class="comment">%energy in the subbands</span>
+0087 binPoint = linspace(0,sampleFreq/2,nOfBins+1);
+0088 
+0089 <span class="keyword">try</span>
+0090 eBin1 = avgpower(pd,[binPoint(1) binPoint(2)]);
+0091 <span class="keyword">catch</span> e1
+0092     eBin1 = NaN;
+0093 <span class="keyword">end</span>
+0094 <span class="keyword">try</span>
+0095 eBin2 = avgpower(pd,[binPoint(2) binPoint(3)]);
+0096 <span class="keyword">catch</span> e2
+0097     eBin2 = NaN;
+0098 <span class="keyword">end</span>
+0099 <span class="keyword">try</span>
+0100 eBin3 = avgpower(pd,[binPoint(3) binPoint(4)]);
+0101 <span class="keyword">catch</span> e3
+0102     eBin3 = NaN;
+0103 <span class="keyword">end</span>
+0104 <span class="keyword">try</span>
+0105 eBin4 = avgpower(pd,[binPoint(4) binPoint(5)-1]);
+0106 <span class="keyword">catch</span> e4
+0107     eBin4 = NaN;
+0108 <span class="keyword">end</span>
+0109 
+0110 <span class="comment">% eBin1 = sum(abs(pdData(find(pdFreqs &gt;= binPoints(1) &amp;...</span>
+0111 <span class="comment">%     pdFreqs &lt;= binPoints(2)-1))));</span>
+0112 <span class="comment">% eBin2 = sum(abs(pdData(find(pdFreqs &gt;= binPoints(2) &amp;...</span>
+0113 <span class="comment">%     pdFreqs &lt;= binPoints(3)-1))));</span>
+0114 <span class="comment">% eBin3 = sum(abs(pdData(find(pdFreqs &gt;= binPoints(3) &amp;...</span>
+0115 <span class="comment">%     pdFreqs &lt;= binPoints(4)-1))));</span>
+0116 <span class="comment">% eBin4 = sum(abs(pdData(find(pdFreqs &gt;= binPoints(4) &amp;...</span>
+0117 <span class="comment">%     pdFreqs &lt;= binPoints(5)))));</span>
+0118 
+0119 <span class="comment">%entropy</span>
+0120 a=abs(pdData);
+0121 b=log(abs(pdData));
+0122 b(isinf(b))=0;
+0123 
+0124 entropy = -sum(a.*b);
+0125 
+0126 <span class="comment">%OLD CODE...using SIGNAL PROCESSING TOOLBOX seems to be more concise ^^</span>
+0127 
+0128 <span class="comment">% nyquistFreq = sampleFreq/2;</span>
+0129 <span class="comment">% NumUniques = ceil((fourierSamples+1)/2);</span>
+0130 <span class="comment">%</span>
+0131 <span class="comment">% Vector = Vector(1:NumUniques);</span>
+0132 <span class="comment">%</span>
+0133 <span class="comment">% %normalised fft vals</span>
+0134 <span class="comment">% VectorN = Vector/signalLength;</span>
+0135 <span class="comment">%</span>
+0136 <span class="comment">% %calculate power</span>
+0137 <span class="comment">% pwr = abs(VectorN);</span>
+0138 <span class="comment">%</span>
+0139 <span class="comment">% if rem(fourierSamples,2)</span>
+0140 <span class="comment">%     pwr(2:end) = pwr(2:end)*2;</span>
+0141 <span class="comment">% else</span>
+0142 <span class="comment">%     pwr(2:end-1) = pwr(2:end-1)*2;</span>
+0143 <span class="comment">% end</span>
+0144 <span class="comment">%</span>
+0145 <span class="comment">% %transform power to decibels</span>
+0146 <span class="comment">% energyDB = 20*log10(pwr+eps);</span>
+0147 <span class="comment">%</span>
+0148 <span class="comment">% %use only the nyquist frequencies, here 0Hz to 10Hz</span>
+0149 <span class="comment">% freq = (0:NumUniques-1)*sampleFreq/fourierSamples;</span>
+0150 <span class="comment">%</span>
+0151 <span class="comment">% %--------------------------------------------------------</span>
+0152 <span class="comment">% %calculate maximum energy and argmax</span>
+0153 <span class="comment">% maxAmplitude = min(abs(energyDB));</span>
+0154 <span class="comment">% argmax = freq((abs(energyDB) == maxAmplitude));</span>
+0155 <span class="comment">%</span>
+0156 <span class="comment">% %calculate sum of energy in frequency-bins</span>
+0157 <span class="comment">% binRange = floor(length(freq)/nOfBins);</span>
+0158 <span class="comment">%</span>
+0159 <span class="comment">% %sum energy in each bin</span>
+0160 <span class="comment">% eBin1 = abs(sum(energyDB(1:binRange)));</span>
+0161 <span class="comment">% eBin2 = abs(sum(energyDB(binRange+1:2*binRange)));</span>
+0162 <span class="comment">% eBin3 = abs(sum(energyDB(2*binRange+1:3*binRange)));</span>
+0163 <span class="comment">% eBin4 = abs(sum(energyDB(3*binRange+1:length(energyDB))));</span>
+0164 <span class="comment">%</span>
+0165 <span class="comment">% %mean energy in each bin</span>
+0166 <span class="comment">% meBin1 = abs(mean(energyDB(1:binRange)));</span>
+0167 <span class="comment">% meBin2 = abs(mean(energyDB(binRange+1:2*binRange)));</span>
+0168 <span class="comment">% meBin3 = abs(mean(energyDB(2*binRange+1:3*binRange)));</span>
+0169 <span class="comment">% meBin4 = abs(mean(energyDB(3*binRange+1:length(energyDB))));</span>
+0170 
+0171 
+0172 <span class="comment">% figure</span>
+0173 <span class="comment">% plot(freq, pwr)</span>
+0174 <span class="comment">% t = title([' maxAmp: ', num2str(maxAmplitude), ' argmax: ',num2str(argmax),...</span>
+0175 <span class="comment">%     'eb1: ', num2str(eBin1), ' meb1: ', num2str(meBin1)]);</span>
+0176 <span class="comment">% set(t, 'Fontsize', 8);</span>
+0177 
+0178 features = [maxAmp, argmaxAmp, eBin1, eBin2, eBin3, eBin4, entropy];
+0179 
+0180 <span class="keyword">end</span>
+0181 
+0182 
+0183 
+0184 
+0185 <span class="comment">%-----dump</span>
+0186 
+0187 <span class="comment">%freq = (0:(vectorLength/2)-1)*sampleFreq/vectorLength;</span>
+0188 <span class="comment">%VectorN = VectorN(1:vectorLength/2);</span>
+0189 <span class="comment">%freq = (1:vectorLength/2)/(vectorLength/2)*nyquistFreq;</span>
+0190 <span class="comment">%k = 0:length(Vector)-1;</span>
+0191 <span class="comment">%freqInterval = length(Vector)/sampleFreq;</span>
+0192 <span class="comment">%freq = k/freqInterval;</span>
+0193 <span class="comment">%periodoGram = [energyDB';freq];</span></pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

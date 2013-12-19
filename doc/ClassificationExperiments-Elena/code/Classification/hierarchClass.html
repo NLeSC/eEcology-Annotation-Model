@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of hierarchClass</title>
+  <meta name="keywords" content="hierarchClass">
+  <meta name="description" content="% hierarchClass - hierarchical classification">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Classification</a> &gt; hierarchClass.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>hierarchClass
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% hierarchClass - hierarchical classification</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function class = hierarchClass(classifiers, data) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% hierarchClass - hierarchical classification
+
+ author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc
+ date creation: 11-2011
+ last modification date: 22-08-2013
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ class = hierarchClass(classifiers, data)
+
+ INPUT
+ classifiers- classifiers is cell array with model structs. The model structs
+ contain the individual models and define the hierarchical model using the
+ struct variable sc.
+ data - N*M matrix containing N unlabelled examples with M
+ features. Structure [device, datetime, index, x, y,z,speed]
+
+ OUPTPUT
+ class- each of the output arguments should be described
+ possible class labels*: 
+ 1 = stand
+ 2 = flap
+ 3 = soar
+ 4 = walk
+ 5 = sit
+ 6 = extreme flap
+ 7 = float
+ 8 = other
+
+ % EXAMPLE
+ [tracks] = getDataFromEecologyDB(&lt;username&gt;, &lt;password&gt;,...
+                               '../data/eecologyqueries.mat', 'sql_gps_acc',...
+                                754, '2013-06-08 06:20:00', ...
+                                '2013-06-08 07:20:00');
+ [formatted_tracks] = formatDataStructure(tracks);
+ j =  1; na = 40; na1 = na - 1;
+ [feat_data] = prepareData4FeatExtraction(formatted_tracks, j, na1);
+ load ../data/classifiers.mat
+ [FTV,INFO] = calcFeatureVectors(feat_data);     
+ classifications = hierarchClass(classifiers, FTV);
+ 
+ SEE ALSO
+ <a href="applyModel.html" class="code" title="function class = applyModel(data,model)">applyModel</a>.m
+
+ REFERENCES
+ &quot;Automatic Classification of Bird Behaviour on the base of Accelerometer
+ Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
+ *Explanations.docx- July 2013, by W.Bouten
+
+ NOTES</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="applyModel.html" class="code" title="function class = applyModel(data,model)">applyModel</a>	% applyModel - classification of feature data according to a given model</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="classifyAccMeas.html" class="code" title="function [out_data, FTVstor, INFO] = classifyAccMeas(inp_data, num_meas,classifiers,num_features, num_classes,windowSize, overlap, epsilon)">classifyAccMeas</a>	% classifyAccMeas - classify accelerometer measurements</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% hierarchClass - hierarchical classification</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 11-2011</span>
+0005 <span class="comment">% last modification date: 22-08-2013</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% class = hierarchClass(classifiers, data)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% INPUT</span>
+0012 <span class="comment">% classifiers- classifiers is cell array with model structs. The model structs</span>
+0013 <span class="comment">% contain the individual models and define the hierarchical model using the</span>
+0014 <span class="comment">% struct variable sc.</span>
+0015 <span class="comment">% data - N*M matrix containing N unlabelled examples with M</span>
+0016 <span class="comment">% features. Structure [device, datetime, index, x, y,z,speed]</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% OUPTPUT</span>
+0019 <span class="comment">% class- each of the output arguments should be described</span>
+0020 <span class="comment">% possible class labels*:</span>
+0021 <span class="comment">% 1 = stand</span>
+0022 <span class="comment">% 2 = flap</span>
+0023 <span class="comment">% 3 = soar</span>
+0024 <span class="comment">% 4 = walk</span>
+0025 <span class="comment">% 5 = sit</span>
+0026 <span class="comment">% 6 = extreme flap</span>
+0027 <span class="comment">% 7 = float</span>
+0028 <span class="comment">% 8 = other</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% % EXAMPLE</span>
+0031 <span class="comment">% [tracks] = getDataFromEecologyDB(&lt;username&gt;, &lt;password&gt;,...</span>
+0032 <span class="comment">%                               '../data/eecologyqueries.mat', 'sql_gps_acc',...</span>
+0033 <span class="comment">%                                754, '2013-06-08 06:20:00', ...</span>
+0034 <span class="comment">%                                '2013-06-08 07:20:00');</span>
+0035 <span class="comment">% [formatted_tracks] = formatDataStructure(tracks);</span>
+0036 <span class="comment">% j =  1; na = 40; na1 = na - 1;</span>
+0037 <span class="comment">% [feat_data] = prepareData4FeatExtraction(formatted_tracks, j, na1);</span>
+0038 <span class="comment">% load ../data/classifiers.mat</span>
+0039 <span class="comment">% [FTV,INFO] = calcFeatureVectors(feat_data);</span>
+0040 <span class="comment">% classifications = hierarchClass(classifiers, FTV);</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">% SEE ALSO</span>
+0043 <span class="comment">% applyModel.m</span>
+0044 <span class="comment">%</span>
+0045 <span class="comment">% REFERENCES</span>
+0046 <span class="comment">% &quot;Automatic Classification of Bird Behaviour on the base of Accelerometer</span>
+0047 <span class="comment">% Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011</span>
+0048 <span class="comment">% *Explanations.docx- July 2013, by W.Bouten</span>
+0049 <span class="comment">%</span>
+0050 <span class="comment">% NOTES</span>
+0051 
+0052 <a name="_sub0" href="#_subfunctions" class="code">function class = hierarchClass(classifiers, data)</a>
+0053 
+0054 nOfSamples = size(data,1);
+0055 class = zeros(nOfSamples,1);
+0056 
+0057 <span class="keyword">for</span> i = 1:nOfSamples
+0058     
+0059     fv = data(i,:);
+0060     
+0061     node = 1;
+0062     endReached = false;
+0063 
+0064     <span class="keyword">while</span> ~endReached
+0065         
+0066        classifier = classifiers{node};
+0067 
+0068        output = <a href="applyModel.html" class="code" title="function class = applyModel(data,model)">applyModel</a>(fv,classifier.model);
+0069        
+0070        r = find(classifier.sc(:,1)==output);
+0071        node = classifier.sc(r,2);         
+0072        
+0073        <span class="keyword">if</span> node == 0    
+0074            endReached = true;
+0075            label = output;
+0076        <span class="keyword">end</span>
+0077 
+0078     <span class="keyword">end</span>
+0079     
+0080     class(i) = label;
+0081     
+0082 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

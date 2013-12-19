@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getAccelerometerData</title>
+  <meta name="keywords" content="getAccelerometerData">
+  <meta name="description" content="% getAccelerometerData - getting data from the eEcology UvA DB">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Classification</a> &gt; getAccelerometerData.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>getAccelerometerData
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% getAccelerometerData - getting data from the eEcology UvA DB</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [data] = getAccelerometerData(connection,device, starttime, stoptime,limited) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% getAccelerometerData - getting data from the eEcology UvA DB
+ Getting the accelerometer, GPS, speed etc. data from the DB
+
+ -----------------------------------------------------------------------
+ SYNTAX
+ [data] = getAccelerometerData(connection, ...
+                               device, starttime, stoptime,...
+                               limited)
+
+ INPUT
+ connection - Database connection object
+ device - device ID for which the data are to be  retrieved
+ starttime and stoptime- define the time strip of interest.
+                         Strings of format 'yyy-mm-dd hh:mm:ss'
+ limited - Use limited views or not. Defaults to false, not using limited views.
+
+ OUPTPUT
+ data - Struct with accelerometer measurements.
+
+ EXAMPLE
+ [data] = getAccelerometerData(connection,...
+                               '../data/eecologyqueries.mat', 'sql_gps_acc',...
+                                754, '2013-06-08 06:20:00', ...
+                                '2013-06-08 07:20:00', true)
+
+ SEE ALSO
+
+ REFERENCES</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% getAccelerometerData - getting data from the eEcology UvA DB</span>
+0002 <span class="comment">% Getting the accelerometer, GPS, speed etc. data from the DB</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% -----------------------------------------------------------------------</span>
+0005 <span class="comment">% SYNTAX</span>
+0006 <span class="comment">% [data] = getAccelerometerData(connection, ...</span>
+0007 <span class="comment">%                               device, starttime, stoptime,...</span>
+0008 <span class="comment">%                               limited)</span>
+0009 <span class="comment">%</span>
+0010 <span class="comment">% INPUT</span>
+0011 <span class="comment">% connection - Database connection object</span>
+0012 <span class="comment">% device - device ID for which the data are to be  retrieved</span>
+0013 <span class="comment">% starttime and stoptime- define the time strip of interest.</span>
+0014 <span class="comment">%                         Strings of format 'yyy-mm-dd hh:mm:ss'</span>
+0015 <span class="comment">% limited - Use limited views or not. Defaults to false, not using limited views.</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% OUPTPUT</span>
+0018 <span class="comment">% data - Struct with accelerometer measurements.</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% EXAMPLE</span>
+0021 <span class="comment">% [data] = getAccelerometerData(connection,...</span>
+0022 <span class="comment">%                               '../data/eecologyqueries.mat', 'sql_gps_acc',...</span>
+0023 <span class="comment">%                                754, '2013-06-08 06:20:00', ...</span>
+0024 <span class="comment">%                                '2013-06-08 07:20:00', true)</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% SEE ALSO</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">% REFERENCES</span>
+0029 
+0030 <a name="_sub0" href="#_subfunctions" class="code">function [data] = getAccelerometerData(connection, </a><span class="keyword">...</span>
+0031                                        device, starttime, stoptime,<span class="keyword">...</span>
+0032                                        limited)
+0033 
+0034 sql_query_tpl = [
+0035     <span class="string">'SELECT \n'</span>,<span class="keyword">...</span>
+0036     <span class="string">'device_info_serial AS device, \n'</span>,<span class="keyword">...</span>
+0037     <span class="string">'date_time, \n'</span>,<span class="keyword">...</span>
+0038     <span class="string">'index, \n'</span>,<span class="keyword">...</span>
+0039     <span class="string">'longitude AS long, \n'</span>,<span class="keyword">...</span>
+0040     <span class="string">'latitude AS lat, \n'</span>,<span class="keyword">...</span>
+0041     <span class="string">'altitude AS alt, \n'</span>,<span class="keyword">...</span>
+0042     <span class="string">'(x_acceleration-x_o)/x_s as x, \n'</span>,<span class="keyword">...</span>
+0043     <span class="string">'(y_acceleration-y_o)/y_s as y, \n'</span>,<span class="keyword">...</span>
+0044     <span class="string">'(z_acceleration-z_o)/z_s as z, \n'</span>,<span class="keyword">...</span>
+0045     <span class="string">'speed AS ispd, \n'</span>,<span class="keyword">...</span>
+0046     <span class="string">'tspd \n'</span>,<span class="keyword">...</span>
+0047     <span class="string">'FROM gps.uva_acceleration101\n'</span>,<span class="keyword">...</span>
+0048     <span class="string">'JOIN gps.uva_device USING (device_info_serial)\n'</span>,<span class="keyword">...</span>
+0049     <span class="string">'JOIN gps.uva_tracking_speed i USING (device_info_serial, date_time)\n'</span>,<span class="keyword">...</span>
+0050     <span class="string">'JOIN (\n'</span>,<span class="keyword">...</span>
+0051     <span class="string">'      SELECT device_info_serial, date_time, speed AS tspd\n'</span>,<span class="keyword">...</span>
+0052     <span class="string">'      FROM gps.get_uvagps_track_speed(%d, ''%s'', ''%s'')\n'</span>,<span class="keyword">...</span>
+0053     <span class="string">') t USING (device_info_serial, date_time)\n'</span>,<span class="keyword">...</span>
+0054     <span class="string">'WHERE device_info_serial = %d \n'</span>,<span class="keyword">...</span>
+0055     <span class="string">'AND date_time BETWEEN ''%s'' AND ''%s'' \n'</span>,<span class="keyword">...</span>
+0056     <span class="string">'AND latitude IS NOT NULL AND userflag &lt;&gt; 1 \n'</span>,<span class="keyword">...</span>
+0057     <span class="string">'ORDER BY device_info_serial, date_time, index\n'</span>,<span class="keyword">...</span>
+0058 ];
+0059 
+0060 <span class="keyword">if</span> limited
+0061     sql_query_tpl = [
+0062         <span class="string">'SELECT \n'</span>,<span class="keyword">...</span>
+0063         <span class="string">'device_info_serial AS device, \n'</span>,<span class="keyword">...</span>
+0064         <span class="string">'date_time, \n'</span>,<span class="keyword">...</span>
+0065         <span class="string">'index, \n'</span>,<span class="keyword">...</span>
+0066         <span class="string">'longitude AS long, \n'</span>,<span class="keyword">...</span>
+0067         <span class="string">'latitude AS lat, \n'</span>,<span class="keyword">...</span>
+0068         <span class="string">'altitude AS alt, \n'</span>,<span class="keyword">...</span>
+0069         <span class="string">'(x_acceleration-x_o)/x_s as x, \n'</span>,<span class="keyword">...</span>
+0070         <span class="string">'(y_acceleration-y_o)/y_s as y, \n'</span>,<span class="keyword">...</span>
+0071         <span class="string">'(z_acceleration-z_o)/z_s as z, \n'</span>,<span class="keyword">...</span>
+0072         <span class="string">'speed AS ispd, \n'</span>,<span class="keyword">...</span>
+0073         <span class="string">'tspd \n'</span>,<span class="keyword">...</span>
+0074         <span class="string">'FROM gps.uva_acceleration_limited\n'</span>,<span class="keyword">...</span>
+0075         <span class="string">'JOIN gps.uva_device_limited USING (device_info_serial)\n'</span>,<span class="keyword">...</span>
+0076         <span class="string">'JOIN gps.uva_tracking_speed_limited i USING (device_info_serial, date_time)\n'</span>,<span class="keyword">...</span>
+0077         <span class="string">'JOIN (\n'</span>,<span class="keyword">...</span>
+0078         <span class="string">'      SELECT device_info_serial, date_time, speed AS tspd\n'</span>,<span class="keyword">...</span>
+0079         <span class="string">'      FROM gps.get_uvagps_track_speed(%d, ''%s'', ''%s'')\n'</span>,<span class="keyword">...</span>
+0080         <span class="string">') t USING (device_info_serial, date_time)\n'</span>,<span class="keyword">...</span>
+0081         <span class="string">'WHERE device_info_serial = %d \n'</span>,<span class="keyword">...</span>
+0082         <span class="string">'AND date_time BETWEEN ''%s'' AND ''%s'' \n'</span>,<span class="keyword">...</span>
+0083         <span class="string">'AND latitude IS NOT NULL AND userflag &lt;&gt; 1 \n'</span>,<span class="keyword">...</span>
+0084         <span class="string">'ORDER BY device_info_serial, date_time, index\n'</span>,<span class="keyword">...</span>
+0085     ];
+0086 <span class="keyword">end</span>
+0087 
+0088 <span class="comment">%% Generate/load query</span>
+0089 sql_query = sprintf(sql_query_tpl, device, starttime, stoptime, device, starttime, stoptime);
+0090 
+0091 <span class="comment">% Run query</span>
+0092 data = pg_fetch_struct(connection, sql_query);
+0093 
+0094</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

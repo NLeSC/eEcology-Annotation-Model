@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getDataFromAnnotStruct</title>
+  <meta name="keywords" content="getDataFromAnnotStruct">
+  <meta name="description" content="% getDataFromAnnotStruct- creates data array from the annotation structure of AccVidGui">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; getDataFromAnnotStruct.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>getDataFromAnnotStruct
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% getDataFromAnnotStruct- creates data array from the annotation structure of AccVidGui</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [data]=getDataFromAnnotStruct(annot_struct) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% getDataFromAnnotStruct- creates data array from the annotation structure of AccVidGui
+
+ author: Elena Ranguelova, NLeSc
+ date creation: 22-11-2013
+ last modification date:
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ [data]=getDataFromAnnotStruct(annot_struct)
+
+ INPUT
+ annot_struct- annotation structure as outputted by AccVidGui
+
+ OUPTPUT
+ data- the data matrix containing the relevrant data from the annotation
+ structure
+
+ EXAMPLE
+ load ./data/Annotated_data/D320_08062010.mat
+ data = getDataFromAnnotStruct(outputStruct)
+
+ SEE ALSO
+ AccVidGui- annotation tool developed by Merijn deBakker
+
+ REFERENCES
+ Based on Merijn's code getLablsFromStruct.m
+
+ NOTES</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="prepareData.html" class="code" title="function [train,test,permutation] = prepareData(annot_struct,frac,labvec)">prepareData</a>	wrapper function for preparing annotated data for classification.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% getDataFromAnnotStruct- creates data array from the annotation structure of AccVidGui</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 22-11-2013</span>
+0005 <span class="comment">% last modification date:</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% [data]=getDataFromAnnotStruct(annot_struct)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% INPUT</span>
+0012 <span class="comment">% annot_struct- annotation structure as outputted by AccVidGui</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% OUPTPUT</span>
+0015 <span class="comment">% data- the data matrix containing the relevrant data from the annotation</span>
+0016 <span class="comment">% structure</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% EXAMPLE</span>
+0019 <span class="comment">% load ./data/Annotated_data/D320_08062010.mat</span>
+0020 <span class="comment">% data = getDataFromAnnotStruct(outputStruct)</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% SEE ALSO</span>
+0023 <span class="comment">% AccVidGui- annotation tool developed by Merijn deBakker</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% REFERENCES</span>
+0026 <span class="comment">% Based on Merijn's code getLablsFromStruct.m</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">% NOTES</span>
+0029 <span class="comment">%</span>
+0030 
+0031 <a name="_sub0" href="#_subfunctions" class="code">function [data]=getDataFromAnnotStruct(annot_struct)</a>
+0032 
+0033 <span class="comment">% initialization</span>
+0034 num_samples = annot_struct.nOfSamples;
+0035 <span class="comment">%num_tags = size(annot_struct.tags,2);</span>
+0036 <span class="comment">%data = zeros(num_samples, 7+num_tags);</span>
+0037 data = [];
+0038 
+0039     <span class="keyword">for</span> i = 1:num_samples
+0040         id=[];
+0041         sp=[];
+0042         da=[];
+0043         index1=[];
+0044 
+0045         date = datenum([annot_struct.year(i) annot_struct.month(i) annot_struct.day(i) <span class="keyword">...</span>
+0046             annot_struct.hour(i) annot_struct.min(i) annot_struct.sec(i)]);
+0047         maxN = max([size(annot_struct.accX{i},2),size(annot_struct.accY{i},2),size(annot_struct.accZ{i},2)]);  
+0048         annot_struct.accX{i}(end+1:maxN) = NaN;
+0049         annot_struct.accY{i}(end+1:maxN) = NaN;
+0050         annot_struct.accZ{i}(end+1:maxN) = NaN;
+0051 
+0052         id(1:maxN,1) = annot_struct.sampleID(i);
+0053         da(1:maxN,1) = date;
+0054 
+0055         <span class="comment">%sp(1:maxN,1) = annot_struct.gpsSpd2D(i);</span>
+0056         sp(1:maxN,1) = annot_struct.gpsSpd(i);
+0057         index1 = 0:maxN-1;
+0058 
+0059         data       = [data; <span class="keyword">...</span>
+0060                      id da index1' <span class="keyword">...</span>
+0061                      annot_struct.accX{i}' annot_struct.accY{i}' annot_struct.accZ{i}' <span class="keyword">...</span>
+0062                      sp annot_struct.tags{i}];
+0063 
+0064     <span class="keyword">end</span>
+0065 
+0066 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

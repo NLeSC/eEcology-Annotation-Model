@@ -4,7 +4,7 @@
 clear all,close all, clc
 
 databaseHost = 'db.e-ecology.sara.nl';
-project_path = fullfile('/','home','elena','LifeWatch','eEcology-Annotation-Model','ClassificationExperiments-Elena');
+project_path = fullfile('/','home','christiaan','eEcology','ClassificationExperiments-Elena');
 data_path = fullfile(project_path,'data');
 results_path = fullfile(project_path,'results');
 

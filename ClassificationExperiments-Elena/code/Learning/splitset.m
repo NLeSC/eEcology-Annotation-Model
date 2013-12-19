@@ -9,7 +9,7 @@
 %varargin: train-filename (csv), test-filename (csv)
 %OUTPUT: train- validationset as a matrix, and if desired as a csv-file. 
 
-function [trainSet, validationSet, P] = splitset(featureM, validationSize)
+function [trainSet, validationSet] = splitset(featureM, validationSize)
 
 trainsetSize = round(validationSize*size(featureM,1));
 

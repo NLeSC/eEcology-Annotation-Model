@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of makeCSVanot</title>
+  <meta name="keywords" content="makeCSVanot">
+  <meta name="description" content="% makeCSVanot - function to generate CSV file with annotations">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Classification</a> &gt; makeCSVanot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>makeCSVanot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% makeCSVanot - function to generate CSV file with annotations</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function []= makeCSVanot(inp_data,classText, dateTimeFormat, fileName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% makeCSVanot - function to generate CSV file with annotations
+
+ author: Stefan Verhoeven, NLeSc
+ date creation: 28-10-2013
+ last modification date:
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ []=makeCSVanot(inp_data, ...
+                classText, dateTimeFormat, fileName)
+
+ INPUT
+ inp_data- anotated data as output by the classification
+ classText- the classification legend string
+ dateTimeFormat- the format for the date and time to be displayed
+ fileName - the filename of the csv file
+
+ OUPTPUT
+ device,datetime,class\n
+
+ EXAMPLE
+ see classificator.m
+
+ SEE ALSO
+
+ REFERENCES
+ Any publications or resources used
+
+ NOTES
+ extra notes</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% makeCSVanot - function to generate CSV file with annotations</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Stefan Verhoeven, NLeSc</span>
+0004 <span class="comment">% date creation: 28-10-2013</span>
+0005 <span class="comment">% last modification date:</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% []=makeCSVanot(inp_data, ...</span>
+0010 <span class="comment">%                classText, dateTimeFormat, fileName)</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% INPUT</span>
+0013 <span class="comment">% inp_data- anotated data as output by the classification</span>
+0014 <span class="comment">% classText- the classification legend string</span>
+0015 <span class="comment">% dateTimeFormat- the format for the date and time to be displayed</span>
+0016 <span class="comment">% fileName - the filename of the csv file</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% OUPTPUT</span>
+0019 <span class="comment">% device,datetime,class\n</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% EXAMPLE</span>
+0022 <span class="comment">% see classificator.m</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% SEE ALSO</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% REFERENCES</span>
+0027 <span class="comment">% Any publications or resources used</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% NOTES</span>
+0030 <span class="comment">% extra notes</span>
+0031 
+0032 <a name="_sub0" href="#_subfunctions" class="code">function []= makeCSVanot(inp_data, </a><span class="keyword">...</span>
+0033                          classText, dateTimeFormat, fileName)
+0034 
+0035 nrows = length(inp_data.device);
+0036 <span class="comment">% TODO dateTimes are printed as 2 instead of 2010-06-28T07:54:51Z</span>
+0037 dateTimes = datestr(inp_data.datetime, dateTimeFormat);
+0038 
+0039 fid = fopen(fileName, <span class="string">'wt'</span>);
+0040 fprintf(fid, <span class="string">'id,datetime,class\n'</span>);
+0041 <span class="keyword">for</span> row=1:nrows
+0042     fprintf(fid, <span class="string">'%d,%s,%s\n'</span>, inp_data.device(row), dateTimes(row,:), classText(5*(inp_data.class(row)-1)+1:5*(inp_data.class(row)-1)+5));
+0043 <span class="keyword">end</span>
+0044 fclose(fid);</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calcFeatureVectors</title>
+  <meta name="keywords" content="calcFeatureVectors">
+  <meta name="description" content="% calcFeatureVectors - feature vectors computaion for classifiers">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Features</a> &gt; calcFeatureVectors.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Features&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>calcFeatureVectors
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% calcFeatureVectors - feature vectors computaion for classifiers</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [FTV,INFO] = calcFeatureVectors(data,  windowSize, overlap, epsilon) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% calcFeatureVectors - feature vectors computaion for classifiers
+
+ author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc, Christiaan
+ Meijer, NLeSc
+ date creation: 11-2011
+ last modification date: 17-12-2013
+ modification details: refactored: changed variable names to improve
+ readability. 
+ -----------------------------------------------------------------------
+ SYNTAX
+ [FTV, INFO]=calFeatureVectors(data, windowSize, overlap, epsilon)
+
+ INPUT
+ data- NxM matrix containing unlabelled data. Format:
+       [device,datetime,index,x,y,z,spd]
+ windowSize- thesegmentaiton window size
+ overlap- the proportion of overlap of the windows (range [0 - 1])
+ epsilon- tolerance parameter for the motionlessness feature
+
+ OUPTPUT
+ FTV- NxM matrix containing N vectors with M features
+ INFO - cell array containing helpful information about the feature vector
+
+ EXAMPLE
+ 
+ 
+ SEE ALSO
+ windowing (same file)
+
+ REFERENCES
+ &quot;Automatic Classification of Bird Behaviour on the base of Accelerometer
+ Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
+
+ NOTES:
+   1. Function based on functions makeFeaturesNSpd and windowingNSpd. This
+   adapted verrsion has no settings for filtering, etc.
+   2. datetime is assumed to be datenum format.
+   3. This function operates on unlabelled data only.
+   4. ! Important: Model is trained using 2D speed instead of 3D speed.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="calcCorrelation.html" class="code" title="function CM = calcCorrelation(M)">calcCorrelation</a>	% calcCorrelation - calculates correlation features</li><li><a href="calcFrequency.html" class="code" title="function FFTM = calcFrequency(M)">calcFrequency</a>	% calcFrequency - calculates frequency spectral features</li><li><a href="calcMotionlessness.html" class="code" title="function Mmotionless = calcMotionlessness(M, epsilon)">calcMotionlessness</a>	% calcMotionlessness - calculates motionlessness features</li><li><a href="calcNoise.html" class="code" title="function noise = calcNoise(M)">calcNoise</a>	% calcNoise - calculates the noise content feature</li><li><a href="calcODBA.html" class="code" title="function ODBA = calcODBA(M,w)">calcODBA</a>	% calcODBA - calculates the Overall Dynamic Body Acceleration feature</li><li><a href="calcPosition.html" class="code" title="function PRM = calcPosition(M)">calcPosition</a>	% calcPosition - calculates function position features</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function windows = windowing(M, wSize, overlapFraction)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% calcFeatureVectors - feature vectors computaion for classifiers</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc, Christiaan</span>
+0004 <span class="comment">% Meijer, NLeSc</span>
+0005 <span class="comment">% date creation: 11-2011</span>
+0006 <span class="comment">% last modification date: 17-12-2013</span>
+0007 <span class="comment">% modification details: refactored: changed variable names to improve</span>
+0008 <span class="comment">% readability.</span>
+0009 <span class="comment">% -----------------------------------------------------------------------</span>
+0010 <span class="comment">% SYNTAX</span>
+0011 <span class="comment">% [FTV, INFO]=calFeatureVectors(data, windowSize, overlap, epsilon)</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% INPUT</span>
+0014 <span class="comment">% data- NxM matrix containing unlabelled data. Format:</span>
+0015 <span class="comment">%       [device,datetime,index,x,y,z,spd]</span>
+0016 <span class="comment">% windowSize- thesegmentaiton window size</span>
+0017 <span class="comment">% overlap- the proportion of overlap of the windows (range [0 - 1])</span>
+0018 <span class="comment">% epsilon- tolerance parameter for the motionlessness feature</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% OUPTPUT</span>
+0021 <span class="comment">% FTV- NxM matrix containing N vectors with M features</span>
+0022 <span class="comment">% INFO - cell array containing helpful information about the feature vector</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% EXAMPLE</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% SEE ALSO</span>
+0028 <span class="comment">% windowing (same file)</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% REFERENCES</span>
+0031 <span class="comment">% &quot;Automatic Classification of Bird Behaviour on the base of Accelerometer</span>
+0032 <span class="comment">% Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">% NOTES:</span>
+0035 <span class="comment">%   1. Function based on functions makeFeaturesNSpd and windowingNSpd. This</span>
+0036 <span class="comment">%   adapted verrsion has no settings for filtering, etc.</span>
+0037 <span class="comment">%   2. datetime is assumed to be datenum format.</span>
+0038 <span class="comment">%   3. This function operates on unlabelled data only.</span>
+0039 <span class="comment">%   4. ! Important: Model is trained using 2D speed instead of 3D speed.</span>
+0040 
+0041 
+0042 <a name="_sub0" href="#_subfunctions" class="code">function [FTV,INFO] = calcFeatureVectors(data,  windowSize, overlap, epsilon)</a>
+0043 
+0044 r1 = find(data(:,3)==0);
+0045 r2 = find(diff(data(:,3))~=1)+1;
+0046 r = unique(sort([1;r1;r2]));
+0047 
+0048 WM = {};
+0049 
+0050 <span class="comment">% windowSize = 20;</span>
+0051 <span class="comment">% overlap = 0;</span>
+0052 <span class="comment">% epsilon = 0.3;</span>
+0053 
+0054 <span class="keyword">for</span> i=1:length(r)-1
+0055     seriesLength = r(i+1)-r(i);
+0056 
+0057     <span class="comment">%if the number of frames is too small, skip this sample</span>
+0058     <span class="keyword">if</span> seriesLength&lt;windowSize
+0059         <span class="keyword">continue</span>
+0060     <span class="keyword">end</span>
+0061 
+0062     <span class="comment">%make windows. see for variable input (for filtering) the windowing function!</span>
+0063     windows = <a href="#_sub1" class="code" title="subfunction windows = windowing(M, wSize, overlapFraction)">windowing</a>(data(r(i):r(i+1)-1,:),windowSize,overlap);
+0064        
+0065     
+0066     WM = [WM;windows];            
+0067 <span class="keyword">end</span>
+0068 
+0069 WM = [WM;<a href="#_sub1" class="code" title="subfunction windows = windowing(M, wSize, overlapFraction)">windowing</a>(data(r(end):<span class="keyword">end</span>,:),windowSize,overlap)];
+0070 windows = {WM{:,1}}';
+0071 
+0072 <span class="comment">% % debug display</span>
+0073 <span class="comment">% disp('calFeatureVectors: after windowing: '), size(windows)</span>
+0074     
+0075 <span class="keyword">if</span> ~isempty(windows)
+0076 
+0077     <span class="comment">%position features (e.g. pitch, roll, etc.)</span>
+0078     SPRM = cellfun(@<a href="calcPosition.html" class="code" title="function PRM = calcPosition(M)">calcPosition</a>, windows, <span class="string">'uniformoutput'</span>, false);
+0079 
+0080     <span class="comment">%correlation features</span>
+0081     CM = cellfun(@<a href="calcCorrelation.html" class="code" title="function CM = calcCorrelation(M)">calcCorrelation</a>, windows, <span class="string">'uniformoutput'</span>, false);
+0082 
+0083     <span class="comment">%motionlessness feature matrix for window set</span>
+0084     MLM = cellfun(@(x) <a href="calcMotionlessness.html" class="code" title="function Mmotionless = calcMotionlessness(M, epsilon)">calcMotionlessness</a>(x,epsilon), windows, <span class="string">'uniformoutput'</span>, false);
+0085     
+0086     <span class="comment">%fourier transform feature matrix for window set</span>
+0087     FM = cellfun(@<a href="calcFrequency.html" class="code" title="function FFTM = calcFrequency(M)">calcFrequency</a>, windows, <span class="string">'uniformoutput'</span>, false);
+0088 
+0089     <span class="comment">%wavelet features</span>
+0090     <span class="comment">%WAV = wav(WM,3);</span>
+0091 
+0092     <span class="comment">%retrieve the speed from the data</span>
+0093     SPD = {WM{:,8}}';
+0094 
+0095     <span class="comment">%'noise'</span>
+0096     SN = cellfun(@<a href="calcNoise.html" class="code" title="function noise = calcNoise(M)">calcNoise</a>, windows, <span class="string">'uniformoutput'</span>, false);
+0097 
+0098     <span class="comment">%ODBA</span>
+0099     ODBA = cellfun(@(x) <a href="calcODBA.html" class="code" title="function ODBA = calcODBA(M,w)">calcODBA</a>(x,windowSize/2), windows, <span class="string">'uniformoutput'</span>, false);
+0100 
+0101     FTV = [cell2mat(SPRM), cell2mat(CM), cell2mat(MLM),<span class="keyword">...</span>
+0102         cell2mat(FM), cell2mat(SPD),cell2mat(SN),cell2mat(ODBA)];
+0103     INFO = [WM(:,1) WM(:,3) WM(:,4) WM(:,5) WM(:,6) WM(:,7) WM(:,8) WM(:,2)];
+0104 
+0105 <span class="keyword">end</span>
+0106 
+0107 <span class="keyword">end</span>
+0108 
+0109 <a name="_sub1" href="#_subfunctions" class="code">function windows = windowing(M, wSize, overlapFraction)</a>
+0110 
+0111 windows = {};
+0112 mLength = size(M,1);
+0113 
+0114 <span class="keyword">if</span> overlapFraction&gt;0
+0115     step = wSize * overlapFraction;
+0116 <span class="keyword">else</span>
+0117     step = wSize;
+0118 <span class="keyword">end</span>
+0119 
+0120 <span class="comment">%start position</span>
+0121 startPos=1;
+0122 <span class="comment">%windownr</span>
+0123 windowNo=1;
+0124 
+0125 <span class="keyword">while</span> startPos+wSize&lt;=mLength+1;
+0126              
+0127      [r,~] = find(isnan(M(startPos:startPos+wSize-1,4:6)));
+0128      <span class="keyword">if</span> ~isempty(r)
+0129          startPos = startPos+step;
+0130          <span class="keyword">continue</span>
+0131      <span class="keyword">else</span>
+0132          windows{windowNo,1} = M(startPos:startPos+wSize-1,4:6);
+0133          <span class="comment">%label, not used here</span>
+0134          windows{windowNo,2} = NaN;
+0135          windows{windowNo,3} = M(startPos,1);
+0136          windows{windowNo,4} = M(startPos,2);
+0137          windows{windowNo,5} = M(startPos+wSize-1,2);
+0138          windows{windowNo,6} = M(startPos,3);
+0139          windows{windowNo,7} = M(startPos+wSize-1,3);
+0140          windows{windowNo,8} = M(startPos,7); 
+0141          startPos = startPos+step;
+0142          windowNo = windowNo+1;
+0143      <span class="keyword">end</span>
+0144 
+0145 <span class="keyword">end</span>
+0146 
+0147 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

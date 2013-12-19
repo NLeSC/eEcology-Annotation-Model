@@ -1,0 +1,1236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of dtc_e</title>
+  <meta name="keywords" content="dtc_e">
+  <meta name="description" content="% dtc_e - the PRTools dtc- decision tree classifier with small enhanecement">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Classification</a> &gt; dtc_e.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>dtc_e
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% dtc_e - the PRTools dtc- decision tree classifier with small enhanecement</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function w = dtc_e(a, crit, chisqstopval, prune, t, nfeat) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% dtc_e - the PRTools dtc- decision tree classifier with small enhanecement
+
+ author: Elena Ranguelova, NLeSc
+ date creation: 11/10/2013
+ last modification date:
+ modification details: added prtrace(mfilename) similar to Merijn's treec
+ version</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function tree = makedt(a, feattype, usefeat, nfeat, c, nlab, weights, cost, crit, chisqstopval)</a></li><li><a href="#_sub2" class="code">function [p, s] = mapdt(tree, a, nlab, weights)</a></li><li><a href="#_sub3" class="code">function [fidx, fval, nb, bidx, chisqval, critval] = findsplit(a, feattype, usefeat, nfeat, c, nlab, weights, cost, crit)</a></li><li><a href="#_sub4" class="code">function [critval, idx] = igr(feattype, varargin)</a></li><li><a href="#_sub5" class="code">function [critval, idx] = gini(feattype, varargin)</a></li><li><a href="#_sub6" class="code">function [critval, idx] = miscls(feattype, varargin)</a></li><li><a href="#_sub7" class="code">function tree = prunep(tree, node)</a></li><li><a href="#_sub8" class="code">function tree = prunet(tree, t, cost)</a></li><li><a href="#_sub9" class="code">function tree = cleandt(tree)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% dtc_e - the PRTools dtc- decision tree classifier with small enhanecement</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 11/10/2013</span>
+0005 <span class="comment">% last modification date:</span>
+0006 <span class="comment">% modification details: added prtrace(mfilename) similar to Merijn's treec</span>
+0007 <span class="comment">% version</span>
+0008 
+0009 <span class="comment">%DTC Verzakov Tree - Decision Tree Classifier</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">%   W = DTC(A, CRIT, CHISQSTOPVAL, PRUNE, T, NFEAT)</span>
+0012 <span class="comment">%</span>
+0013 <span class="comment">% INPUT</span>
+0014 <span class="comment">%   A       Training dataset.</span>
+0015 <span class="comment">%           Object weights and class priors:</span>
+0016 <span class="comment">%             It is possible to assign individual weights to dataset</span>
+0017 <span class="comment">%             objects by using 'weights' identifier:</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">%             A = SETIDENT(A, WEIGHTS, 'weights')</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">%             If weights are not defined they assumed to be equal to 1 for</span>
+0022 <span class="comment">%             all objects. The actual weights used by the training routine</span>
+0023 <span class="comment">%             are computed by using supplied weights along with the class</span>
+0024 <span class="comment">%             priors (if priors are not set then the apparent priors are used):</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">%             ACTUAL_WEIGHTS(I) = M*(WEIGHTS(I)/CW(C))*(PRIOR(C)/SUM(PRIOR))</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">%             where M is the total amount of (labelled) objects in A,</span>
+0029 <span class="comment">%             CW is the vector weights sums for each class, and C is</span>
+0030 <span class="comment">%             the class of the object I. The sum of all actual weights is M.</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">%           Feature types:</span>
+0033 <span class="comment">%             Features are treated diffrently based on their domain information.</span>
+0034 <span class="comment">%             If the feature domain is empty or is the interval/collection of intervals</span>
+0035 <span class="comment">%             then this feature is considered to be the continuous one and</span>
+0036 <span class="comment">%             branches are created by splitting at the threshold value.</span>
+0037 <span class="comment">%             Otherwise (feature domain specifies a set of values or set of</span>
+0038 <span class="comment">%             names), the feature is considered to be the nominal one and</span>
+0039 <span class="comment">%             branches corresponding to all present feature values are</span>
+0040 <span class="comment">%             created.</span>
+0041 <span class="comment">%</span>
+0042 <span class="comment">%           Unknown and 'non-applicable' values:</span>
+0043 <span class="comment">%           If the feature value is NaN then it is assumed that its value</span>
+0044 <span class="comment">%           is unknown. In such a situation the object with unknown value</span>
+0045 <span class="comment">%           is split into fractions and sent down all branches.</span>
+0046 <span class="comment">%           The concept of the 'non-applicable' feature value is different</span>
+0047 <span class="comment">%           from the concept of the unknown (missing) value.</span>
+0048 <span class="comment">%           ...</span>
+0049 <span class="comment">%           The 'non-applicable' values for the continues features are</span>
+0050 <span class="comment">%           encoded as INF. If feature domain is the (set of) interval(s),</span>
+0051 <span class="comment">%           then INF value has to be explicitly added to the domain</span>
+0052 <span class="comment">%           defintion. The 'non-applicable' value of nominal features</span>
+0053 <span class="comment">%           does not have predefined encoding. If it is necessary user</span>
+0054 <span class="comment">%           have to include such value into domain definition.</span>
+0055 <span class="comment">%</span>
+0056 <span class="comment">%   CRIT   Splitting citerion name.</span>
+0057 <span class="comment">%          'igr' Information Gain Ratio (default):</span>
+0058 <span class="comment">%          As defined by Quinlan. The penalty on the number of the distinct</span>
+0059 <span class="comment">%          values of the continues feature is used. If the gain is zero or</span>
+0060 <span class="comment">%          negative due to such penalization, the split is not performed.</span>
+0061 <span class="comment">%          This leads to smaller trees and may give non-zero training error.</span>
+0062 <span class="comment">%          This criterion does not use costs. (Costs are used only at the classification step).</span>
+0063 <span class="comment">%</span>
+0064 <span class="comment">%          'gini' Gini impurity index. More precisely, the change in this</span>
+0065 <span class="comment">%          index. GINI index can be interpreted as a misclassification rate</span>
+0066 <span class="comment">%          for the stochastic prior based classifier, so costs are</span>
+0067 <span class="comment">%          naturally embedded. If the change in the (absolute) error less</span>
+0068 <span class="comment">%          or equal to 0.1 (change in the cost less or equal to 0.1 of minimal</span>
+0069 <span class="comment">%          absolute value of non-zero costs) the split is not performed.</span>
+0070 <span class="comment">%          This leads to smaller trees and may give non-zero training error.</span>
+0071 <span class="comment">%</span>
+0072 <span class="comment">%          'miscls' Classification error criterion.</span>
+0073 <span class="comment">%          To be used only for educational puposes because</span>
+0074 <span class="comment">%          it gives rather inferior results. Costs are naturally embedded.</span>
+0075 <span class="comment">%</span>
+0076 <span class="comment">%   CHISQSTOPVAL Early stopping crtitical value for the chi-squared test</span>
+0077 <span class="comment">%          on the difference between the original node class distribution and</span>
+0078 <span class="comment">%          branches class distributions. CHISQSTOPVAL is 0 by default.</span>
+0079 <span class="comment">%          Which means that branches will be discarded only if they bring no</span>
+0080 <span class="comment">%          change in class distribution.</span>
+0081 <span class="comment">%</span>
+0082 <span class="comment">%   PRUNE  Pruning type name</span>
+0083 <span class="comment">%          'prunep' - pessimistic (top-down) pruning as defined by Quinlan.</span>
+0084 <span class="comment">%          Pessimistic pruning be perfromed if cost matrix is defined.</span>
+0085 <span class="comment">%          'prunet' - test set (bottom-up) pruning using the (required)</span>
+0086 <span class="comment">%          dataset T.</span>
+0087 <span class="comment">%          These implementations of both pruning algorithms may be not</span>
+0088 <span class="comment">%          exactly correct if there are unknown values in datastes.</span>
+0089 <span class="comment">%</span>
+0090 <span class="comment">%   T      Test test for the test set pruning</span>
+0091 <span class="comment">%</span>
+0092 <span class="comment">% OUTPUT</span>
+0093 <span class="comment">%   W      Classifier mapping</span>
+0094 <span class="comment">%</span>
+0095 <span class="comment">% DESCRIPTION</span>
+0096 <span class="comment">%    If (full grown) branches of (sub)tree do not improve classification error</span>
+0097 <span class="comment">%    (misclassification cost) they are immediatley discarded.</span>
+0098 <span class="comment">%    This may happen because we use regularized posteriors. As a result</span>
+0099 <span class="comment">%    the algorithm is more stable, trees are smaller, but split on</span>
+0100 <span class="comment">%    the training set may be not perfect.</span>
+0101 <span class="comment">%</span>
+0102 <span class="comment">% REFERENCES</span>
+0103 <span class="comment">% [1] J.R. Quinlan, Simplifying Decision Trees, International Journal of</span>
+0104 <span class="comment">%     Man-Machine Studies, 27(3), pp. 221-234, 1987.</span>
+0105 <span class="comment">% [2] J.R. Quinlan, Improved use of continuous attributes in C4.5. Journal</span>
+0106 <span class="comment">%     of AI Research, 4(96), pp. 77-90, 1996.</span>
+0107 <span class="comment">%</span>
+0108 <span class="comment">% see also DATASETS, MAPPINGS, TREEC</span>
+0109 
+0110 <span class="comment">% Copyright: S. Verzakov, s.verzakov@gmail.com</span>
+0111 <span class="comment">% Based on prtools' treec, tree_map, and their subroutines</span>
+0112 <span class="comment">% by Guido te Brake and R.P.W Duin</span>
+0113 
+0114 <a name="_sub0" href="#_subfunctions" class="code">function w = dtc_e(a, crit, chisqstopval, prune, t, nfeat)</a>
+0115 
+0116     prtrace(mfilename);
+0117     
+0118     <span class="comment">% When no input data is given, an empty tree is defined:</span>
+0119     <span class="keyword">if</span> (nargin == 0) || isempty(a)
+0120     
+0121     <span class="keyword">if</span> nargin &lt; 2 || isempty(crit)
+0122             crit = <span class="string">'igr'</span>;
+0123     <span class="keyword">end</span>
+0124     
+0125     <span class="keyword">if</span> nargin &lt; 3 || isempty(chisqstopval)
+0126       chisqstopval = 0;
+0127     <span class="keyword">end</span>
+0128     
+0129     <span class="keyword">if</span> nargin &lt; 4 || isempty(prune)
+0130       prune = <span class="string">''</span>;
+0131     <span class="keyword">end</span>
+0132     
+0133     <span class="keyword">if</span> nargin &lt; 5
+0134       t = [];
+0135     <span class="keyword">end</span>
+0136     
+0137     <span class="keyword">if</span> nargin &lt; 6
+0138       nfeat = [];
+0139     <span class="keyword">end</span>
+0140     
+0141     w = prmapping(<span class="string">'dtc'</span>, {crit, chisqstopval, prune, t, nfeat});
+0142     w = setname(w, [<span class="string">'DecTree'</span> upper(crit)]);
+0143     
+0144   <span class="keyword">elseif</span> (nargin == 2) &amp;&amp; ismapping(crit)
+0145     <span class="comment">% Execution</span>
+0146     w = crit;    
+0147     tree = +w;
+0148     
+0149     <span class="comment">% B contains posteriors.</span>
+0150     <span class="comment">% We do not need to convert posteriors to costs.</span>
+0151     <span class="comment">% PRTools will do it automatically</span>
+0152 
+0153     b = <a href="#_sub2" class="code" title="subfunction [p, s] = mapdt(tree, a, nlab, weights)">mapdt</a>(tree, +a);
+0154     b = setdat(a,b,w);
+0155 <span class="comment">%    b = setfeatlab(b, getlabels(w));</span>
+0156     
+0157     w = b;
+0158   
+0159   <span class="keyword">else</span>
+0160     <span class="comment">% Training</span>
+0161     
+0162     <span class="keyword">if</span> nargin &lt; 2 || isempty(crit)
+0163       crit = <span class="string">'igr'</span>; 
+0164     <span class="keyword">end</span>
+0165 
+0166     <span class="keyword">if</span> nargin &lt; 3 || isempty(chisqstopval)
+0167       chisqstopval = 0; 
+0168     <span class="keyword">end</span>
+0169     
+0170     <span class="keyword">if</span> nargin &lt; 4 || isempty(prune)
+0171       prune = <span class="string">''</span>; 
+0172     <span class="keyword">end</span>
+0173 
+0174     <span class="keyword">if</span> nargin &lt; 5
+0175       t = []; 
+0176     <span class="keyword">end</span>
+0177     
+0178     <span class="keyword">if</span> nargin &lt; 6
+0179       nfeat = []; 
+0180     <span class="keyword">end</span>
+0181     
+0182     
+0183     <span class="keyword">if</span> ~any(strcmpi(crit, {<span class="string">'igr'</span>, <span class="string">'gini'</span>, <span class="string">'miscls'</span>}))
+0184       error(<span class="string">'Unknown splitting criterion'</span>);
+0185     <span class="keyword">end</span>
+0186 
+0187     islabtype(a,<span class="string">'crisp'</span>);
+0188     isvaldfile(a, 1, 2); <span class="comment">% at least 1 object per class, 2 classes</span>
+0189     a = seldat(prdataset(a)); <span class="comment">% get rid of all unlabelled objects</span>
+0190     
+0191     m = size(a,1);
+0192     <span class="comment">% Get weights (if defined)</span>
+0193     weights = getident(a, <span class="string">'weights'</span>);
+0194     <span class="keyword">if</span> isempty(weights)
+0195       weights = ones([m 1]);
+0196     <span class="keyword">else</span>
+0197      idx = (weights &gt; 0);
+0198      <span class="keyword">if</span> nnz(idx) &lt; m
+0199        a = a(idx, :);  
+0200        weights = weights(idx);
+0201      <span class="keyword">end</span>
+0202      isvaldset(a, 1, 2); 
+0203     <span class="keyword">end</span>
+0204       
+0205     <span class="comment">% First get some useful parameters:</span>
+0206     
+0207     <span class="comment">% Sizes</span>
+0208     [m, k, c] = getsize(a);
+0209     cs = classsizes(a);
+0210 
+0211     <span class="comment">% Determine if features are categorical</span>
+0212     featdom = getfeatdom(a);
+0213     featdom = featdom(:)';
+0214     <span class="keyword">if</span> isempty(featdom)
+0215       feattype = zeros(1, k);
+0216     <span class="keyword">else</span>
+0217       feattype = cellfun(@(x) ischar(x) || (size(x,1)==1), featdom);
+0218     <span class="keyword">end</span>
+0219     
+0220     <span class="comment">% Features to use</span>
+0221     usefeat = true([1, k]);
+0222     <span class="keyword">if</span> ~isempty(nfeat)
+0223       nfeat = min(nfeat, k);
+0224     <span class="keyword">end</span>
+0225 
+0226     <span class="comment">% Labelling</span>
+0227     nlab = getnlab(a);
+0228     
+0229     <span class="comment">% Get priors</span>
+0230     prior = getprior(a);
+0231     prior = prior/sum(prior);
+0232     
+0233     <span class="comment">% Define weights:</span>
+0234     <span class="comment">% the total sum of weights is equal to m</span>
+0235     <span class="comment">% Compute class weights</span>
+0236     cw = zeros(size(cs));
+0237     <span class="keyword">for</span> i=1:c
+0238       cw(i) = sum(weights(nlab == i));
+0239     <span class="keyword">end</span>
+0240     <span class="comment">% Rescale objects weights</span>
+0241     <span class="comment">% by class weight factors derived from priors</span>
+0242     cwf = m*prior./cw;
+0243     weights = weights.*(cwf(nlab)).';
+0244 
+0245     <span class="comment">% Miscalssification cost</span>
+0246     cost = a.cost;
+0247 
+0248     <span class="comment">% Now the training can really start:</span>
+0249     tree = <a href="#_sub1" class="code" title="subfunction tree = makedt(a, feattype, usefeat, nfeat, c, nlab, weights, cost, crit, chisqstopval)">makedt</a>(+a, feattype, usefeat, nfeat, c, nlab, weights, cost, crit, chisqstopval);
+0250     
+0251     <span class="keyword">if</span> ~isempty(prune)
+0252       <span class="keyword">if</span> strcmpi(prune, <span class="string">'prunep'</span>)
+0253         <span class="keyword">if</span> ~isempty(cost)
+0254           error(<span class="string">'Pessimistic prunning based on misclassification costs is not implemented'</span>);
+0255         <span class="keyword">end</span>
+0256         tree = <a href="#_sub7" class="code" title="subfunction tree = prunep(tree, node)">prunep</a>(tree);
+0257       <span class="keyword">elseif</span> strcmpi(prune, <span class="string">'prunet'</span>)
+0258         <span class="keyword">if</span> isempty(t)
+0259           error(<span class="string">'Test set is not specified for the test set prunning'</span>);
+0260         <span class="keyword">end</span>
+0261          tree = <a href="#_sub8" class="code" title="subfunction tree = prunet(tree, t, cost)">prunet</a>(tree, t, cost);
+0262       <span class="keyword">else</span>
+0263         error(<span class="string">'Unkown prunning method'</span>);        
+0264       <span class="keyword">end</span>
+0265       
+0266       tree = <a href="#_sub9" class="code" title="subfunction tree = cleandt(tree)">cleandt</a>(tree);
+0267     <span class="keyword">end</span>
+0268     
+0269 
+0270     <span class="comment">% Store the results:</span>
+0271     w = prmapping(<span class="string">'dtc'</span>, <span class="string">'trained'</span>, {tree}, getlablist(a), k, c);
+0272     w = setname(w, [<span class="string">'DecTree'</span> upper(crit)]);
+0273     w = setcost(w, cost);
+0274   <span class="keyword">end</span>
+0275   
+0276   <span class="keyword">return</span>
+0277 
+0278 <span class="comment">%MAKEDT General tree building algorithm</span>
+0279 <span class="comment">%</span>
+0280 <span class="comment">%   TREE = MAKEDT(A, FEATTYPE, USEFEAT, NFEAT, C, NLAB, WEIGHTS, COST, CRIT, CHISQSTOPVAL)</span>
+0281 <span class="comment">%</span>
+0282 <span class="comment">% INPUT</span>
+0283 <span class="comment">%   A      Data matrix</span>
+0284 <span class="comment">%</span>
+0285 <span class="comment">%   FEATTYPE Row defining the feature types (0 - continues, 1 - nominal)</span>
+0286 <span class="comment">%</span>
+0287 <span class="comment">%   USEFEAT Row defining the features to be used for splitting</span>
+0288 <span class="comment">%</span>
+0289 <span class="comment">%   NFEAT  The maximum number of features for which splitting has to be</span>
+0290 <span class="comment">%          attempted. If the number of the available features is geater</span>
+0291 <span class="comment">%          than NFEAT the random subset of NFEAT features will be used for</span>
+0292 <span class="comment">%          splitting.</span>
+0293 <span class="comment">%</span>
+0294 <span class="comment">%  C       Total number of classes in the initial dataset</span>
+0295 <span class="comment">%</span>
+0296 <span class="comment">%  NLAB    Numeric class labels of objects in A</span>
+0297 <span class="comment">%</span>
+0298 <span class="comment">%  WEIGHTS Weights of objects in A</span>
+0299 <span class="comment">%</span>
+0300 <span class="comment">%  COST    Misclassification costs</span>
+0301 <span class="comment">%</span>
+0302 <span class="comment">%  CRIT    Name of splitting criterion to be used</span>
+0303 <span class="comment">%</span>
+0304 <span class="comment">%  CHISQSTOPVAL Crtitical value for the chi-squared test</span>
+0305 <span class="comment">%</span>
+0306 <span class="comment">% OUTPUT</span>
+0307 <span class="comment">%   TREE   Structure containing arrays defining decision tree.</span>
+0308 <span class="comment">%          .NSMP The number of samples. NSMP(J) is the sum of weights of objects</span>
+0309 <span class="comment">%          which reached the node J.</span>
+0310 <span class="comment">%</span>
+0311 <span class="comment">%          .POST Posterior probabilities. POST(J, :) is the class</span>
+0312 <span class="comment">%          distribution at the node J. Object weights are taken into</span>
+0313 <span class="comment">%          account. 0 and 1 probablities are avoided by perfroming Bayes</span>
+0314 <span class="comment">%          uniform priors regularization.</span>
+0315 <span class="comment">%</span>
+0316 <span class="comment">%          .CIDX Class index. CIDX(J) is the class corresponding to the</span>
+0317 <span class="comment">%          node J if it considered as a leaf.</span>
+0318 <span class="comment">%</span>
+0319 <span class="comment">%          .ERRL Leaf error. ERRL(J) is the misclassification error (cost)</span>
+0320 <span class="comment">%          on training samples which reached the node J if this node is</span>
+0321 <span class="comment">%          considered to be a leaf.</span>
+0322 <span class="comment">%</span>
+0323 <span class="comment">%          .ERRT Leaf error. ERRT(J) is the misclassification error (cost)</span>
+0324 <span class="comment">%          on training samples which reached the node J if this node is</span>
+0325 <span class="comment">%          considered to be a root of the (sub)tree.</span>
+0326 <span class="comment">%</span>
+0327 <span class="comment">%          .SIZE Tree size. SIZE(J) is the (sub)tree size with root at the</span>
+0328 <span class="comment">%          node J.</span>
+0329 <span class="comment">%</span>
+0330 <span class="comment">%          .FIDX Feature index. FIDX(J) is the index of the feature on</span>
+0331 <span class="comment">%          which node J is split. FIDX(J) == 0 means that J is a leaf.</span>
+0332 <span class="comment">%</span>
+0333 <span class="comment">%          .FVAL Feature value(s). For nominal features FVAL{J} is the set</span>
+0334 <span class="comment">%          of feature values observed at the node J (LENGTH(FVAL{J} == 0</span>
+0335 <span class="comment">%          for the leaf, otherwise it is &gt; 1).</span>
+0336 <span class="comment">%          For continues features, if LENGTH(FVAL{J}) == 1 then it contains</span>
+0337 <span class="comment">%          threshold THR for splitting into the left (&lt;= THR) and the</span>
+0338 <span class="comment">%          right (&gt; THR) branches. If FVAL{J} == [] (and J is not a leaf)</span>
+0339 <span class="comment">%          then it means that split is perfromed between applicable and</span>
+0340 <span class="comment">%          non-applicable values.</span>
+0341 <span class="comment">%</span>
+0342 <span class="comment">%          .NIDX Branch node indices. For nominal features NIDX{J,K} is</span>
+0343 <span class="comment">%          the index of branch node of node J with value FVAL{J,K}</span>
+0344 <span class="comment">%          of feature FIDX(J). For continues features (if LENGTH(FVAL{J}) == 1)</span>
+0345 <span class="comment">%          NIDX{J,1} is the index of the left branch node, NIDX{J,2} is the</span>
+0346 <span class="comment">%          index of the right branch node. If FVAL{J} == []</span>
+0347 <span class="comment">%          (and J is not a leaf) then NIDX{J,1} is the index of branch node</span>
+0348 <span class="comment">%          containing objects with applicable values of feature FIDX(J) and</span>
+0349 <span class="comment">%          NIDX{J,2} is the index of branch node containing objects with</span>
+0350 <span class="comment">%          non-applicable values of the same feature.</span>
+0351 <span class="comment">%</span>
+0352 <span class="comment">% This is a low-level routine called by DTC.</span>
+0353 <span class="comment">%</span>
+0354 <span class="comment">% See also IGR, GINI, MISCLS</span>
+0355 
+0356 <a name="_sub1" href="#_subfunctions" class="code">function tree = makedt(a, feattype, usefeat, nfeat, c, nlab, weights, cost, crit, chisqstopval) </a>
+0357     
+0358   prtrace(mfilename);    
+0359   <span class="comment">% Construct the tree:</span>
+0360   
+0361   <span class="comment">% Find (absolute) class frequencies</span>
+0362   C = zeros(1, c);
+0363   <span class="keyword">for</span> j=1:c
+0364     C(j) = sum(weights(nlab == j)); 
+0365   <span class="keyword">end</span>
+0366   
+0367   NC = nnz(C);
+0368   tree.nsmp = sum(C);
+0369   
+0370   <span class="comment">% regularization by 'uniform' Bayesian priors;</span>
+0371   C0 = C;
+0372   C = C + 1;
+0373   p = C/sum(C);
+0374   
+0375   <span class="keyword">if</span> isempty(cost)
+0376     [maxpost, cidx] = max(p);
+0377     errc = tree.nsmp*(1-maxpost);
+0378     <span class="comment">%errc = tree.nsmp - C0(cidx);</span>
+0379   <span class="keyword">else</span>
+0380     costp = p*cost;
+0381     [mincost, cidx] = min(costp);
+0382     errc = mincost;    
+0383   <span class="keyword">end</span>
+0384   
+0385   tree.post = p;
+0386   tree.cidx = cidx;
+0387   tree.errl = errc;
+0388   tree.errt = errc;
+0389   tree.size = 1;
+0390 
+0391   <span class="keyword">if</span> NC ~= 1 <span class="comment">% not a pure class dataset</span>
+0392     <span class="comment">% now the tree is recursively constructed further:</span>
+0393         <span class="comment">% use desired split criterion</span>
+0394     [fidx, fval, nb, bidx, chisqval] = <a href="#_sub3" class="code" title="subfunction [fidx, fval, nb, bidx, chisqval, critval] = findsplit(a, feattype, usefeat, nfeat, c, nlab, weights, cost, crit)">findsplit</a>(+a, feattype, usefeat, nfeat, c, nlab, weights, cost, crit);
+0395     
+0396     <span class="comment">% When the stop criterion is not reached yet, we recursively split</span>
+0397         <span class="comment">% further:</span>
+0398     <span class="keyword">if</span> ~isempty(fidx) &amp;&amp; (chisqval &gt; chisqstopval)
+0399       tree.fidx = fidx;
+0400       tree.fval = {fval};
+0401 
+0402       <span class="keyword">if</span> feattype(fidx) &gt; 0 
+0403         usefeat(fidx) = 0;
+0404       <span class="keyword">end</span>
+0405       
+0406       uidx = bidx == 0;
+0407       nu = nnz(uidx);
+0408       <span class="keyword">if</span> nu &gt; 0
+0409         knsmp = tree.nsmp - sum(weights(uidx));
+0410       <span class="keyword">end</span>
+0411       
+0412       tree.nidx = {zeros(1, nb)};
+0413       tree.errt(1) = 0; 
+0414       <span class="keyword">for</span> j=1:nb
+0415         tree.nidx{1}(j) = tree.size(1) + 1;
+0416         
+0417         J = bidx == j;
+0418         <span class="keyword">if</span> nu == 0
+0419           bweights = weights(J);
+0420         <span class="keyword">else</span>
+0421           J = J | uidx;
+0422           bweights = weights(J);
+0423           buidx = uidx(J);
+0424           bknsmp = sum(bweights(~buidx)); 
+0425           bweights(buidx) = (bknsmp/knsmp)*bweights(buidx);
+0426         <span class="keyword">end</span>
+0427         
+0428         branch = <a href="#_sub1" class="code" title="subfunction tree = makedt(a, feattype, usefeat, nfeat, c, nlab, weights, cost, crit, chisqstopval)">makedt</a>(+a(J, :), feattype, usefeat, nfeat, c, nlab(J), bweights, cost, crit, chisqstopval);
+0429         
+0430         branch.nidx = cellfun(@(x) x + tree.size(1)*(x&gt;0), branch.nidx, <span class="string">'UniformOutput'</span>, false);
+0431         tree.errt(1) = tree.errt(1) + branch.errt(1);
+0432         tree.size(1) = tree.size(1) + size(branch.nidx, 1);
+0433 
+0434         tree.nsmp = [tree.nsmp; branch.nsmp];
+0435         tree.post = [tree.post; branch.post];
+0436         tree.cidx = [tree.cidx; branch.cidx];
+0437         tree.errl = [tree.errl; branch.errl];
+0438         tree.errt = [tree.errt; branch.errt];
+0439         tree.size = [tree.size; branch.size];          
+0440         tree.fidx = [tree.fidx; branch.fidx];
+0441         tree.fval = [tree.fval; branch.fval];
+0442         tree.nidx = [tree.nidx; branch.nidx];
+0443       <span class="keyword">end</span>
+0444     <span class="keyword">end</span>
+0445   <span class="keyword">end</span>
+0446   
+0447   <span class="comment">% no improvement in error (cost), rollback</span>
+0448   <span class="keyword">if</span> (tree.size(1) &gt; 1) &amp;&amp; (tree.errt(1) &gt;= tree.errl(1))
+0449     tree.nsmp = tree.nsmp(1);
+0450     tree.post = tree.post(1,:);    
+0451     tree.cidx = tree.cidx(1);        
+0452     tree.errl = tree.errl(1);    
+0453     tree.errt = tree.errl(1); <span class="comment">% sic!</span>
+0454     tree.size = 1;
+0455   <span class="keyword">end</span>  
+0456 
+0457   <span class="keyword">if</span> tree.size(1) == 1
+0458     <span class="comment">% We reached the stop criterion or no further split is possible</span>
+0459     <span class="comment">% so we make a leaf node:</span>
+0460     tree.fidx = 0;
+0461     tree.fval = {[]};
+0462     tree.nidx = {[]};
+0463   <span class="keyword">end</span>
+0464     
+0465     <span class="keyword">return</span>
+0466 
+0467 <span class="comment">%MAPDT Tree mapping and node statistic calculation</span>
+0468 <span class="comment">%</span>
+0469 <span class="comment">%     [P, S] = MAPDT(TREE, A, NLAB, WEIGHTS)</span>
+0470 <span class="comment">%</span>
+0471 
+0472 <a name="_sub2" href="#_subfunctions" class="code">function [p, s] = mapdt(tree, a, nlab, weights)</a>
+0473   
+0474   prtrace(mfilename);  
+0475   <span class="keyword">persistent</span> dt st
+0476   
+0477   <span class="keyword">if</span> isstruct(tree)
+0478     dt = tree;
+0479     
+0480     <span class="keyword">if</span> nargin &lt; 4
+0481       weights = [];
+0482     <span class="keyword">end</span>
+0483   
+0484     <span class="keyword">if</span> nargin &lt; 3
+0485       nlab = [];
+0486     <span class="keyword">end</span>
+0487   
+0488     m = size(a, 1);
+0489     [n, c] = size(dt.post);
+0490     p = zeros([m, c]);
+0491   
+0492     <span class="keyword">if</span> (nargout &lt; 2) || isempty(nlab)
+0493       st = [];    
+0494       
+0495       <span class="keyword">for</span> i=1:m
+0496         p(i, :) = <a href="#_sub2" class="code" title="subfunction [p, s] = mapdt(tree, a, nlab, weights)">mapdt</a>(1, +a(i, :));
+0497       <span class="keyword">end</span>
+0498       
+0499     <span class="keyword">else</span>
+0500       st = zeros([n, c]);
+0501       nlab (nlab &gt; c) = 0;
+0502       <span class="keyword">if</span> isempty(weights)
+0503         weights = ones(m, 1);
+0504       <span class="keyword">end</span>
+0505       
+0506       <span class="keyword">for</span> i=1:m
+0507         p(i, :) = <a href="#_sub2" class="code" title="subfunction [p, s] = mapdt(tree, a, nlab, weights)">mapdt</a>(1, +a(i, :), nlab(i), weights(i));
+0508       <span class="keyword">end</span>
+0509     <span class="keyword">end</span>
+0510     
+0511     
+0512     s = st;
+0513     clear dt st
+0514     
+0515   <span class="keyword">else</span>
+0516     j = tree;
+0517 
+0518     <span class="keyword">while</span> j &gt; 0  
+0519       <span class="keyword">if</span> ~isempty(st) &amp;&amp; (nlab &gt; 0)
+0520         st(j, nlab) = st(j, nlab) + weights;
+0521       <span class="keyword">end</span>
+0522       
+0523       k = 0;
+0524       fidx = dt.fidx(j);
+0525 
+0526       <span class="keyword">if</span> fidx ~= 0
+0527         nidx = dt.nidx{j};
+0528         aval = a(fidx);
+0529 
+0530         <span class="keyword">if</span> ~isnan(aval)
+0531           fval = dt.fval{j};
+0532 
+0533           <span class="keyword">if</span> isempty(fval)
+0534             k = nidx(2 - (aval ~= inf));            
+0535           <span class="keyword">elseif</span> length(fval) == 1
+0536             <span class="keyword">if</span> aval ~= inf
+0537               k = nidx(2 - (aval &lt;= fval));            
+0538             <span class="keyword">elseif</span> length(nidx) == 3
+0539               k = nidx(3);
+0540             <span class="keyword">end</span>;
+0541           <span class="keyword">else</span>
+0542             k = nidx(aval == fval);
+0543             <span class="keyword">if</span> isempty(k)
+0544               k = 0;
+0545             <span class="keyword">end</span>
+0546           <span class="keyword">end</span>
+0547           
+0548         <span class="keyword">else</span>
+0549           p = zeros([1, size(dt.post, 2)]);
+0550           <span class="keyword">if</span> isempty(st) || (nlab &lt;= 0)
+0551             <span class="keyword">for</span> b=1:length(nidx)
+0552               k = nidx(b);
+0553               f = (dt.nsmp(k)/dt.nsmp(j));
+0554               p = p + f*<a href="#_sub2" class="code" title="subfunction [p, s] = mapdt(tree, a, nlab, weights)">mapdt</a>(nidx(b), a);
+0555             <span class="keyword">end</span>
+0556           <span class="keyword">else</span>
+0557             <span class="keyword">for</span> b=1:length(nidx)
+0558               k = nidx(b);
+0559               f = (dt.nsmp(k)/dt.nsmp(j));
+0560               p = p + f*<a href="#_sub2" class="code" title="subfunction [p, s] = mapdt(tree, a, nlab, weights)">mapdt</a>(nidx(b), a, nlab, f*weights);
+0561             <span class="keyword">end</span>
+0562           <span class="keyword">end</span>
+0563           k = -1;
+0564         <span class="keyword">end</span>
+0565       <span class="keyword">end</span>
+0566 
+0567       <span class="keyword">if</span> k == 0
+0568         p = dt.post(j, :);
+0569       <span class="keyword">end</span>
+0570 
+0571       j = k;
+0572     <span class="keyword">end</span>
+0573   <span class="keyword">end</span>
+0574     
+0575   <span class="keyword">return</span>
+0576 
+0577   
+0578 <span class="comment">%FINDSPLIT General routine for finding the best split</span>
+0579 <span class="comment">%</span>
+0580 <span class="comment">%     [FIDX, FVAL, NB, BIDX, CHISQVAL, CRITVAL] = FINDSPLI(A, FEATTYPE, USEFEAT, NFEAT, C, NLAB, WEIGHTS, COST, CRIT)</span>
+0581 <span class="comment">%</span>
+0582 
+0583 <a name="_sub3" href="#_subfunctions" class="code">function [fidx, fval, nb, bidx, chisqval, critval] = findsplit(a, feattype, usefeat, nfeat, c, nlab, weights, cost, crit)</a>
+0584     
+0585   prtrace(mfilename);
+0586   
+0587   selfeatidx = find(usefeat);
+0588   nf = length(selfeatidx);
+0589   <span class="keyword">if</span> ~isempty(nfeat) &amp;&amp; (nfeat &lt; nf)
+0590     permidx = randperm(length(selfeatidx));
+0591     selfeatidx = selfeatidx(permidx(1:nfeat));
+0592     nf = nfeat;
+0593   <span class="keyword">end</span>
+0594 
+0595   fval = cell([1, nf]);
+0596   chisqval = zeros([1, nf]);
+0597   critval = nan([1, nf]);
+0598   
+0599   <span class="comment">% repeat for all selected features</span>
+0600   <span class="keyword">for</span> f=1:nf
+0601     fidx = selfeatidx(f);
+0602     af = a(:, fidx);
+0603     
+0604     kidx = ~isnan(af); <span class="comment">% known values index</span>
+0605     <span class="keyword">if</span> nnz(kidx) == 0
+0606       <span class="keyword">continue</span>
+0607     <span class="keyword">end</span>
+0608     
+0609     MU = sum(weights(~kidx)) + realmin;
+0610 
+0611     af = af(kidx);
+0612     wk = weights(kidx);
+0613     nlabk = nlab(kidx);
+0614     
+0615     <span class="keyword">switch</span> feattype(fidx)
+0616       <span class="keyword">case</span> 0 <span class="comment">% continous/ordered feature</span>
+0617         naidx = af == inf;
+0618         NA = repmat(realmin, [1 c]);
+0619         MNA = c*realmin;
+0620         nlabna = nlabk(naidx);
+0621         nna = length(nlabna);
+0622         <span class="keyword">if</span> nna &gt; 0
+0623           <span class="keyword">for</span> j = 1:c
+0624             NA(1,j) = sum(wk(nlabna == j)) + realmin;
+0625           <span class="keyword">end</span>
+0626           MNA = sum(NA);  
+0627         <span class="keyword">end</span>
+0628         
+0629         apidx = find(~naidx);
+0630         af = af(apidx);
+0631         wap = wk(apidx);
+0632         nlabap = nlabk(apidx);
+0633         [af, sortidx] = sort(af);
+0634         wap = wap(sortidx);
+0635         nlabap = nlabap(sortidx);
+0636         
+0637         <span class="keyword">if</span> length(af) == 1
+0638           uv = af;
+0639           ns = 0;
+0640           sli = [];
+0641         <span class="keyword">else</span>
+0642           labchngcount = cumsum([1; double(diff(nlabap) ~= 0)]);
+0643           uniquevallowidx = find([true; ((diff(af)./(0.5*abs(af(1:end-1) + af(2:end)) + realmin)) &gt; 1e-8)]);
+0644           uniquevalhighidx = [(uniquevallowidx(2:end) - 1); length(af)];
+0645           <span class="comment">% unique values</span>
+0646           uv = af(uniquevalhighidx);
+0647 
+0648           <span class="comment">% split low indices in unique values</span>
+0649           sli = find(labchngcount(uniquevalhighidx(2:end)) - labchngcount(uniquevallowidx(1:end-1)) &gt; 0);
+0650           <span class="comment">% split low indices in af</span>
+0651           splitlowidx = uniquevalhighidx(sli);
+0652           ns = length(splitlowidx);
+0653         <span class="keyword">end</span>
+0654         
+0655         <span class="keyword">if</span> (ns == 0) &amp;&amp; (nna == 0)
+0656           <span class="keyword">continue</span>
+0657         <span class="keyword">end</span>
+0658         
+0659         <span class="comment">% applicable, left, and right branch class counts</span>
+0660         AP = zeros(1, c);
+0661         L = zeros(ns, c); 
+0662         R = zeros(ns, c);        
+0663         
+0664         <span class="keyword">for</span> j = 1:c
+0665           J = find(nlabap == j);
+0666           mj = length(J);
+0667           AP(j) = sum(wap(J));
+0668           <span class="keyword">if</span> (ns &gt; 0) &amp;&amp; (mj &gt; 0)
+0669             L(:, j) = (repmat(splitlowidx, [1, mj]) &gt;= repmat(J.', [ns, 1]))*wap(J) + realmin;
+0670             R(:, j) = AP(j) - L(:, j) + realmin;
+0671           <span class="keyword">end</span>
+0672         <span class="keyword">end</span>
+0673         AP = AP + 2*realmin;
+0674         
+0675         <span class="comment">% total count of applicable</span>
+0676         MAP = sum(AP);
+0677         
+0678         <span class="comment">% known</span>
+0679         K = AP + NA;
+0680         MK = MNA + MAP;
+0681 
+0682         <span class="comment">% object counts for branches</span>
+0683         ML = sum(L, 2);
+0684         MR = sum(R, 2); 
+0685         
+0686         [cv, i] = feval(crit, 0, MU, MK, K, MNA, NA, MAP, AP, ML, L, MR, R, cost, weights, uv, sli);
+0687         critval(f) = cv;
+0688 
+0689         <span class="keyword">if</span> ~isnan(cv) &amp;&amp; (cv &gt; -inf) 
+0690           <span class="keyword">if</span> (ns &gt; 0) &amp;&amp; ~isempty(i)
+0691             t = splitlowidx(i);
+0692             fval{f} = 0.5*(af(t) + af(t+1));
+0693 
+0694             <span class="keyword">if</span> nna == 0 
+0695               APL = AP*(ML(i)/MAP);
+0696               APR = AP*(MR(i)/MAP);
+0697               chisqval(f) = sum(((L(i, :) - APL).^2)./APL + ((R(i, :) - APR).^2)./APR);
+0698             <span class="keyword">else</span>
+0699               KNA = K*(MNA/MK);
+0700               KL = K*(ML(i)/MK);
+0701               KR = K*(MR(i)/MK);
+0702               chisqval(f) = sum(((NA - KNA).^2)./KNA + ((L(i, :) - KL).^2)./KL + ((R(i, :) - KR).^2)./KR);
+0703             <span class="keyword">end</span>
+0704           <span class="keyword">else</span>
+0705             fval{f} = [];
+0706             KNA = K*(MNA/MK);
+0707             KAP = K*(MAP/MK);
+0708             chisqval(f) = sum(((NA - KNA).^2)./KNA + ((AP(i, :) - KAP).^2)./KAP);
+0709           <span class="keyword">end</span>
+0710         <span class="keyword">end</span>
+0711         
+0712       <span class="keyword">case</span> 1 <span class="comment">% nominal feature</span>
+0713         vf = unique(af);
+0714         v = length(vf);
+0715 
+0716         B = zeros(v, c);
+0717         <span class="keyword">for</span> j=1:c
+0718           J = find(j == nlab);
+0719           mj = length(J);
+0720           <span class="keyword">if</span> mj &gt; 0
+0721             B(:, j) = (repmat(vf, [1, mj]) ==  repmat(af(J).', [v 1]))*weights(J);
+0722           <span class="keyword">end</span>
+0723         <span class="keyword">end</span>
+0724         
+0725         B = B + realmin;
+0726         
+0727         <span class="comment">% class counts for known</span>
+0728         K = sum(B, 1);
+0729 
+0730         <span class="comment">% total known count</span>
+0731         MK = sum(K);
+0732 
+0733         <span class="comment">% object counts for branches</span>
+0734         MB = sum(B, 2);
+0735         
+0736         cv = feval(crit, 1, MU, MK, K, MB, B, cost, weights);        
+0737         critval(f) = cv;
+0738         
+0739         <span class="keyword">if</span> ~isnan(cv) &amp;&amp; (cv &gt; -inf)
+0740           KB = MB.*K/MK;
+0741           chisqval(f) = sum(sum(((B - KB).^2)./KB));
+0742           fval{f} = bf;
+0743         <span class="keyword">end</span>
+0744     <span class="keyword">end</span>
+0745   <span class="keyword">end</span>
+0746     
+0747   <span class="comment">% best criterion over all features</span>
+0748   testfeatidx = find(~isnan(critval) &amp; (critval &gt; -inf));
+0749   <span class="keyword">if</span> isempty(testfeatidx)
+0750     fidx = [];
+0751     fval = [];
+0752     nb = [];
+0753     bidx = [];
+0754     chisqval = [];
+0755     critval = [];    
+0756 
+0757   <span class="keyword">else</span>
+0758     [critval, fidx] = max(critval(testfeatidx));
+0759     fidx = testfeatidx(fidx);
+0760     fval = fval{fidx};
+0761     chisqval = chisqval(fidx);    
+0762     fidx = selfeatidx(fidx);
+0763     
+0764     af = a(:, fidx);
+0765     m = size(af, 1);
+0766     bidx = zeros(m, 1);
+0767 
+0768     <span class="keyword">switch</span> feattype(fidx)
+0769       <span class="keyword">case</span> 0
+0770         apidx = af &lt; inf;
+0771 
+0772         <span class="keyword">if</span> ~isempty(fval)
+0773           lidx = af &lt;= fval;
+0774           ridx = apidx &amp; ~lidx;
+0775           bidx(lidx) = 1;
+0776           bidx(ridx) = 2;
+0777           nb = 2;
+0778         <span class="keyword">else</span>  
+0779           bidx(apidx) = 1;
+0780           nb = 1;
+0781         <span class="keyword">end</span>
+0782         
+0783         naidx = ~isnan(af) &amp; ~apidx;
+0784         <span class="keyword">if</span> nnz(naidx) &gt; 0
+0785           nb = nb + 1;
+0786           bidx(naidx) = nb;            
+0787         <span class="keyword">end</span>
+0788       
+0789       <span class="keyword">case</span> 1
+0790         nb = length(fval);
+0791         <span class="keyword">for</span> i=1:nb
+0792           bidx(af == fval(i)) = i;
+0793         <span class="keyword">end</span>
+0794     <span class="keyword">end</span>
+0795   <span class="keyword">end</span>
+0796   
+0797   <span class="keyword">return</span>
+0798 
+0799   
+0800 <span class="comment">%IGR The information gain ratio</span>
+0801 <span class="comment">%</span>
+0802 <span class="comment">%     [CRITVAL, IDX] = IGR(FEATTYPE, MU, MK, K, MNA, NA, PRMAP, AP, ML, L, MR, R, COST, WEIGHTS, UV, SLI)</span>
+0803 <span class="comment">%   [CRITVAL, IDX] = IGR(FEATTYPE,MU, MK, K, MB, B, COST, WEIGHTS</span>
+0804 
+0805 <a name="_sub4" href="#_subfunctions" class="code">function [critval, idx] = igr(feattype, varargin) </a>
+0806     
+0807   prtrace(mfilename);    
+0808   <span class="keyword">switch</span> feattype
+0809     <span class="keyword">case</span> 0
+0810       [MU, MK, K, MNA, NA, PRMAP, AP, ML, L, MR, R, cost, weights, uv, sli] = deal(varargin{:});
+0811 
+0812       M = MK + MU;
+0813       
+0814       infoold = - K * log2(K.'/MK);
+0815       infonew = - NA * log2(NA.'/MNA);
+0816       infosplit = - MU * log2(MU/M) - MNA * log2(MNA/M);      
+0817 
+0818       <span class="keyword">if</span> ~isempty(R) 
+0819         infolr = - ( <span class="keyword">...</span>
+0820           sum(L .* log2(L./(repmat(ML, [1 size(L, 2)]))), 2) + <span class="keyword">...</span>
+0821           sum(R .* log2(R./(repmat(MR, [1 size(R, 2)]))), 2) <span class="keyword">...</span>
+0822         );
+0823       
+0824         <span class="comment">% best criterion value over all thresholds</span>
+0825         [infolr, idx] = min(infolr);
+0826         
+0827         infonew = infonew + infolr;
+0828         infosplit = infosplit - [ML(idx), MR(idx)] * log2([ML(idx); MR(idx)]/M);
+0829 
+0830       <span class="keyword">else</span>
+0831         idx = [];
+0832         infonew = infonew - AP * log2(AP.'/MAP);
+0833         infosplit = infosplit - MAP * log2(MAP/M);
+0834       <span class="keyword">end</span>
+0835       
+0836       infothresh = log2(max(length(uv) - 1, 1));
+0837       infogain = (infoold - infonew - infothresh);
+0838 
+0839     <span class="keyword">case</span> 1
+0840       idx = [];
+0841        [MU, MK, K, MB, B, cost, weights] = deal(varargin{:});
+0842       
+0843       M = MK + MU;
+0844       
+0845       infoold = - K * log2(K.'/MK);
+0846       infosplit = - MU.' * log2(MU/M);
+0847       
+0848       infonew = - sum(sum(B .* log2(B./(repmat(MB, [1 size(B, 2)]))), 2), 1);
+0849       infosplit = infosplit - MB.' * log2(MB/M);
+0850       
+0851       infogain = (infoold - infonew);
+0852   <span class="keyword">end</span>
+0853   
+0854   <span class="comment">% infogain = infogain / M;</span>
+0855   <span class="comment">% infosplit = infospit / M;</span>
+0856   
+0857   <span class="keyword">if</span> infogain &gt; 0
+0858     critval = infogain / infosplit;    
+0859   <span class="keyword">else</span>
+0860     critval = -inf;
+0861   <span class="keyword">end</span>
+0862   
+0863   <span class="keyword">return</span>
+0864 
+0865 <span class="comment">%GINI</span>
+0866 <span class="comment">%</span>
+0867 <span class="comment">%     [CRITVAL, IDX] = GINI(FEATTYPE, MU, MK, K, MNA, NA, PRMAP, AP, ML, L, MR, R, COST, WEIGHTS, UV, SLI)</span>
+0868 <span class="comment">%   [CRITVAL, IDX] = GINI(FEATTYPE,MU, MK, K, MB, B, COST, WEIGHTS%</span>
+0869 
+0870 <a name="_sub5" href="#_subfunctions" class="code">function [critval, idx] = gini(feattype, varargin) </a>
+0871     
+0872   prtrace(mfilename);    
+0873   <span class="keyword">switch</span> feattype
+0874     <span class="keyword">case</span> 0
+0875       [MU, MK, K, MNA, NA, PRMAP, AP, ML, L, MR, R, cost, weights, uv, sli] = deal(varargin{:});
+0876       
+0877       <span class="keyword">if</span> isempty(cost)
+0878         purityold = K * (K.'/MK);
+0879         <span class="comment">%impurityold = MK - purityold;</span>
+0880 
+0881         <span class="keyword">if</span> ~isempty(R)
+0882           puritylr = ( <span class="keyword">...</span>
+0883             sum(L .* (L./(repmat(ML, [1 size(L, 2)]))), 2) + <span class="keyword">...</span>
+0884             sum(R .* (R./(repmat(MR, [1 size(R, 2)]))), 2) <span class="keyword">...</span>
+0885           );  
+0886 
+0887           <span class="comment">% best criterion value over all thresholds</span>
+0888           [puritylr, idx] = max(puritylr);
+0889           puritynew = puritylr + NA * (NA.'/MNA);
+0890         
+0891         <span class="keyword">else</span>
+0892           idx = [];
+0893           puritynew = AP * (AP.'/ MAP) + NA * (NA.'/MNA);
+0894         <span class="keyword">end</span>
+0895         
+0896         <span class="comment">%impuritynew = MK - puritynew;</span>
+0897         deltaimpurity = puritynew - purityold;
+0898 
+0899       <span class="keyword">else</span>
+0900         impurityold = K * cost * (K.'/MK);
+0901         
+0902         <span class="keyword">if</span> ~isempty(R)
+0903           impuritylr = <span class="keyword">...</span>
+0904             sum((L*cost) .* (L./(repmat(ML, [1 size(L, 2)]))), 2) + <span class="keyword">...</span>
+0905             sum((R*cost) .* (R./(repmat(MR, [1 size(R, 2)]))), 2);
+0906  
+0907           [impuritylr, idx] = min(impuritylr);
+0908           impuritynew = impuritylr + NA * cost * (NA.'/MNA);
+0909         
+0910         <span class="keyword">else</span>
+0911           idx = [];
+0912           impuritynew = AP * cost* (AP.'/ MAP) + NA * cost *(NA.'/MNA);
+0913         <span class="keyword">end</span>
+0914         
+0915         deltaimpurity = impurityold - impuritynew;
+0916       <span class="keyword">end</span>
+0917       
+0918     <span class="keyword">case</span> 1
+0919       idx = [];
+0920       [MU, MK, K, MB, B, cost, weights] = deal(varargin{:});
+0921       
+0922       <span class="keyword">if</span> isempty(cost)
+0923         purityold = K * (K.'/MK);
+0924         <span class="comment">%impurityold = MK - purityold;</span>
+0925         puritynew = sum(sum(B .* (B./(repmat(MB, [1 size(B, 2)]))), 2));
+0926         <span class="comment">%impuritynew = MK - puritynew;</span>
+0927         deltaimpurity = puritynew - purityold;
+0928       
+0929       <span class="keyword">else</span>
+0930         impurityold = K * cost * (K.'/MK);        
+0931         impuritynew = ( <span class="keyword">...</span>
+0932           sum(sum((B*cost) .* (B./(repmat(MB, [1 size(B, 2)]))), 2), 1) <span class="keyword">...</span>
+0933         );
+0934       
+0935         deltaimpurity = impurityold - impuritynew;
+0936       <span class="keyword">end</span>
+0937   <span class="keyword">end</span>
+0938   
+0939   
+0940   <span class="keyword">if</span> isempty(cost)
+0941     deltamin = 0.1;
+0942   <span class="keyword">else</span>
+0943     deltamin = 0.1*min(abs(cost(abs(cost) &gt; 0)));
+0944   <span class="keyword">end</span>
+0945   
+0946   
+0947   <span class="keyword">if</span> deltaimpurity &gt; deltamin
+0948     critval = deltaimpurity/(MU+MK);
+0949   <span class="keyword">else</span>
+0950     critval = -inf;
+0951   <span class="keyword">end</span>
+0952   
+0953   <span class="keyword">return</span>
+0954 
+0955 <span class="comment">%MISCLS Miscalssification error</span>
+0956 <span class="comment">%</span>
+0957 <span class="comment">%     [CRITVAL, IDX] = MISCLS(FEATTYPE, MU, MK, K, MNA, NA, PRMAP, AP, ML, L, MR, R, COST, WEIGHTS, UV, SLI)</span>
+0958 <span class="comment">%   [CRITVAL, IDX] = MISCLS(FEATTYPE,MU, MK, K, MB, B, COST, WEIGHTS</span>
+0959 <span class="comment">%</span>
+0960 
+0961 <a name="_sub6" href="#_subfunctions" class="code">function [critval, idx] = miscls(feattype, varargin) </a>
+0962     
+0963   prtrace(mfilename);    
+0964   <span class="keyword">switch</span> feattype
+0965     <span class="keyword">case</span> 0
+0966       [MU, MK, K, MNA, NA, PRMAP, AP, ML, L, MR, R, cost, weights, uv, sli] = deal(varargin{:});      
+0967 
+0968       <span class="keyword">if</span> isempty(cost)
+0969         ccold = max(K, [], 2);
+0970         <span class="keyword">if</span> ~isempty(R)
+0971           ccnew = max(L, [], 2) + max(R, [], 2);
+0972           [ccnew, idx] = max(ccnew);
+0973           ccnew = ccnew + max(NA, [], 2);
+0974         <span class="keyword">else</span>
+0975           idx = [];
+0976           ccnew = max(AP, [], 2) + max(NA, [], 2);
+0977         <span class="keyword">end</span>
+0978         
+0979         deltamc = ccnew - ccold;
+0980       
+0981       <span class="keyword">else</span>
+0982         mcold = min(K*cost, [], 2);
+0983         <span class="keyword">if</span> ~isempty(R)
+0984           mcnew = min(L*cost, [], 2) + min(R*cost, [], 2);
+0985           [mcnew, idx] = min(mcnew);     
+0986            mcnew = mcnew + min(NA*cost, [], 2);
+0987         <span class="keyword">else</span>
+0988           idx = [];
+0989           mcnew = min(AP*cost, [], 2) + min(NA*cost, [], 2);          
+0990         <span class="keyword">end</span>
+0991         
+0992         deltamc = mcold - mcnew; 
+0993       <span class="keyword">end</span>
+0994 
+0995     <span class="keyword">case</span> 1
+0996       idx = [];
+0997       [MU, MK, K, MB, B, cost, weights] = deal(varargin{:});      
+0998 
+0999       <span class="keyword">if</span> isempty(cost)
+1000         ccold = max(K, [], 2);        
+1001         ccnew = sum(max(B, [], 2), 1);
+1002         deltamc = ccnew - ccold;        
+1003       <span class="keyword">else</span>
+1004         mcold = min(K*cost, [], 2);        
+1005         mcnew  = sum(min(B*cost, [], 2), 1);
+1006         deltamc = mcold - mcnew; 
+1007       <span class="keyword">end</span>
+1008   <span class="keyword">end</span>
+1009   
+1010 
+1011   <span class="comment">%if isempty(cost)</span>
+1012   <span class="comment">%  deltamin = min(weights(weights &gt; 0));</span>
+1013   <span class="comment">%else</span>
+1014   <span class="comment">%  deltamin = min(weights(weights &gt; 0))*min(cost(cost &gt; 0));</span>
+1015   <span class="comment">%end</span>
+1016   <span class="comment">%</span>
+1017   <span class="comment">%if ~isempty(deltamin)</span>
+1018   <span class="comment">%  deltamin = 0.5*deltamin;</span>
+1019   <span class="comment">%else</span>
+1020   <span class="comment">%  deltamin = 0;</span>
+1021   <span class="comment">%end</span>
+1022   <span class="comment">%</span>
+1023   <span class="comment">%if deltamc &lt;= deltamin</span>
+1024   <span class="comment">%  critval = -inf;</span>
+1025   <span class="comment">%else</span>
+1026   <span class="comment">%  critval = deltamc / (MU+MK);</span>
+1027   <span class="comment">%end</span>
+1028   
+1029   critval = deltamc / (MU+MK);
+1030   
+1031   <span class="keyword">return</span>
+1032 
+1033 <span class="comment">%PRUNEP Pessimistic pruning of a decision tree</span>
+1034 <span class="comment">%</span>
+1035 <span class="comment">%     TREE = PRUNEP(TREE,NODE)</span>
+1036 <span class="comment">%</span>
+1037 <span class="comment">% Pessimistic pruning defined by Quinlan.</span>
+1038 
+1039 <a name="_sub7" href="#_subfunctions" class="code">function tree = prunep(tree, node)</a>
+1040     
+1041   prtrace(mfilename);  
+1042   <span class="keyword">persistent</span> pt;
+1043   
+1044   <span class="keyword">if</span> (nargout ~= 0) || (nargin ~= 1) || ~isscalar(tree) || ~isnumeric(tree) || ~isint(tree)
+1045     <span class="keyword">if</span> nargin &lt; 2 || isempty(node)
+1046       node = 1;
+1047     <span class="keyword">end</span>
+1048     
+1049     pt = tree;
+1050     <a href="#_sub7" class="code" title="subfunction tree = prunep(tree, node)">prunep</a>(node);
+1051     tree = pt;
+1052     clear pt;
+1053   
+1054   <span class="keyword">else</span>
+1055     node = tree;
+1056     <span class="keyword">if</span> pt.fidx(node) &gt; 0
+1057       tnidx = (node+1):(node + pt.size(node) - 1);
+1058 
+1059       nleaves = nnz(pt.fidx(tnidx) == 0);
+1060       errt = pt.errt(node) + 0.5*nleaves;
+1061       errl = pt.errl(node) + 0.5;
+1062       nsmp = pt.nsmp(node);
+1063       sd = sqrt(errt*(1-errt/nsmp));
+1064 
+1065       <span class="keyword">if</span> errl &lt; (errt + sd)
+1066         pt.fidx(tnidx) = -1;
+1067 
+1068         pt.errt(node) = pt.errl(node);
+1069         pt.size(node) = 1;
+1070         pt.fidx(node) = 0;
+1071         pt.fval(node) = {[]};
+1072         pt.nidx(node) = {[]};
+1073 
+1074       <span class="keyword">else</span>
+1075         errt = 0;
+1076         <span class="keyword">for</span> i=1:length(pt.nidx{node})
+1077           idx = pt.nidx{node}(i);
+1078           <a href="#_sub7" class="code" title="subfunction tree = prunep(tree, node)">prunep</a>(idx);
+1079           errt = errt + pt.errt(idx); 
+1080         <span class="keyword">end</span>
+1081         pt.errt(idx) = errt;
+1082       <span class="keyword">end</span>
+1083     <span class="keyword">end</span>
+1084   <span class="keyword">end</span>
+1085 
+1086   <span class="keyword">return</span>
+1087 
+1088 <span class="comment">%PRUNET Prune tree by testset</span>
+1089 <span class="comment">%</span>
+1090 <span class="comment">%     TREE = PRUNET(TREE,T,COST)</span>
+1091 <span class="comment">%</span>
+1092 <span class="comment">% The test set a is used to prune a decision tree.</span>
+1093 
+1094 <a name="_sub8" href="#_subfunctions" class="code">function tree = prunet(tree, t, cost)</a>
+1095     
+1096   prtrace(mfilename);    
+1097   <span class="keyword">persistent</span> pt;
+1098   
+1099   <span class="keyword">if</span> (nargout ~= 0) || (nargin ~= 1) || ~isscalar(tree) || ~isnumeric(tree) || ~isint(tree)
+1100     <span class="keyword">if</span> nargin &lt; 3
+1101       cost = [];
+1102     <span class="keyword">end</span>
+1103     
+1104     [m, k, c] = getsize(t);
+1105     
+1106     cs = classsizes(t);
+1107     prior = getprior(t);
+1108     prior = prior/sum(prior);
+1109     weights = m*prior./cs;
+1110 
+1111     pt = tree;
+1112     mt = size(pt.post,1);
+1113     [p, s] = <a href="#_sub2" class="code" title="subfunction [p, s] = mapdt(tree, a, nlab, weights)">mapdt</a>(pt, +t, getnlab(t), weights);
+1114     
+1115     <span class="comment">% error (cost) in each node as if there were leafs</span>
+1116     <span class="keyword">if</span> isempty(cost)
+1117       idx = sub2ind([mt, c], (1:mt).', pt.cidx);  
+1118       pt.test_errl = sum(s,2) - s(idx);
+1119     <span class="keyword">else</span>
+1120       pt.test_errl = sum(s .* cost(:, pt.cidx).', 2);  
+1121     <span class="keyword">end</span>
+1122     
+1123     pt.test_errt = pt.test_errl;
+1124     
+1125     <a href="#_sub8" class="code" title="subfunction tree = prunet(tree, t, cost)">prunet</a>(1);
+1126     tree = pt;
+1127     clear pt;
+1128 
+1129   <span class="keyword">else</span>
+1130     node = tree;
+1131     <span class="keyword">if</span> pt.fidx(node) &gt; 0
+1132       test_errt = 0;
+1133       errt = 0;
+1134 
+1135       <span class="keyword">for</span> i=1:length(pt.nidx{node})
+1136         idx = pt.nidx{node}(i);
+1137         <a href="#_sub8" class="code" title="subfunction tree = prunet(tree, t, cost)">prunet</a>(idx);
+1138         test_errt = test_errt + pt.test_errt(idx);
+1139         errt = errt + pt.errt(idx);
+1140       <span class="keyword">end</span>
+1141 
+1142       <span class="keyword">if</span> pt.test_errl(node) &lt;= test_errt
+1143         pt.fidx(pt.nidx{node}) = -1;
+1144 
+1145         pt.errt(node) = pt.errl(node);    
+1146         pt.size(node) = 1;
+1147         pt.fidx(node) = 0;
+1148         pt.fval(node) = {[]};
+1149         pt.nidx(node) = {[]};
+1150 
+1151       <span class="keyword">else</span>
+1152         pt.test_errt(node) = test_errt;
+1153         pt.errt(node) = errt;
+1154       <span class="keyword">end</span>
+1155     <span class="keyword">end</span>
+1156   <span class="keyword">end</span>;
+1157   
+1158   <span class="keyword">return</span>
+1159   
+1160 <a name="_sub9" href="#_subfunctions" class="code">function tree = cleandt(tree)</a>
+1161     
+1162   prtrace(mfilename);  
+1163   rnidx = tree.fidx == -1;
+1164   <span class="keyword">if</span> nnz(rnidx) == 0
+1165     <span class="keyword">return</span>
+1166   <span class="keyword">end</span>
+1167   
+1168   rncount = cumsum(rnidx);
+1169   fn = fieldnames(tree);
+1170   <span class="keyword">for</span> i=1:length(fn)
+1171     tree.(fn{i})(rnidx, :) = [];
+1172   <span class="keyword">end</span>
+1173   
+1174   tree.nidx = cellfun(@(x) x - rncount(x).', tree.nidx, <span class="string">'UniformOutput'</span>, false);
+1175 
+1176   idx = (1:length(rnidx)).';
+1177   idx(rnidx) = [];
+1178   tree.size = tree.size - (rncount(idx) - rncount(idx + tree.size - 1));
+1179 
+1180      <span class="keyword">return</span>
+1181</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

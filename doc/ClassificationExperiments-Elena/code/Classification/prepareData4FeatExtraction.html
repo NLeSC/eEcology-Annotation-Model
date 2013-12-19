@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of prepareData4FeatExtraction</title>
+  <meta name="keywords" content="prepareData4FeatExtraction">
+  <meta name="description" content="% prepareData4FeatExtraction - preparation of data for feature extraction">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Classification</a> &gt; prepareData4FeatExtraction.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>prepareData4FeatExtraction
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% prepareData4FeatExtraction - preparation of data for feature extraction</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [feat_data] = prepareData4FeatExtraction(formatted_data, ind, offset) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% prepareData4FeatExtraction - preparation of data for feature extraction
+
+ author: Elena Ranguelova, NLeSc
+ date creation: 22-08-2013
+ last modification date:
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ [feat_data]=prepareData4FeatExtraction(formatted_data, ind, offset)
+
+ INPUT
+ formatted_data- formatted DB GPS and accelerometer data 
+ ind- the index of the data point in the birds' trajectory
+ offset - index offset- number of measurements
+
+ OUPTPUT
+ feat_data- each of the output arguments should be described
+
+ EXAMPLE
+ [tracks] = getDataFromEecologyDB(&lt;your-user-name&gt;, &lt;your-password&gt;,...
+                               '../data/eecologyqueries.mat', 'sql_gps_acc',...
+                                754, '2013-06-08 06:20:00', ...
+                                '2013-06-08 07:20:00');
+ [formatted_tracks] = formatDataStructure(tracks);
+ j =  1; na = 40; na1 = na - 1;
+ [feat_data] = prepareData4FeatExtraction(formatted_tracks, j, na1);
+ 
+ SEE ALSO
+ getDataFromEecologyDB.m, <a href="formatDataStructure.html" class="code" title="function [formatted_data] = formatDataStructure(input_data)">formatDataStructure</a>.m, <a href="classifyAccMeas.html" class="code" title="function [out_data, FTVstor, INFO] = classifyAccMeas(inp_data, num_meas,classifiers,num_features, num_classes,windowSize, overlap, epsilon)">classifyAccMeas</a>.m
+ DBAcc_Texel/FEBO.m scripts from W. Bouten (legacy)
+
+ REFERENCES</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="classifyAccMeas.html" class="code" title="function [out_data, FTVstor, INFO] = classifyAccMeas(inp_data, num_meas,classifiers,num_features, num_classes,windowSize, overlap, epsilon)">classifyAccMeas</a>	% classifyAccMeas - classify accelerometer measurements</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% prepareData4FeatExtraction - preparation of data for feature extraction</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 22-08-2013</span>
+0005 <span class="comment">% last modification date:</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% [feat_data]=prepareData4FeatExtraction(formatted_data, ind, offset)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% INPUT</span>
+0012 <span class="comment">% formatted_data- formatted DB GPS and accelerometer data</span>
+0013 <span class="comment">% ind- the index of the data point in the birds' trajectory</span>
+0014 <span class="comment">% offset - index offset- number of measurements</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% OUPTPUT</span>
+0017 <span class="comment">% feat_data- each of the output arguments should be described</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% EXAMPLE</span>
+0020 <span class="comment">% [tracks] = getDataFromEecologyDB(&lt;your-user-name&gt;, &lt;your-password&gt;,...</span>
+0021 <span class="comment">%                               '../data/eecologyqueries.mat', 'sql_gps_acc',...</span>
+0022 <span class="comment">%                                754, '2013-06-08 06:20:00', ...</span>
+0023 <span class="comment">%                                '2013-06-08 07:20:00');</span>
+0024 <span class="comment">% [formatted_tracks] = formatDataStructure(tracks);</span>
+0025 <span class="comment">% j =  1; na = 40; na1 = na - 1;</span>
+0026 <span class="comment">% [feat_data] = prepareData4FeatExtraction(formatted_tracks, j, na1);</span>
+0027 <span class="comment">%</span>
+0028 <span class="comment">% SEE ALSO</span>
+0029 <span class="comment">% getDataFromEecologyDB.m, formatDataStructure.m, classifyAccMeas.m</span>
+0030 <span class="comment">% DBAcc_Texel/FEBO.m scripts from W. Bouten (legacy)</span>
+0031 <span class="comment">%</span>
+0032 <span class="comment">% REFERENCES</span>
+0033 
+0034 <a name="_sub0" href="#_subfunctions" class="code">function [feat_data] = prepareData4FeatExtraction(formatted_data, ind, offset)</a>
+0035  
+0036 <span class="comment">% index limits</span>
+0037 start = ind; stop = ind + offset;
+0038 limits = start:stop;
+0039 
+0040 <span class="comment">% get the relevant data</span>
+0041 device = formatted_data.device(limits); 
+0042 datetime = formatted_data.datetime(limits);
+0043 index = formatted_data.index(limits);
+0044 x = formatted_data.x(limits);
+0045 y = formatted_data.y(limits);
+0046 z = formatted_data.z(limits);
+0047 speed = formatted_data.ispd(limits);
+0048 
+0049 <span class="comment">% construct data suitable for feature calsulations</span>
+0050 feat_data = [device, datetime, index, x, y, z, speed];
+0051 
+0052 
+0053</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

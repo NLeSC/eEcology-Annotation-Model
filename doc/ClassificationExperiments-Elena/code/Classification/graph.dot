@@ -1,0 +1,24 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  classifyAccMeas -> hierarchClass;
+  classifyAccMeas -> prepareData4FeatExtraction;
+  hierarchClass -> applyModel;
+  makeKMZanot -> writeAccPNG;
+
+  applyModel [URL="applyModel.html"];
+  classifyAccMeas [URL="classifyAccMeas.html"];
+  connectEecologyDB [URL="connectEecologyDB.html"];
+  contents [URL="contents.html"];
+  createAnot [URL="createAnot.html"];
+  createDatacube [URL="createDatacube.html"];
+  dtc_e [URL="dtc_e.html"];
+  formatDataStructure [URL="formatDataStructure.html"];
+  getAccelerometerData [URL="getAccelerometerData.html"];
+  getAccelerometerSize [URL="getAccelerometerSize.html"];
+  hierarchClass [URL="hierarchClass.html"];
+  makeCSVanot [URL="makeCSVanot.html"];
+  makeKMZanot [URL="makeKMZanot.html"];
+  prepareData4FeatExtraction [URL="prepareData4FeatExtraction.html"];
+  tree_map_e [URL="tree_map_e.html"];
+  writeAccPNG [URL="writeAccPNG.html"];
+}

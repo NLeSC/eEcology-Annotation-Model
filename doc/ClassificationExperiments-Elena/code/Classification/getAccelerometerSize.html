@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getAccelerometerSize</title>
+  <meta name="keywords" content="getAccelerometerSize">
+  <meta name="description" content="% getAccelerometerSize - Number of accelerometer measurements. Fetched from eEcology database.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Classification</a> &gt; getAccelerometerSize.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>getAccelerometerSize
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% getAccelerometerSize - Number of accelerometer measurements. Fetched from eEcology database.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function num_meas = getAccelerometerSize(connection,device, starttime, stoptime,limited) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% getAccelerometerSize - Number of accelerometer measurements. Fetched from eEcology database.
+
+ -----------------------------------------------------------------------
+ SYNTAX
+ num_meas = getAccelerometerSize(connection, ...
+                                 device, starttime, stoptime,...
+                                 limited)
+
+ INPUT
+ connection - Database connection object
+ device - device ID for which the data are to be  retrieved
+ starttime and stoptime- define the time strip of interest.
+                         Strings of format 'yyy-mm-dd hh:mm:ss'
+ limited - Use limited views or not. Defaults to false, not using limited views.
+
+ OUPTPUT
+ num_meas - Number of accelerometer measurements
+
+ EXAMPLE
+ num_meas = getAccelerometerSize(connection,...
+                                754, '2013-06-08 06:20:00', ...
+                                '2013-06-08 07:20:00', true)
+
+ SEE ALSO
+
+ REFERENCES</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% getAccelerometerSize - Number of accelerometer measurements. Fetched from eEcology database.</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% -----------------------------------------------------------------------</span>
+0004 <span class="comment">% SYNTAX</span>
+0005 <span class="comment">% num_meas = getAccelerometerSize(connection, ...</span>
+0006 <span class="comment">%                                 device, starttime, stoptime,...</span>
+0007 <span class="comment">%                                 limited)</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% INPUT</span>
+0010 <span class="comment">% connection - Database connection object</span>
+0011 <span class="comment">% device - device ID for which the data are to be  retrieved</span>
+0012 <span class="comment">% starttime and stoptime- define the time strip of interest.</span>
+0013 <span class="comment">%                         Strings of format 'yyy-mm-dd hh:mm:ss'</span>
+0014 <span class="comment">% limited - Use limited views or not. Defaults to false, not using limited views.</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">% OUPTPUT</span>
+0017 <span class="comment">% num_meas - Number of accelerometer measurements</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% EXAMPLE</span>
+0020 <span class="comment">% num_meas = getAccelerometerSize(connection,...</span>
+0021 <span class="comment">%                                754, '2013-06-08 06:20:00', ...</span>
+0022 <span class="comment">%                                '2013-06-08 07:20:00', true)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% SEE ALSO</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% REFERENCES</span>
+0027 
+0028 <a name="_sub0" href="#_subfunctions" class="code">function num_meas = getAccelerometerSize(connection, </a><span class="keyword">...</span>
+0029                                          device, starttime, stoptime,<span class="keyword">...</span>
+0030                                          limited)
+0031 
+0032 sql_query_tpl = [
+0033     <span class="string">'SELECT \n'</span>,<span class="keyword">...</span>
+0034     <span class="string">'max(index)+1 AS num_meas\n'</span>,<span class="keyword">...</span>
+0035     <span class="string">'FROM gps.uva_acceleration101\n'</span>,<span class="keyword">...</span>
+0036     <span class="string">'WHERE device_info_serial = %d \n'</span>,<span class="keyword">...</span>
+0037     <span class="string">'AND date_time BETWEEN ''%s'' AND ''%s'' \n'</span>
+0038 ];
+0039 
+0040 <span class="keyword">if</span> limited
+0041     sql_query_tpl = [
+0042         <span class="string">'SELECT \n'</span>,<span class="keyword">...</span>
+0043         <span class="string">'max(index)+1 AS num_meas\n'</span>,<span class="keyword">...</span>
+0044         <span class="string">'FROM gps.uva_acceleration_limited\n'</span>,<span class="keyword">...</span>
+0045         <span class="string">'WHERE device_info_serial = %d \n'</span>,<span class="keyword">...</span>
+0046         <span class="string">'AND date_time BETWEEN ''%s'' AND ''%s'' \n'</span>
+0047     ];
+0048 <span class="keyword">end</span>
+0049 
+0050 <span class="comment">%% Generate/load query</span>
+0051 sql_query = sprintf(sql_query_tpl, device, starttime, stoptime);
+0052 
+0053 <span class="comment">% Run query</span>
+0054 data = pg_fetch_struct(connection, sql_query);
+0055 
+0056 num_meas = data.num_meas(1);</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

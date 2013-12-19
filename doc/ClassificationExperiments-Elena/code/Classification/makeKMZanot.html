@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of makeKMZanot</title>
+  <meta name="keywords" content="makeKMZanot">
+  <meta name="description" content="% makeKMZanot - function to generate KMZ files with anotations">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Classification</a> &gt; makeKMZanot.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>makeKMZanot
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% makeKMZanot - function to generate KMZ files with anotations</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function []= makeKMZanot(inp_data, iconStr, iconSize,classText, dateTimeFormat, dirName, fileName, plotAccel) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% makeKMZanot - function to generate KMZ files with anotations
+
+ author: Elena Ranguelova, NLeSc
+ date creation: 23-08-2013
+ last modification date:
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ []=makeKMZanot(inp_data, iconStr, iconSize, ...
+                classText, dateTimeFormat, dirName, fileName)
+
+ INPUT
+ inp_data- anotated data as output by the classification
+ iconStr- string with value the location of the icon to be used
+ iconSize- the size of the icon
+ classText- the classification legend string
+ dateTimeFormat- the format for the date and time to be displayed
+ dirName- the directory name to save the PNG files
+ fileName - the filename of the kmz file
+ plotAccel - boolean whether or not to create accelerometer plots
+
+ OUPTPUT
+
+ EXAMPLE
+ see DBAcc_Texel_New.m
+
+ SEE ALSO
+ DBAcc_Texel_New.m, <a href="makeKMZanot.html" class="code" title="function []= makeKMZanot(inp_data, iconStr, iconSize,classText, dateTimeFormat, dirName, fileName, plotAccel)">MakeKMZanot</a>.m (legacy)
+ <a href="writeAccPNG.html" class="code" title="function writeAccPNG(pngFileName, inp_data, index, classText)">writeAccPNG</a>.m
+
+ REFERENCES
+ Any publications or resources used
+
+ NOTES
+ extra notes</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="writeAccPNG.html" class="code" title="function writeAccPNG(pngFileName, inp_data, index, classText)">writeAccPNG</a>	% writeAccPNG - generates KMZ file from anotated accelerometer data</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% makeKMZanot - function to generate KMZ files with anotations</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 23-08-2013</span>
+0005 <span class="comment">% last modification date:</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% []=makeKMZanot(inp_data, iconStr, iconSize, ...</span>
+0010 <span class="comment">%                classText, dateTimeFormat, dirName, fileName)</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% INPUT</span>
+0013 <span class="comment">% inp_data- anotated data as output by the classification</span>
+0014 <span class="comment">% iconStr- string with value the location of the icon to be used</span>
+0015 <span class="comment">% iconSize- the size of the icon</span>
+0016 <span class="comment">% classText- the classification legend string</span>
+0017 <span class="comment">% dateTimeFormat- the format for the date and time to be displayed</span>
+0018 <span class="comment">% dirName- the directory name to save the PNG files</span>
+0019 <span class="comment">% fileName - the filename of the kmz file</span>
+0020 <span class="comment">% plotAccel - boolean whether or not to create accelerometer plots</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% OUPTPUT</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% EXAMPLE</span>
+0025 <span class="comment">% see DBAcc_Texel_New.m</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% SEE ALSO</span>
+0028 <span class="comment">% DBAcc_Texel_New.m, MakeKMZanot.m (legacy)</span>
+0029 <span class="comment">% writeAccPNG.m</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">% REFERENCES</span>
+0032 <span class="comment">% Any publications or resources used</span>
+0033 <span class="comment">%</span>
+0034 <span class="comment">% NOTES</span>
+0035 <span class="comment">% extra notes</span>
+0036 
+0037 <a name="_sub0" href="#_subfunctions" class="code">function []= makeKMZanot(inp_data, iconStr, iconSize, </a><span class="keyword">...</span>
+0038                          classText, dateTimeFormat, dirName, fileName, plotAccel)
+0039 
+0040 <span class="comment">% initializations</span>
+0041 kmlStr =<span class="string">''</span>;
+0042 behaviorclass=0;
+0043 
+0044 <span class="comment">% create png directory</span>
+0045 <span class="keyword">if</span> ~exist(dirName,<span class="string">'dir'</span>)
+0046     mkdir(dirName);
+0047 <span class="keyword">end</span>
+0048 
+0049 Year = inp_data.year;
+0050 Month = inp_data.month;
+0051 Day = inp_data.day;
+0052 Hour = inp_data.hour;
+0053 Min = inp_data.min;
+0054 Sec = inp_data.sec;
+0055 ISpd = inp_data.ispd;
+0056 TSpd = inp_data.tspd;
+0057 Class = inp_data.class;
+0058 Device = inp_data.device;
+0059 Long =inp_data.long;
+0060 Lat = inp_data.lat;
+0061 Alt = inp_data.alt;
+0062 
+0063 <span class="comment">%Set colour table</span>
+0064 stand= <span class="string">'ff0000ff'</span>;
+0065 flap= <span class="string">'ff00ffff'</span>;
+0066 soar= <span class="string">'ff9900ff'</span>;
+0067 walk= <span class="string">'ffccccff'</span>;
+0068 sit= <span class="string">'ff00ff00'</span>;
+0069 Xfl= <span class="string">'ffffff00'</span>;
+0070 float= <span class="string">'ffff0000'</span>;
+0071 NoCl= <span class="string">'83000000'</span>;
+0072 
+0073 <span class="comment">%%%Set time</span>
+0074 numTime = datenum(Year,Month,Day,Hour,Min,Sec);
+0075 time=datenum(Year,Month,Day,Hour,Min,Sec)-735235;
+0076 
+0077 Ix = find(Year&lt;1900|Year&gt;2015);
+0078 numTime(Ix)=NaN;
+0079 clear Ix;
+0080 
+0081 kmlStr = [kmlStr,ge_plot(Long,<span class="keyword">...</span>
+0082                 Lat,<span class="keyword">...</span>
+0083                  <span class="string">'lineColor'</span>,<span class="string">'ff00ffff'</span>,<span class="keyword">...</span>
+0084                  <span class="string">'lineWidth'</span>,1)];
+0085 
+0086 
+0087 
+0088 <span class="keyword">for</span> j=2:length(Long)-1
+0089     <span class="comment">% set time stamp</span>
+0090     tNumPrev = datenum(numTime(j-1));
+0091     tNumNow = datenum(numTime(j));
+0092     tNumNext = datenum(numTime(j+1));
+0093     <span class="keyword">if</span> isnan(tNumPrev)&amp;&amp;~isnan(tNumNow)
+0094         tStart = datestr(tNumNow+datenum([0,0,0,-1,0,0]),dateTimeFormat);
+0095     <span class="keyword">elseif</span> ~isnan(tNumPrev)&amp;&amp;~isnan(tNumNow)
+0096         tStart = datestr(mean([tNumPrev;tNumNow]),dateTimeFormat);
+0097     <span class="keyword">else</span>
+0098         clear tNumPrev
+0099         clear tNumNow
+0100         clear tNumNext
+0101         clear tStart
+0102         clear tStop
+0103         <span class="keyword">continue</span>
+0104     <span class="keyword">end</span>
+0105 
+0106     <span class="keyword">if</span> isnan(tNumNext)&amp;&amp;~isnan(tNumNow)
+0107         tStop = datestr(tNumNow+datenum([0,0,0,+1,0,0]),dateTimeFormat);
+0108     <span class="keyword">elseif</span> ~isnan(tNumNext)&amp;&amp;~isnan(tNumNow)
+0109         tStop = datestr(mean([tNumNext;tNumNow]),dateTimeFormat);
+0110     <span class="keyword">else</span>
+0111         clear tNumPrev
+0112         clear tNumNow
+0113         clear tNumNext
+0114         clear tStart
+0115         clear tStop
+0116         <span class="keyword">continue</span>
+0117     <span class="keyword">end</span>
+0118 
+0119     <span class="keyword">switch</span> Class(j)
+0120         <span class="keyword">case</span> 1
+0121             behaviorclass= stand;
+0122         <span class="keyword">case</span> 2
+0123             behaviorclass= flap;
+0124         <span class="keyword">case</span> 3
+0125             behaviorclass= soar;
+0126         <span class="keyword">case</span> 4
+0127             behaviorclass= walk;
+0128         <span class="keyword">case</span> 5
+0129             behaviorclass= sit;
+0130         <span class="keyword">case</span> 6
+0131             behaviorclass= Xfl;
+0132         <span class="keyword">case</span> 7
+0133             behaviorclass= float;
+0134         <span class="keyword">otherwise</span>
+0135             behaviorclass= NoCl;
+0136     <span class="keyword">end</span>;
+0137 
+0138 
+0139      extraData = {<span class="string">'UTM time'</span>,datestr(tNumNow,0);<span class="keyword">...</span>
+0140                  <span class="string">'sensor ID'</span>,num2str(Device(j));<span class="keyword">...</span>
+0141                  <span class="string">'sensor time'</span>,num2str(time(j),8);<span class="keyword">...</span>
+0142                  <span class="string">'long lat'</span>,[num2str(Long(j))<span class="keyword">...</span>
+0143                  <span class="string">'  '</span> num2str(Lat(j))];<span class="keyword">...</span>
+0144                  <span class="string">'altitude [m]'</span>,num2str(Alt(j));<span class="keyword">...</span>
+0145                  <span class="string">'T-P Speed [m/s]'</span>,[num2str(TSpd(j)) <span class="string">'  '</span> num2str(ISpd(j))];<span class="keyword">...</span>
+0146                  <span class="string">'Class'</span>, classText(5*(Class(j)-1)+1:5*(Class(j)-1)+5);<span class="keyword">...</span>
+0147                  <span class="string">'record index'</span>,num2str(j)};
+0148 
+0149         bgColor = {<span class="string">'#D0D0D0'</span>;<span class="string">'#F0F0F0'</span>};
+0150         htmlStr = [<span class="string">'&lt;TABLE border=&quot;0px&quot;&gt;'</span>,char(10)];
+0151         clear pngFileName
+0152         <span class="keyword">if</span> plotAccel &amp;&amp; isnan(Class(j))==0
+0153             pngFileName = [dirName <span class="string">'/accelero'</span>,num2str(j,<span class="string">'%04d'</span>),<span class="string">'B.png'</span>];
+0154             <a href="writeAccPNG.html" class="code" title="function writeAccPNG(pngFileName, inp_data, index, classText)">writeAccPNG</a>(pngFileName, inp_data, j, classText);
+0155             htmlStr = [htmlStr,<span class="string">'&lt;TR&gt;&lt;TD colspan=&quot;2&quot;&gt;&lt;img src=&quot;'</span>,pngFileName,<span class="string">'&quot;&gt;&lt;/TD&gt;&lt;/TR&gt;'</span>,char(10)];
+0156 
+0157         <span class="keyword">end</span>
+0158         <span class="keyword">for</span> iRow = 1:size(extraData,1)
+0159             htmlStr = [htmlStr,<span class="string">'&lt;TR bgcolor=&quot;'</span>,bgColor{1+mod(iRow,2),1},<span class="string">'&quot;&gt;&lt;TD&gt;'</span>,extraData{iRow,1},<span class="string">'&lt;/TD&gt;'</span>,<span class="keyword">...</span>
+0160                 <span class="string">'&lt;TD&gt;'</span>,extraData{iRow,2},<span class="string">'&lt;/TD&gt;&lt;/TR&gt;'</span>,char(10)];
+0161         <span class="keyword">end</span>
+0162         htmlStr = [htmlStr,<span class="string">'&lt;/TABLE&gt;'</span>];
+0163 
+0164 
+0165        <span class="keyword">if</span> Alt(j)&gt;2
+0166          kmlStr = [kmlStr,ge_point(Long(j),<span class="keyword">...</span>
+0167                   Lat(j),<span class="keyword">...</span>
+0168                   Alt(j),<span class="keyword">...</span>
+0169                   <span class="string">'iconURL'</span>,iconStr,<span class="keyword">...</span>
+0170                   <span class="string">'altitudeMode'</span>,<span class="string">'absolute'</span>,<span class="keyword">...</span>
+0171                   <span class="string">'extrude'</span>,1,<span class="keyword">...</span>
+0172                   <span class="string">'name'</span>,<span class="string">''</span>,<span class="keyword">...</span>
+0173                   <span class="string">'iconColor'</span>, behaviorclass,<span class="keyword">...</span>
+0174                   <span class="string">'iconScale'</span>,iconSize,<span class="keyword">...</span>
+0175                   <span class="string">'description'</span>,htmlStr,<span class="keyword">...</span>
+0176                   <span class="string">'timeSpanStart'</span>,tStart,<span class="keyword">...</span>
+0177                   <span class="string">'timeSpanStop'</span>,tStop)];
+0178         <span class="keyword">else</span>
+0179          kmlStr = [kmlStr,ge_point(Long(j),<span class="keyword">...</span>
+0180                   Lat(j),<span class="keyword">...</span>
+0181                   10,<span class="keyword">...</span>
+0182                   <span class="string">'iconURL'</span>,iconStr,<span class="keyword">...</span>
+0183                   <span class="string">'altitudeMode'</span>,<span class="string">'clampToGround'</span>,<span class="keyword">...</span>
+0184                   <span class="string">'extrude'</span>,1,<span class="keyword">...</span>
+0185                   <span class="string">'name'</span>,<span class="string">''</span>,<span class="keyword">...</span>
+0186                   <span class="string">'iconColor'</span>, behaviorclass,<span class="keyword">...</span>
+0187                   <span class="string">'iconScale'</span>,iconSize,<span class="keyword">...</span>
+0188                   <span class="string">'description'</span>,htmlStr,<span class="keyword">...</span>
+0189                   <span class="string">'timeSpanStart'</span>,tStart,<span class="keyword">...</span>
+0190                   <span class="string">'timeSpanStop'</span>,tStop)];
+0191         <span class="keyword">end</span>
+0192 
+0193 <span class="keyword">end</span>;
+0194 
+0195 <span class="comment">% Save</span>
+0196 kml_all = [ge_folder(<span class="string">'points'</span>, kmlStr)];
+0197 <span class="comment">% Create kml</span>
+0198 newfilename = fileName(1:(end-4));
+0199 newfilename = strcat(fileName,<span class="string">'.kml'</span>);
+0200 ge_output(newfilename,kml_all);
+0201 <span class="comment">% Create kmz = kml + dir with pngs</span>
+0202 zip(fileName, {newfilename, dirName});
+0203 <span class="comment">% Clean up</span>
+0204 movefile(strcat(fileName, <span class="string">'.zip'</span>), fileName);
+0205 delete(newfilename);
+0206 rmdir(dirName, <span class="string">'s'</span>);</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

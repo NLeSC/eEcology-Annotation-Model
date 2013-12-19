@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of makeFeaturesNSpd</title>
+  <meta name="keywords" content="makeFeaturesNSpd">
+  <meta name="description" content="merijn de bakker || merijn.debakker@gmail.com">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; makeFeaturesNSpd.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>makeFeaturesNSpd
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>merijn de bakker || merijn.debakker@gmail.com</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [featureMatrix,infoMatrix]  = makeFeaturesNSpd(M, windowSize,overlap,perSample,varargin) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">merijn de bakker || merijn.debakker@gmail.com
+17-03-2010 | revised: 30-05-2011
+
+
+FUNCTION MAKEFEATURES
+calculates features for a given input matrix. mind the assumptions!
+INPUT: matrix with data, variable argument list with features.
+ assumes input as follows: [device, samplenr, index, X, Y, Z,spd,label,spdLab].
+or, in the case of outputstructs [device,dateT, index,X,Y,Z,spd,label,spdLab]
+v1 = labelPos: position of label,(0 if unlabelled)
+v2 = 'norm' or 'scale' depending of whether data should be normalised ...
+ to zero-mean and 1 std, or scaled to values between -1 and 1.
+v3 = 'c' for continuous windowing. 'd' for per sample windowing
+
+
+
+OUTPUT: matrix with for every device and dateTime features:
+ device,dateTime, windowIndex, ft1,...,ft</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="windowingNSpd.html" class="code" title="function  windows =windowingNSpd(M, wSize, oLap, perSample, varargin)">windowingNSpd</a>	merijn de bakker</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="prepareData.html" class="code" title="function [train,test,permutation] = prepareData(annot_struct,frac,labvec)">prepareData</a>	wrapper function for preparing annotated data for classification.</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%merijn de bakker || merijn.debakker@gmail.com</span>
+0002 <span class="comment">%17-03-2010 | revised: 30-05-2011</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">%FUNCTION MAKEFEATURES</span>
+0006 <span class="comment">%calculates features for a given input matrix. mind the assumptions!</span>
+0007 <span class="comment">%INPUT: matrix with data, variable argument list with features.</span>
+0008 <span class="comment">% assumes input as follows: [device, samplenr, index, X, Y, Z,spd,label,spdLab].</span>
+0009 <span class="comment">%or, in the case of outputstructs [device,dateT, index,X,Y,Z,spd,label,spdLab]</span>
+0010 <span class="comment">%v1 = labelPos: position of label,(0 if unlabelled)</span>
+0011 <span class="comment">%v2 = 'norm' or 'scale' depending of whether data should be normalised ...</span>
+0012 <span class="comment">% to zero-mean and 1 std, or scaled to values between -1 and 1.</span>
+0013 <span class="comment">%v3 = 'c' for continuous windowing. 'd' for per sample windowing</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">%</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">%OUTPUT: matrix with for every device and dateTime features:</span>
+0018 <span class="comment">% device,dateTime, windowIndex, ft1,...,ft</span>
+0019 <span class="comment">%</span>
+0020 
+0021 
+0022 
+0023 <a name="_sub0" href="#_subfunctions" class="code">function [featureMatrix,infoMatrix]  = makeFeaturesNSpd(M, windowSize,overlap,</a><span class="keyword">...</span>
+0024     perSample,varargin)
+0025 
+0026 
+0027 <span class="comment">%M = M(:,2:end);</span>
+0028 
+0029 
+0030 r1 = find(M(:,3)==0);
+0031 r2 = find(diff(M(:,3))~=1)+1;
+0032 r = unique(sort([1;r1;r2]));
+0033 <span class="comment">%nOfMeasurements = size(r)</span>
+0034 <span class="comment">%windowSize = 20;</span>
+0035 <span class="comment">%overlap = 0.5;</span>
+0036 nOfWindows = 0;
+0037 epsilon = 0.3;
+0038 
+0039 featureMatrix = [];
+0040 infoMatrix = [];
+0041 
+0042 SPRMtotal = [];
+0043 CMtotal = [];
+0044 MLMtotal = [];
+0045 FMtotal = [];
+0046 WMtotal = [];
+0047 
+0048 windowingMode = varargin{3};
+0049 index = 0;
+0050 
+0051 <span class="keyword">switch</span> windowingMode
+0052 
+0053     <span class="keyword">case</span> <span class="string">'d'</span>
+0054         WM = {};
+0055         <span class="keyword">for</span> i=1:length(r)-1
+0056             seriesLength = r(i+1)-r(i);
+0057            
+0058             <span class="comment">%if the number of frames is to small, skip this sample</span>
+0059             <span class="keyword">if</span> seriesLength&lt;windowSize
+0060                 <span class="keyword">continue</span>
+0061             <span class="keyword">end</span>
+0062 
+0063             windows = <a href="windowingNSpd.html" class="code" title="function  windows =windowingNSpd(M, wSize, oLap, perSample, varargin)">windowingNSpd</a>(M(r(i):r(i+1)-1,:),windowSize,overlap,perSample);
+0064            
+0065             nOfS = size(windows,1);
+0066             
+0067             WM = [WM;windows];
+0068             
+0069         <span class="keyword">end</span>
+0070         
+0071         windows = <a href="windowingNSpd.html" class="code" title="function  windows =windowingNSpd(M, wSize, oLap, perSample, varargin)">windowingNSpd</a>(M(r(end):<span class="keyword">end</span>,:),windowSize,overlap,perSample);
+0072          
+0073         WM = [WM;windows];
+0074         
+0075     <span class="keyword">case</span> <span class="string">'c'</span>
+0076         
+0077 
+0078         <span class="keyword">if</span> size(M,1)&lt; windowSize
+0079              disp(<span class="string">'too few frames in sample'</span>);
+0080 
+0081         <span class="keyword">end</span>
+0082 
+0083         <span class="comment">%make windows</span>
+0084         WM = <a href="windowingNSpd.html" class="code" title="function  windows =windowingNSpd(M, wSize, oLap, perSample, varargin)">windowingNSpd</a>(M(1:<span class="keyword">end</span>,:),windowSize,overlap,perSample);
+0085 
+0086         nOfWindows = nOfWindows + size(WM,1);
+0087 <span class="keyword">end</span>
+0088 
+0089 
+0090 windows = {WM{:,1}}';
+0091 
+0092 <span class="comment">% % debug display</span>
+0093 <span class="comment">% disp('makeFeaturesNSpd: after windowingNSpd: '), size(windows)</span>
+0094 
+0095     <span class="keyword">if</span> ~isempty(WM)
+0096 
+0097         addpath ../Features
+0098         <span class="comment">%create pitch/roll feature matrix for window set</span>
+0099         <span class="comment">%SPRM = position(WM);</span>
+0100         SPRM = cellfun(@calcPosition, windows, <span class="string">'uniformoutput'</span>, false);        
+0101         
+0102         <span class="comment">%correlation features</span>
+0103         <span class="comment">%CM = correlation(WM);</span>
+0104         CM = cellfun(@calcCorrelation, windows, <span class="string">'uniformoutput'</span>, false);
+0105 
+0106         <span class="comment">%motionlessness feature matrix for window set</span>
+0107         <span class="comment">%MLM = motionlessness(WM,0.3);</span>
+0108         MLM = cellfun(@(x) calcMotionlessness(x,epsilon), windows, <span class="string">'uniformoutput'</span>, false);
+0109 
+0110         <span class="comment">%fourier transform feature matrix for window set</span>
+0111         <span class="comment">%FM = FaFoTr(WM);</span>
+0112         FM = cellfun(@calcFrequency, windows, <span class="string">'uniformoutput'</span>, false);
+0113 
+0114         <span class="comment">%wavelet features</span>
+0115         <span class="comment">%WAV = wav(WM,3);</span>
+0116 
+0117         <span class="comment">%retrieve the speed from the data</span>
+0118 <span class="comment">%         for j = 1:size(WM,1)</span>
+0119 <span class="comment">%             SPD{j,1} = WM{j,8};</span>
+0120 <span class="comment">%         end</span>
+0121         SPD = {WM{:,8}}';
+0122 
+0123         <span class="comment">%'signal to noise'</span>
+0124         <span class="comment">%SN = siToNo(WM);</span>
+0125         SN = cellfun(@calcNoise, windows, <span class="string">'uniformoutput'</span>, false);
+0126         
+0127         <span class="comment">%ODBA</span>
+0128         <span class="comment">%ODBA = calcODBA(WM,20);</span>
+0129         ODBA = cellfun(@(x) calcODBA(x,windowSize/2), windows, <span class="string">'uniformoutput'</span>, false);
+0130         rmpath ../Features
+0131 
+0132     <span class="comment">%</span>
+0133     <span class="comment">%     featureMatrix = [WM{:,2}, SPRM, CM, MLM, FM, SPD];</span>
+0134     <span class="comment">%     infoMatrix = [WM{:,3:8}, WM{:,2}];</span>
+0135    
+0136     
+0137     <span class="keyword">for</span> j=1:size(MLM,1)
+0138         index=index+1;
+0139         <span class="comment">% if no extra parameter is given for the position of the label,</span>
+0140         <span class="comment">% just store the deviceNr and Timestamp, or label=0 if libsvm is...</span>
+0141         <span class="comment">% used.</span>
+0142 
+0143         featureMatrix(index,:) = [WM{j,2},SPRM{j,:},CM{j,:},<span class="keyword">...</span>
+0144             MLM{j,:},FM{j,:},SPD{j,:},SN{j,:}, ODBA{j,:}];
+0145 
+0146         <span class="comment">%[data,device startTime endTime startIndex endIndex Speed, Label]</span>
+0147         infoMatrix{index,1} = WM{j,1};
+0148         infoMatrix{index,2} = WM{j,3};
+0149         infoMatrix{index,3} = WM{j,4};
+0150         infoMatrix{index,4} = WM{j,5};
+0151         infoMatrix{index,5} = WM{j,6};
+0152         infoMatrix{index,6} = WM{j,7};
+0153         infoMatrix{index,7} = WM{j,8};
+0154         infoMatrix{index,8} = WM{j,2};
+0155         
+0156         <span class="comment">%infoMatrix{index,7}= [WM{j,3},WM{j,4},WM{j,5},WM{j,6},...</span>
+0157         <span class="comment">%WM{j,7},WM{j,8}, WM{j,2},WM{j,1}];</span>
+0158     
+0159 
+0160     <span class="keyword">end</span>
+0161     
+0162 <span class="keyword">end</span>
+0163 
+0164 
+0165 
+0166 
+0167 
+0168 
+0169 
+0170 
+0171 
+0172</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

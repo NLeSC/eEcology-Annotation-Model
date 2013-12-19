@@ -1,0 +1,18 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  calcFeatureVectors -> calcCorrelation;
+  calcFeatureVectors -> calcFrequency;
+  calcFeatureVectors -> calcMotionlessness;
+  calcFeatureVectors -> calcNoise;
+  calcFeatureVectors -> calcODBA;
+  calcFeatureVectors -> calcPosition;
+
+  calcCorrelation [URL="calcCorrelation.html"];
+  calcFeatureVectors [URL="calcFeatureVectors.html"];
+  calcFrequency [URL="calcFrequency.html"];
+  calcMotionlessness [URL="calcMotionlessness.html"];
+  calcNoise [URL="calcNoise.html"];
+  calcODBA [URL="calcODBA.html"];
+  calcPosition [URL="calcPosition.html"];
+  contents [URL="contents.html"];
+}

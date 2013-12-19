@@ -1,0 +1,25 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+  makeFeaturesNSpd -> windowingNSpd;
+  plotTree -> explainTree;
+  prepareData -> getDataFromAnnotStruct;
+  prepareData -> groupD2Label;
+  prepareData -> makeFeaturesNSpd;
+  prepareData -> splitset;
+  treeExperimenter -> tree_map;
+
+  contents [URL="contents.html"];
+  explainTree [URL="explainTree.html"];
+  getDataFromAnnotStruct [URL="getDataFromAnnotStruct.html"];
+  getLabsFromStruct [URL="getLabsFromStruct.html"];
+  groupD2Label [URL="groupD2Label.html"];
+  groupDataByLabels [URL="groupDataByLabels.html"];
+  makeFeaturesNSpd [URL="makeFeaturesNSpd.html"];
+  plotTree [URL="plotTree.html"];
+  prepareData [URL="prepareData.html"];
+  splitset [URL="splitset.html"];
+  treeExperimenter [URL="treeExperimenter.html"];
+  tree_map [URL="tree_map.html"];
+  treecold [URL="treecold.html"];
+  windowingNSpd [URL="windowingNSpd.html"];
+}

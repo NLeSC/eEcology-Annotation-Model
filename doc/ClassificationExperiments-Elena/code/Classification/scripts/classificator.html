@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of classificator</title>
+  <meta name="keywords" content="classificator">
+  <meta name="description" content="classification and vizualization of a track for adding to script wrapper">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../../index.html">Home</a> &gt;  <a href="../../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../../index.html">code</a> &gt; <a href="../index.html">Classification</a> &gt; <a href="index.html">scripts</a> &gt; classificator.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../../index.html"><img alt="<" border="0" src="../../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification/scripts&nbsp;<img alt=">" border="0" src="../../../../right.png"></a></td></tr></table>-->
+
+<h1>classificator
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="box"><strong>classification and vizualization of a track for adding to script wrapper</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="box"><strong>function classificator(dbUsername, dbPassword, dbName, databaseHost, TrackerIdentifier, startTime, stopTime, data_path, plotAccel) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> classification and vizualization of a track for adding to script wrapper
+
+ INPUT
+ dbUsername is a string for connecting to the database
+ dbPassword is a string for connecting to the database
+ dbName is a string
+ databaseHost is a string hostname of the database
+ TrackerIdentifier is a tracker indentifiers, eg '800'.
+ startTime is a string in ISO8601 time format, eg. '2013-07-01T00:00:00'
+ stopTime is a string in ISO8601 time format, eg. '2013-07-01T00:00:00'
+ data_path is string of a directory where classifiers.mat and eecologyqueries.mat reside
+ plotAccel is string 'true' or 'false' whether or not to create accelerometer plots
+
+ Command to compile:
+ mcc -mv -R -nodisplay -I googlearth -I openearth/io/postgresql -I openearth -I openearth/general -I openearth/general/io_fun -I code code/scripts/classificator.m
+
+ Usage:
+ ./run_classificator.sh /opt/matlab2009b '****' '****' eecology db.e-ecology.sara.nl 800 2010-07-01T00:00:00 2010-09-01T00:00:00 /data/classifiers true</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function classificator(dbUsername, dbPassword, dbName, databaseHost, TrackerIdentifier, startTime, stopTime, data_path, plotAccel)</a>
+0002 <span class="comment">% classification and vizualization of a track for adding to script wrapper</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% INPUT</span>
+0005 <span class="comment">% dbUsername is a string for connecting to the database</span>
+0006 <span class="comment">% dbPassword is a string for connecting to the database</span>
+0007 <span class="comment">% dbName is a string</span>
+0008 <span class="comment">% databaseHost is a string hostname of the database</span>
+0009 <span class="comment">% TrackerIdentifier is a tracker indentifiers, eg '800'.</span>
+0010 <span class="comment">% startTime is a string in ISO8601 time format, eg. '2013-07-01T00:00:00'</span>
+0011 <span class="comment">% stopTime is a string in ISO8601 time format, eg. '2013-07-01T00:00:00'</span>
+0012 <span class="comment">% data_path is string of a directory where classifiers.mat and eecologyqueries.mat reside</span>
+0013 <span class="comment">% plotAccel is string 'true' or 'false' whether or not to create accelerometer plots</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% Command to compile:</span>
+0016 <span class="comment">% mcc -mv -R -nodisplay -I googlearth -I openearth/io/postgresql -I openearth -I openearth/general -I openearth/general/io_fun -I code code/scripts/classificator.m</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% Usage:</span>
+0019 <span class="comment">% ./run_classificator.sh /opt/matlab2009b '****' '****' eecology db.e-ecology.sara.nl 800 2010-07-01T00:00:00 2010-09-01T00:00:00 /data/classifiers true</span>
+0020 
+0021 TrackerIdentifier = str2double(TrackerIdentifier);
+0022 plotAccel = eval(plotAccel);
+0023 
+0024 results_path = <span class="string">''</span>;
+0025 
+0026 classifiers_fname = fullfile(data_path,<span class="string">'classifiers.mat'</span>);
+0027 load(classifiers_fname);
+0028 
+0029 connection = connectEecologyDB(databaseHost, dbUsername, dbPassword);
+0030 num_meas = getAccelerometerSize(connection, <span class="keyword">...</span>
+0031                                 TrackerIdentifier, startTime, stopTime,<span class="keyword">...</span>
+0032                                 true);
+0033 num_features= 58;
+0034 num_classes= 7;
+0035 windowSize=20;
+0036 overlap=0;
+0037 epsilon = 0.3;
+0038 
+0039 <span class="comment">%filename for kmz file</span>
+0040 IDdate=[num2str(TrackerIdentifier) <span class="string">'_'</span> startTime(1:4) startTime(6:7) startTime(9:10)<span class="keyword">...</span>
+0041     <span class="string">'_'</span> startTime(12:13) startTime(15:16) startTime(18:19) <span class="keyword">...</span>
+0042     <span class="string">'__'</span> stopTime(1:4) stopTime(6:7) stopTime(9:10)<span class="keyword">...</span>
+0043     <span class="string">'_'</span> stopTime(12:13) stopTime(15:16) stopTime(18:19)];
+0044 
+0045 fileName=[fullfile(results_path, <span class="string">'S'</span>) IDdate <span class="string">'.kmz'</span>];
+0046 fileCSVName=[fullfile(results_path, <span class="string">'S'</span>) IDdate <span class="string">'.csv'</span>];
+0047 iconStr = [<span class="string">'http://maps.google.com/'</span>,<span class="string">'mapfiles/kml/pal2/icon26.png'</span>];
+0048 iconSize = 0.4;
+0049 classText=<span class="string">'stand flap soar walk sit XFl  float NoCl'</span>;
+0050 dateTimeFormat = <span class="string">'yyyy-mm-ddTHH:MM:SSZ'</span>;
+0051 
+0052 <span class="comment">%mat-file for storing intermediate results</span>
+0053 StorName=[fullfile(results_path,<span class="string">'Stor'</span>) IDdate <span class="string">'.mat'</span>];
+0054 
+0055 <span class="comment">%name datacube</span>
+0056 DCubeName= [fullfile(results_path,<span class="string">'Datacube'</span>) IDdate];
+0057 <span class="comment">% name annotation file</span>
+0058 AnotName= [fullfile(results_path,<span class="string">'Anot'</span>) IDdate];
+0059 <span class="comment">% create png directory</span>
+0060 dirName=[results_path IDdate <span class="string">'.png'</span>];
+0061 <span class="comment">%% get the data from the DB</span>
+0062 t=clock;
+0063 disp(<span class="string">'Retrieving data from the DB...'</span>);
+0064 tic
+0065 <span class="comment">% TODO pass dbName, databaseHost so script can be used against other databases</span>
+0066 [tracks] = getAccelerometerData(connection,<span class="keyword">...</span>
+0067                                  TrackerIdentifier, startTime, stopTime,<span class="keyword">...</span>
+0068                                  true);
+0069 disp(<span class="string">'Done.'</span>);
+0070 toc
+0071 
+0072 <span class="comment">%% format the data</span>
+0073 disp(<span class="string">'Formatting the data...'</span>);
+0074 tic
+0075 [formatted_tracks] = formatDataStructure(tracks);
+0076 disp(<span class="string">'Done.'</span>);
+0077 toc
+0078 
+0079 <span class="comment">%% classify the data</span>
+0080 disp(<span class="string">'Classification...'</span>);
+0081 tic
+0082 [class_data, FTVstor, INFO]=classifyAccMeas(formatted_tracks, num_meas, classifiers, <span class="keyword">...</span>
+0083                                     num_features, num_classes, windowSize, overlap, epsilon);
+0084 disp(<span class="string">'Done.'</span>);
+0085 toc
+0086 
+0087 <span class="comment">%% create Datacube</span>
+0088 disp(<span class="string">'Creating Datacube...'</span>);
+0089 tic
+0090 Datacube = createDatacube(class_data,1,DCubeName);
+0091 disp(<span class="string">'Done.'</span>);
+0092 toc
+0093 
+0094 <span class="comment">%% create Anotations</span>
+0095 disp(<span class="string">'Creating Annotations...'</span>);
+0096 tic
+0097 FTVanot = createAnot(FTVstor,num_features,1,AnotName);
+0098 disp(<span class="string">'Done.'</span>);
+0099 toc
+0100 
+0101 <span class="comment">%% Make kmz</span>
+0102 disp(<span class="string">'Creating KMZ file...'</span>);
+0103 
+0104 tic
+0105 makeKMZanot(class_data, iconStr, iconSize, <span class="keyword">...</span>
+0106             classText, dateTimeFormat, dirName, fileName, plotAccel);
+0107 disp(<span class="string">'Done.'</span>);
+0108 toc
+0109 
+0110 disp(<span class="string">'Creating CSV file...'</span>);
+0111 tic
+0112 makeCSVanot(class_data, <span class="keyword">...</span>
+0113             classText, dateTimeFormat,  fileCSVName);
+0114 disp(<span class="string">'Done.'</span>);
+0115 toc
+0116 
+0117 
+0118 disp(<span class="string">'Cleaning up...'</span>);
+0119 delete(strcat(AnotName, <span class="string">'.mat'</span>));
+0120 delete(strcat(DCubeName, <span class="string">'.mat'</span>));
+0121 disp(<span class="string">'Done.'</span>);
+0122 
+0123 disp(<span class="string">'Total elapsed time: '</span>);
+0124 etime(clock, t)</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

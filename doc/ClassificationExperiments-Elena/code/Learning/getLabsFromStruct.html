@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of getLabsFromStruct</title>
+  <meta name="keywords" content="getLabsFromStruct">
+  <meta name="description" content="Merijn de Bakker || merijn.debakker@gmail.com">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; getLabsFromStruct.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>getLabsFromStruct
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Merijn de Bakker || merijn.debakker@gmail.com</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function alldata = getLabsFromStruct(str) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">Merijn de Bakker || merijn.debakker@gmail.com</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001  <span class="comment">%Merijn de Bakker || merijn.debakker@gmail.com</span>
+0002 
+0003 <a name="_sub0" href="#_subfunctions" class="code">function alldata = getLabsFromStruct(str)</a>
+0004 
+0005 <span class="comment">% lf = load(file);</span>
+0006 <span class="comment">% sn = fieldnames(lf);</span>
+0007 <span class="comment">% str = lf.(sn{1});</span>
+0008 
+0009 <span class="comment">%make alldata</span>
+0010 alldata = [];
+0011 
+0012 <span class="keyword">for</span> i = 1:str.nOfSamples
+0013     id=[];
+0014     sp=[];
+0015     da=[];
+0016     index1=[];
+0017     
+0018     d = datenum([str.year(i) str.month(i) str.day(i) str.hour(i) str.min(i) <span class="keyword">...</span>
+0019         str.sec(i)]);
+0020     maxN = max([size(str.accX{i},2),size(str.accY{i},2),size(str.accZ{i},2)]);  
+0021     str.accX{i}(end+1:maxN) = NaN;
+0022     str.accY{i}(end+1:maxN) = NaN;
+0023     str.accZ{i}(end+1:maxN) = NaN;
+0024     
+0025     id(1:maxN,1) = str.sampleID(i);
+0026     da(1:maxN,1) = d;
+0027        
+0028     <span class="comment">%sp(1:maxN,1) = str.gpsSpd2D(i);</span>
+0029     sp(1:maxN,1) = str.gpsSpd(i);
+0030     index1 = 0:maxN-1;
+0031  
+0032     alldata = [alldata; id da index1' str.accX{i}' str.accY{i}' str.accZ{i}' sp str.tags{i}];
+0033 
+0034 <span class="keyword">end</span>
+0035 
+0036 <span class="keyword">end</span>
+0037     
+0038</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

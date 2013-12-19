@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of tree_map</title>
+  <meta name="keywords" content="tree_map">
+  <meta name="description" content="TREE_MAP Map a dataset by binary decision tree">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; tree_map.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>tree_map
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>TREE_MAP Map a dataset by binary decision tree</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [F,lab,N,treeInfo] = tree_map(T,W) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">TREE_MAP Map a dataset by binary decision tree
+ 
+  F = TREE_MAP(A,W)
+ 
+ INPUT
+  A  Dataset
+  W  Decision tree mapping
+
+ OUTPUT
+  F  Posterior probabilities
+
+ DESCRIPTION
+ Maps the dataset A by the binary decision tree classifier W on the 
+ [0,1] interval for each of the classes W is trained on. The 
+ posterior probabilities stored in F sum row-wise to one. W should 
+ be trained by a classifier like treec. This routine is called 
+ automatically to solve A*W if W is trained by treec.
+ 
+ SEE ALSO
+ mappings, datasets, treec</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="treeExperimenter.html" class="code" title="function  [errorTest,confM] = treeExperimenter(fM,testd,crit, pruning, crossValidation, ft, reject,featureSelection,structName)">treeExperimenter</a>	function for doing experiments with the labelled bird data, using PRTools'</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%TREE_MAP Map a dataset by binary decision tree</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%  F = TREE_MAP(A,W)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% INPUT</span>
+0006 <span class="comment">%  A  Dataset</span>
+0007 <span class="comment">%  W  Decision tree mapping</span>
+0008 <span class="comment">%</span>
+0009 <span class="comment">% OUTPUT</span>
+0010 <span class="comment">%  F  Posterior probabilities</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% DESCRIPTION</span>
+0013 <span class="comment">% Maps the dataset A by the binary decision tree classifier W on the</span>
+0014 <span class="comment">% [0,1] interval for each of the classes W is trained on. The</span>
+0015 <span class="comment">% posterior probabilities stored in F sum row-wise to one. W should</span>
+0016 <span class="comment">% be trained by a classifier like treec. This routine is called</span>
+0017 <span class="comment">% automatically to solve A*W if W is trained by treec.</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% SEE ALSO</span>
+0020 <span class="comment">% mappings, datasets, treec</span>
+0021 
+0022 <span class="comment">% Copyright: R.P.W. Duin, duin@ph.tn.tudelft.nl</span>
+0023 <span class="comment">% Faculty of Applied Sciences, Delft University of Technology</span>
+0024 <span class="comment">% P.O. Box 5046, 2600 GA Delft, The Netherlands</span>
+0025 
+0026 <a name="_sub0" href="#_subfunctions" class="code">function [F,lab,N,treeInfo] = tree_map(T,W)</a>
+0027 
+0028         prtrace(mfilename);
+0029 
+0030 <span class="comment">% N yields for each node and each class in T the fraction of objects</span>
+0031 <span class="comment">% in T that passes that node.</span>
+0032 
+0033 <span class="comment">%[tree,classlist,type,k,c,v,num] = mapping(W);</span>
+0034 <span class="comment">% Unpack the classifier:</span>
+0035 w = getdata(W);
+0036 tree = w{1};
+0037 num  = w{2};
+0038 [k,c] = size(W);
+0039 
+0040 <span class="comment">% Classification of the data vectors in T starts with node</span>
+0041 <span class="comment">% num. In F the aposteriori probabilities for the classes</span>
+0042 <span class="comment">% of the final node are returned.</span>
+0043 <span class="comment">% N yields for each node and each class in T the fraction</span>
+0044 <span class="comment">% of objects in T that passes that node.</span>
+0045 <span class="comment">% lab returns for each data vector the column for which F is</span>
+0046 <span class="comment">% maximum.</span>
+0047 <span class="comment">% tree(n,1) - feature number to be used in node n</span>
+0048 <span class="comment">% tree(n,2) - threshold t to be used</span>
+0049 <span class="comment">% tree(n,3) - node to be processed if value &lt;= t</span>
+0050 <span class="comment">% tree(n,4) - node to be processed if value &gt; t</span>
+0051 <span class="comment">% tree(n,5:4+c) - aposteriori probabilities for all classes in</span>
+0052 <span class="comment">% node n</span>
+0053 <span class="comment">% If tree(n,3) == 0, stop, class in tree(n,1)</span>
+0054 
+0055 <span class="comment">%[nlabt,lablistt,m,kt,ct,pt] = dataset_old(T);</span>
+0056 <span class="comment">% Setup the variables, also depending what outputs are requested by</span>
+0057 <span class="comment">% the user:</span>
+0058 [m,kt,ct] = getsize(T);
+0059 <span class="keyword">if</span> kt ~= k, error(<span class="string">'Wrong feature size'</span>); <span class="keyword">end</span>
+0060 [n,d] = size(tree);
+0061 
+0062 lab = zeros(m,1);
+0063 <span class="keyword">if</span> nargout==3
+0064     b = expandd(getnlab(T),ct);
+0065     N = zeros(n,ct);
+0066 <span class="keyword">end</span>
+0067 F = zeros(m,c);
+0068 node = num*ones(1,m);
+0069 
+0070 treeInfo = [];
+0071 
+0072 
+0073 <span class="keyword">for</span> i = num:n
+0074     
+0075     S = find(node == i);
+0076     
+0077     <span class="keyword">if</span> nargout==3
+0078         N(i,:) = sum(b(S,:));
+0079     <span class="keyword">end</span>
+0080     <span class="keyword">if</span> tree(i,3) &gt; 0
+0081         
+0082         <span class="comment">%EDIT_0611_merijndebakker -- put the decision info in the matrix</span>
+0083         feature = tree(i,1);
+0084         threshold = tree(i,2);
+0085         nodIfSmall = tree(i,3);
+0086         nodIfBig = tree(i,4);
+0087         probs = tree(i,5:4+c);
+0088         treeInfo(end+1,:) = [i, feature, threshold, nodIfSmall,probs];
+0089         treeInfo(end+1,:) = [i, feature, threshold, nodIfBig, probs];
+0090         
+0091         <span class="comment">%--continue original program</span>
+0092         SL = S(find(+T(S,tree(i,1)) &lt;= tree(i,2)));
+0093         SR = S(find(+T(S,tree(i,1)) &gt; tree(i,2)));
+0094         node(SL) = tree(i,3)*ones(1,length(SL));
+0095         node(SR) = tree(i,4)*ones(1,length(SR));
+0096     <span class="keyword">elseif</span> tree(i,3) == 0
+0097         node(S) = inf * ones(1,length(S));
+0098         lab(S) = tree(i,1) * ones(1,length(S));
+0099         F(S,:) = tree(i*ones(length(S),1),5:4+c);
+0100         
+0101         <span class="comment">%EDIT_0611_merijndebakker -- put the decision info in the matrix</span>
+0102         probs = tree(i,5:4+c);
+0103         treeInfo(end+1,:) = [i, 0, 0, tree(i,1),probs];
+0104         treeInfo(end+1,:) = [i, 0, 0, tree(i,1),probs];
+0105         
+0106         <span class="comment">%--continue original program</span>
+0107     <span class="keyword">else</span>
+0108       <span class="comment">% right, what now?</span>
+0109     <span class="keyword">end</span>
+0110 <span class="keyword">end</span>
+0111 <span class="keyword">if</span> nargout==3
+0112     N=N./(ones(n,1)*(sum(b,1)./getprior(T)));
+0113 <span class="keyword">end</span>
+0114 
+0115 F = setdat(T,F,W);
+0116 <span class="comment">%F = dataset_old(F,getlab(T),classlist,pt,lablistt);</span>
+0117 N=0;
+0118 <span class="keyword">return</span></pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

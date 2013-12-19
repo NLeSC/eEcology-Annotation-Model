@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calcODBA</title>
+  <meta name="keywords" content="calcODBA">
+  <meta name="description" content="% calcODBA - calculates the Overall Dynamic Body Acceleration feature">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Features</a> &gt; calcODBA.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Features&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>calcODBA
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% calcODBA - calculates the Overall Dynamic Body Acceleration feature</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function ODBA = calcODBA(M,w) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% calcODBA - calculates the Overall Dynamic Body Acceleration feature
+
+ author: Merijn de Bakker, UvA,Elena Ranguelova, NLeSc
+ date creation: 11-2011
+ last modification date: 27-09-2013
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ [ODBA]=calcODBA(M,w)
+
+ INPUT
+ M- 3-D matrix with accelerometer data (frames are rows)
+ w- window size
+
+ OUPTPUT
+ ODBA- Overal Dynamic Body Accelerationd
+
+ EXAMPLE
+ 
+ SEE ALSO
+ calFeatureVectors.m
+
+ REFERENCES
+ Gleiss et al. (2011) Convergent evolution in locomotory
+ patterns of flying and swimming animals. Nature Communications (DOI:10.1038)
+ &quot;Automatic Classification of Bird Behaiviour on the baes of Accelerometer
+ Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="calcFeatureVectors.html" class="code" title="function [FTV,INFO] = calcFeatureVectors(data,  windowSize, overlap, epsilon)">calcFeatureVectors</a>	% calcFeatureVectors - feature vectors computaion for classifiers</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% calcODBA - calculates the Overall Dynamic Body Acceleration feature</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Merijn de Bakker, UvA,Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 11-2011</span>
+0005 <span class="comment">% last modification date: 27-09-2013</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% [ODBA]=calcODBA(M,w)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% INPUT</span>
+0012 <span class="comment">% M- 3-D matrix with accelerometer data (frames are rows)</span>
+0013 <span class="comment">% w- window size</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% OUPTPUT</span>
+0016 <span class="comment">% ODBA- Overal Dynamic Body Accelerationd</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% EXAMPLE</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% SEE ALSO</span>
+0021 <span class="comment">% calFeatureVectors.m</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% REFERENCES</span>
+0024 <span class="comment">% Gleiss et al. (2011) Convergent evolution in locomotory</span>
+0025 <span class="comment">% patterns of flying and swimming animals. Nature Communications (DOI:10.1038)</span>
+0026 <span class="comment">% &quot;Automatic Classification of Bird Behaiviour on the baes of Accelerometer</span>
+0027 <span class="comment">% Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011</span>
+0028 
+0029 <a name="_sub0" href="#_subfunctions" class="code">function ODBA = calcODBA(M,w)</a>
+0030 
+0031 
+0032 x = M(:,1);
+0033 y = M(:,2);
+0034 z = M(:,3);
+0035 
+0036 v = ones(1,w)/w;
+0037 
+0038 <span class="comment">%filter the data as a moving average</span>
+0039 ODBA = sum(abs(x-conv(x,v,<span class="string">'same'</span>)))+ <span class="keyword">...</span>
+0040     sum(abs(y-conv(y,v,<span class="string">'same'</span>)))+<span class="keyword">...</span>
+0041     sum(abs(z-conv(z,v,<span class="string">'same'</span>)));
+0042 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

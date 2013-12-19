@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of prepareData</title>
+  <meta name="keywords" content="prepareData">
+  <meta name="description" content="wrapper function for preparing annotated data for classification.">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; prepareData.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>prepareData
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>wrapper function for preparing annotated data for classification.</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [train,test,permutation] = prepareData(annot_struct,frac,labvec) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">wrapper function for preparing annotated data for classification.
+frac is the fraction for the training set.
+labvec is a vector containing the desired labels in the dataset. an empty
+vector means that all labels will be included to the dataset.</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="getDataFromAnnotStruct.html" class="code" title="function [data]=getDataFromAnnotStruct(annot_struct)">getDataFromAnnotStruct</a>	% getDataFromAnnotStruct- creates data array from the annotation structure of AccVidGui</li><li><a href="groupD2Label.html" class="code" title="function labels = groupD2Label(data, label)">groupD2Label</a>	splitData2Templates(data)</li><li><a href="makeFeaturesNSpd.html" class="code" title="function [featureMatrix,infoMatrix]  = makeFeaturesNSpd(M, windowSize,overlap,perSample,varargin)">makeFeaturesNSpd</a>	merijn de bakker || merijn.debakker@gmail.com</li><li><a href="splitset.html" class="code" title="function [trainSet, validationSet, P] = splitset(featureM, validationSize)">splitset</a>	merijn de bakker</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%wrapper function for preparing annotated data for classification.</span>
+0002 <span class="comment">%frac is the fraction for the training set.</span>
+0003 <span class="comment">%labvec is a vector containing the desired labels in the dataset. an empty</span>
+0004 <span class="comment">%vector means that all labels will be included to the dataset.</span>
+0005 
+0006 <a name="_sub0" href="#_subfunctions" class="code">function [train,test,permutation] = prepareData(annot_struct,frac,labvec)</a>
+0007 
+0008 <span class="comment">%assignin('base', 'files', dataStructs);</span>
+0009 data = [];
+0010 dataInfo = [];
+0011 windowingMode = <span class="string">'d'</span>;
+0012 ws=20;
+0013 olap = 0;
+0014 
+0015 <span class="comment">%for j = 1:length(dataStructs)</span>
+0016     
+0017     <span class="comment">%dataStruct = char(dataStructs(j));</span>
+0018     <span class="comment">%[~,fname,~] = fileparts(dataStruct);</span>
+0019     
+0020     <span class="comment">%retrieve all labelled data from the input</span>
+0021     <span class="comment">%alldata = getLabsFromStruct(dataStruct);</span>
+0022     [alldata]=<a href="getDataFromAnnotStruct.html" class="code" title="function [data]=getDataFromAnnotStruct(annot_struct)">getDataFromAnnotStruct</a>(annot_struct);
+0023     
+0024     <span class="comment">%group by label</span>
+0025     <span class="comment">%allLabels = groupD2Label(alldata,8,j);</span>
+0026     allLabels = <a href="groupD2Label.html" class="code" title="function labels = groupD2Label(data, label)">groupD2Label</a>(alldata,8);
+0027 
+0028     <span class="comment">%only add the selected labels to the dataset.</span>
+0029     <span class="keyword">if</span> isempty(labvec)
+0030         labels = allLabels;
+0031     <span class="keyword">else</span>
+0032         [~,pos] = ismember(labvec,allLabels);
+0033         labels = allLabels(pos(pos~=0));
+0034     <span class="keyword">end</span>
+0035         
+0036 
+0037     <span class="comment">%calculate the features for each label</span>
+0038     <span class="keyword">for</span> i = 1:length(labels)
+0039         
+0040         thisLab = labels(i);
+0041         
+0042         <span class="comment">%labDat = evalin('base', strcat('f',num2str(j),'_label_',num2str(thisLab)));</span>
+0043         labDat = evalin(<span class="string">'base'</span>, strcat(<span class="string">'label_'</span>,num2str(thisLab)));
+0044 
+0045         [ft, info] = <a href="makeFeaturesNSpd.html" class="code" title="function [featureMatrix,infoMatrix]  = makeFeaturesNSpd(M, windowSize,overlap,perSample,varargin)">makeFeaturesNSpd</a>(labDat, ws, olap,0,8, <span class="string">'norm'</span>, windowingMode);
+0046         <span class="comment">%[ft, info] = calcFeatureVectors(labDat, ws, olap,0.3);</span>
+0047 
+0048         data = [data;ft];
+0049         dataInfo = [dataInfo;info];
+0050         
+0051         <span class="comment">%assignin('base', strcat('f',num2str(j),'_fts_', num2str(labels(i))), ft);</span>
+0052         <span class="comment">%assignin('base', strcat('f',num2str(j),'_inf_', num2str(labels(i))), info);</span>
+0053         
+0054         assignin(<span class="string">'base'</span>, strcat(<span class="string">'fts_'</span>, num2str(labels(i))), ft);
+0055         assignin(<span class="string">'base'</span>, strcat(<span class="string">'inf_'</span>, num2str(labels(i))), info)        
+0056        
+0057     <span class="keyword">end</span>   
+0058 
+0059 <span class="comment">%end</span>
+0060 
+0061 [train,test,permutation] = <a href="splitset.html" class="code" title="function [trainSet, validationSet, P] = splitset(featureM, validationSize)">splitset</a>(data,frac);
+0062 <span class="comment">% metadata = struct('data',{datestr(today)},'author', {'Elena'},...</span>
+0063 <span class="comment">%     'files',{dataStructs},'mode',{windowingMode}, 'wSize', {ws}, 'step', {olap},...</span>
+0064 <span class="comment">%     'filter',{''},'ftSet',{''});</span>
+0065 <span class="comment">%</span>
+0066 <span class="comment">% assignin('base', 'dataFeatures', data);</span>
+0067 <span class="comment">% assignin('base', 'dataInfo', dataInfo);</span>
+0068 <span class="comment">% assignin('base', strcat('train_',num2str(frac*100)), train);</span>
+0069 <span class="comment">% assignin('base', strcat('test_',num2str((1-frac)*100)), test);</span>
+0070 <span class="comment">% assignin('base', 'IDtrain', permutation(1:size(train,1)));</span>
+0071 <span class="comment">% assignin('base', 'IDtest', permutation(size(train,1)+1:end));</span>
+0072 <span class="comment">% assignin('base', 'metaData', metadata);</span>
+0073 
+0074 
+0075 
+0076 
+0077</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

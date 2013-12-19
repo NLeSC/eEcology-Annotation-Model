@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of plotTree</title>
+  <meta name="keywords" content="plotTree">
+  <meta name="description" content="function plotTree">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; plotTree.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>plotTree
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function plotTree</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function plotTree(Matrix, NNodes, ftList,name) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">function plotTree
+   plotting a tree resulting from PRtools treemap function
+
+merijn de bakker || merijn.debakker@gmail.com
+created: 11-06-2011 | modified: --
+
+INPUT: a 'info' matrix (result from treemap). note that this not available
+in the original prtool. treemap has been modified for outputting the 'info
+ matrix
+OUTPUT: a figure with the tree. next to the nodes is the feature and the
+threshold value. lefts branch &lt;= threshold, right branch &gt; threshold. Leaf
+nodes are the classes.
+DEPENDS: --
+NOTES: --</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="explainTree.html" class="code" title="function explainTree(Matrix, ftList, nodeCount,nodeID,name)">explainTree</a>	Merijn de Bakker || merijn.debakker@gmail.com</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%function plotTree</span>
+0002 <span class="comment">%   plotting a tree resulting from PRtools treemap function</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%merijn de bakker || merijn.debakker@gmail.com</span>
+0005 <span class="comment">%created: 11-06-2011 | modified: --</span>
+0006 <span class="comment">%</span>
+0007 <span class="comment">%INPUT: a 'info' matrix (result from treemap). note that this not available</span>
+0008 <span class="comment">%in the original prtool. treemap has been modified for outputting the 'info</span>
+0009 <span class="comment">% matrix</span>
+0010 <span class="comment">%OUTPUT: a figure with the tree. next to the nodes is the feature and the</span>
+0011 <span class="comment">%threshold value. lefts branch &lt;= threshold, right branch &gt; threshold. Leaf</span>
+0012 <span class="comment">%nodes are the classes.</span>
+0013 <span class="comment">%DEPENDS: --</span>
+0014 <span class="comment">%NOTES: --</span>
+0015 
+0016 <a name="_sub0" href="#_subfunctions" class="code">function plotTree(Matrix, NNodes, ftList,name)</a>
+0017 
+0018 nOfNodes = Matrix(<span class="keyword">end</span>,1);
+0019 
+0020 <span class="comment">%ftns = evalin('base','ftLabels');</span>
+0021 <span class="comment">%find start and endnode</span>
+0022 <span class="comment">%startNode = Matrix(1,1);</span>
+0023 <span class="comment">%[endNodes,~,~] = unique(Matrix(find(Matrix(:,2)==0),1), 'first');</span>
+0024 
+0025 nodes = zeros(1,nOfNodes);
+0026 features = zeros(nOfNodes,1);
+0027 thresholds = zeros(nOfNodes,1);
+0028 
+0029 features(1) = Matrix(1,2);
+0030 thresholds(1) = Matrix(1,3);
+0031 
+0032 <span class="comment">%convert the nodes to the format Matlab desires in treeplot</span>
+0033 <span class="keyword">for</span> i = 1:size(Matrix,1)
+0034     
+0035     thisNode = Matrix(i,4);
+0036     
+0037     <span class="keyword">if</span> Matrix(i,4) == 1 || Matrix(i,2)==0           
+0038         
+0039         <span class="keyword">continue</span>
+0040     <span class="keyword">end</span>
+0041     
+0042     [index,~] = find(Matrix(:,4)==thisNode &amp; Matrix(:,2)~=0);
+0043     parent = Matrix(index,1);
+0044 
+0045     <span class="keyword">if</span> Matrix(find(Matrix(:,1)==thisNode,1,<span class="string">'first'</span>),2)==0
+0046         
+0047         features(thisNode) = Matrix(find(Matrix(:,1)==thisNode,1,<span class="keyword">...</span>
+0048              <span class="string">'first'</span>),4);  
+0049     <span class="keyword">else</span>
+0050   
+0051         features(thisNode) = Matrix(find(Matrix(:,1)==thisNode,1,<span class="string">'first'</span>),2);
+0052         thresholds(thisNode) = Matrix(find(Matrix(:,1)==thisNode,1,<span class="string">'first'</span>),3);
+0053         
+0054     <span class="keyword">end</span>    
+0055     
+0056     nodes(thisNode) = parent;
+0057 <span class="keyword">end</span>
+0058 
+0059 figure
+0060 hold on
+0061 
+0062 axis off;
+0063 nodespec = [<span class="string">'b'</span>,<span class="string">'o'</span>];
+0064 edgespec = [<span class="string">'b'</span>];
+0065 treeplot(nodes, nodespec, edgespec);
+0066 
+0067 [x,y] = treelayout(nodes);
+0068 
+0069 x = x';
+0070 y = y';
+0071 [endNodes,~] = find(thresholds==0);
+0072 realNodes = setdiff(1:length(nodes),endNodes);
+0073 realnodeID = 1:length(realNodes);
+0074 endnodeID = length(realNodes)+1:length(features);
+0075 name1 = cellstr(num2str(features));
+0076 realID = cellstr(num2str(realnodeID'));
+0077 endID = cellstr(num2str(endnodeID'));
+0078 
+0079 name2 = cellstr(num2str(thresholds,2));
+0080 counts = cellstr(num2str(NNodes));
+0081 
+0082 <span class="comment">%while (thresholds(i+4)~=0 || thresholds(i+5)~=0)</span>
+0083 
+0084     <span class="comment">%if abs(x(i) - x(i+1))&gt;0.01 &amp;&amp; abs(y(i) - y(i+1))&gt;0.02</span>
+0085         text(x(realNodes,1)+0.01, y(realNodes,1), strcat(<span class="string">'ID:'</span>,realID,<span class="string">'FT:'</span>,name1(realNodes)), <span class="string">'VerticalAlignment'</span>,<span class="keyword">...</span>
+0086             <span class="string">'bottom'</span>,<span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>, <span class="string">'Fontsize'</span>, 6)
+0087         <span class="comment">%text(x(:,1)-0.02, y(:,1)-0.09, '&lt;=', 'VerticalAlignment','bottom','HorizontalAlignment','right')</span>
+0088         <span class="comment">%text(x(:,1)+0.02, y(:,1)-0.09, '&gt;', 'VerticalAlignment','bottom','HorizontalAlignment','right')</span>
+0089         text(x(realNodes,1), y(realNodes,1)-0.015, name2(realNodes), <span class="string">'VerticalAlignment'</span>,<span class="keyword">...</span>
+0090             <span class="string">'bottom'</span>,<span class="string">'HorizontalAlignment'</span>,<span class="string">'left'</span>,<span class="string">'Fontsize'</span>, 6)
+0091 <span class="comment">%        text(x(i,1), y(i,1)-0.03, strcat('(',counts(i,:),')'), 'VerticalAlignment',...</span>
+0092 <span class="comment">%            'bottom','HorizontalAlignment','left','Fontsize', 6)</span>
+0093     <span class="comment">%end</span>
+0094     
+0095 <span class="comment">%    i=i+1;</span>
+0096 <span class="comment">%end</span>
+0097 
+0098 <span class="comment">%draw endnodes</span>
+0099 <span class="comment">% for j=1:length(thresholds)</span>
+0100 <span class="comment">%     if thresholds(j) == 0</span>
+0101 <span class="comment">%         text(x(j,1), y(j,1)-0.02, name1(j), 'VerticalAlignment',...</span>
+0102 <span class="comment">%             'bottom','HorizontalAlignment','center', 'Fontsize', 6)</span>
+0103 <span class="comment">%     end</span>
+0104 <span class="comment">% end</span>
+0105 
+0106 text(x(endNodes,1), y(endNodes,1)-0.04, name1(endNodes), <span class="string">'VerticalAlignment'</span>,<span class="keyword">...</span>
+0107              <span class="string">'bottom'</span>,<span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>, <span class="string">'Fontsize'</span>, 7)
+0108 text(x(endNodes,1), y(endNodes,1)-0.07, endID, <span class="string">'VerticalAlignment'</span>,<span class="keyword">...</span>
+0109      <span class="string">'bottom'</span>,<span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>, <span class="string">'Fontsize'</span>, 6)
+0110  
+0111 pos = 0.11;
+0112 
+0113 <span class="keyword">for</span> i = 1:size(NNodes,2)
+0114     
+0115     text(x(endNodes,1), y(endNodes,1)-pos, num2str(NNodes(endNodes,i)),<span class="string">'VerticalAlignment'</span>,<span class="keyword">...</span>
+0116              <span class="string">'bottom'</span>,<span class="string">'HorizontalAlignment'</span>,<span class="string">'center'</span>, <span class="string">'Fontsize'</span>, 6);
+0117     pos = pos+0.015;
+0118 <span class="keyword">end</span>
+0119 
+0120 
+0121 <span class="comment">%make a file that explains the tree and enumerates the passes through nodes</span>
+0122 <span class="keyword">if</span> strcmp(name,<span class="string">''</span>)==0
+0123     <a href="explainTree.html" class="code" title="function explainTree(Matrix, ftList, nodeCount,nodeID,name)">explainTree</a>(Matrix,ftList, NNodes,[realNodes';endNodes],name)
+0124 <span class="keyword">end</span>
+0125 
+0126 
+0127 
+0128 
+0129</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

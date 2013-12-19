@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of DBAcc_meeuw_all</title>
+  <meta name="keywords" content="DBAcc_meeuw_all">
+  <meta name="description" content="DBAcc_meeuw_all- fetching all meeuw data">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../../index.html">Home</a> &gt;  <a href="../../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../../index.html">code</a> &gt; <a href="../index.html">Classification</a> &gt; <a href="index.html">scripts</a> &gt; DBAcc_meeuw_all.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../../index.html"><img alt="<" border="0" src="../../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification/scripts&nbsp;<img alt=">" border="0" src="../../../../right.png"></a></td></tr></table>-->
+
+<h1>DBAcc_meeuw_all
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="box"><strong>DBAcc_meeuw_all- fetching all meeuw data</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment"> DBAcc_meeuw_all- fetching all meeuw data</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">% DBAcc_meeuw_all- fetching all meeuw data</span>
+0002 
+0003 <span class="comment">%% initializations</span>
+0004 clear all,close all, clc
+0005 
+0006 databaseHost = <span class="string">'db.e-ecology.sara.nl'</span>;
+0007 project_path = fullfile(<span class="string">'/'</span>,<span class="string">'home'</span>,<span class="string">'elena'</span>,<span class="string">'LifeWatch'</span>,<span class="string">'eEcology-Annotation-Model'</span>,<span class="string">'ClassificationExperiments-Elena'</span>);
+0008 data_path = fullfile(project_path,<span class="string">'data'</span>);
+0009 results_path = fullfile(project_path,<span class="string">'results'</span>);
+0010 
+0011 classifiers_fname = fullfile(data_path,<span class="string">'classifiers.mat'</span>);
+0012 load(classifiers_fname);
+0013 eco_queries =  fullfile(data_path,<span class="string">'eecologyqueries.mat'</span>); 
+0014 query_id = <span class="string">'sql_gps_acc'</span>;
+0015 
+0016 <span class="comment">% prompt the user for username and password</span>
+0017 disp(<span class="string">'Login credentials for access to eEcologyDB are needed.'</span>);
+0018 username = input(<span class="string">'Please, enter your user name: '</span>,<span class="string">'s'</span>);  
+0019 password = input(<span class="string">'Please, enter your password: '</span>,<span class="string">'s'</span>);
+0020 
+0021 <span class="comment">% IDevice = [320];</span>
+0022 <span class="comment">% starttime = '2010-06-08 02:09:36';</span>
+0023 <span class="comment">% stoptime  = '2010-06-09 09:07:20';</span>
+0024 
+0025 IDevice = [325];
+0026 starttime = <span class="string">'2010-06-09 00:13:48'</span>;
+0027 stoptime  = <span class="string">'2010-06-09 11:01:05'</span>;
+0028 
+0029 <span class="comment">%num_meas = 60;</span>
+0030 num_features= 58;
+0031 num_classes= 7;
+0032 windowSize=20;
+0033 overlap=10;
+0034 epsilon = 0.3;
+0035 
+0036 IDdate=[IDevice <span class="string">'_'</span> starttime(1:4) starttime(6:7) starttime(9:10) <span class="string">'_'</span> stoptime(1:4) stoptime(6:7) stoptime(9:10)];
+0037 
+0038 <span class="comment">%mat-file for storing intermediate results</span>
+0039 StorName=[fullfile(results_path,<span class="string">'Stor'</span>) IDdate <span class="string">'.mat'</span>];
+0040 
+0041 <span class="comment">%name datacube</span>
+0042 DCubeName= [fullfile(results_path,<span class="string">'Datacube'</span>) IDdate];
+0043 
+0044 <span class="comment">%% get the data from the DB</span>
+0045 <span class="comment">% [tracks] = getDataFromEecologyDB(username, password,...</span>
+0046 <span class="comment">%                               eco_queries, query_id, IDevice, starttime, stoptime)</span>
+0047 connection = connectEecologyDB(databaseHost, username, password);
+0048 [tracks] = getAccelerometerData(connection,<span class="keyword">...</span>
+0049                                  IDevice, starttime, stoptime,<span class="keyword">...</span>
+0050                                  false);
+0051 
+0052 num_meas = getAccelerometerSize(connection, <span class="keyword">...</span>
+0053                                 IDevice, starttime, stoptime,<span class="keyword">...</span>
+0054                                 false);
+0055 
+0056 
+0057 <span class="comment">%% format the data</span>
+0058 [formatted_tracks] = formatDataStructure(tracks);
+0059 
+0060 
+0061 <span class="comment">%% classify the data</span>
+0062 [class_data, FTVstor, INFO]=classifyAccMeas(formatted_tracks, num_meas, classifiers,<span class="keyword">...</span>
+0063     num_features, num_classes, windowSize, overlap, epsilon);
+0064 
+0065 <span class="comment">%% create Datacube</span>
+0066 Datacube = createDatacube(class_data,1,DCubeName);
+0067</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

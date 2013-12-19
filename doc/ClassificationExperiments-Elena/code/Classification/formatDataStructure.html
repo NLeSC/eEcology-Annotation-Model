@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of formatDataStructure</title>
+  <meta name="keywords" content="formatDataStructure">
+  <meta name="description" content="% formatDataStructure - formatting the data retrieved from the EcologyDB">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Classification</a> &gt; formatDataStructure.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>formatDataStructure
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% formatDataStructure - formatting the data retrieved from the EcologyDB</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [formatted_data] = formatDataStructure(input_data) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% formatDataStructure - formatting the data retrieved from the EcologyDB
+
+ author: Elena Ranguelova, NLeSc
+ date creation: 22.08.2013
+ last modification date:
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ [formatted_data]=formatDataStructure(input_data)
+
+ INPUT
+ input_data- the data structure as retrieved from the DB (using query like
+             the 'sql_gps_acc' from '../data/eecologyqueries.mat')
+
+ OUPTPUT
+ formatted_data- the input data structure formatted (to default double)
+
+ EXAMPLE
+ [tracks] = getDataFromEecologyDB(&lt;your-user-name&gt;, &lt;your-password&gt;,...
+                               '../data/eecologyqueries.mat', 'sql_gps_acc',...
+                                754, '2013-06-08 06:20:00', ...
+                                '2013-06-08 07:20:00');
+ [formatted_tracks] = formatDataStructure(tracks);
+
+ SEE ALSO
+ getDataFromEecologyDB.m
+ DBAcc_Texel/FEBO.m scripts from W. Bouten (legacy)
+
+ REFERENCES</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% formatDataStructure - formatting the data retrieved from the EcologyDB</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 22.08.2013</span>
+0005 <span class="comment">% last modification date:</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% [formatted_data]=formatDataStructure(input_data)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% INPUT</span>
+0012 <span class="comment">% input_data- the data structure as retrieved from the DB (using query like</span>
+0013 <span class="comment">%             the 'sql_gps_acc' from '../data/eecologyqueries.mat')</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% OUPTPUT</span>
+0016 <span class="comment">% formatted_data- the input data structure formatted (to default double)</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% EXAMPLE</span>
+0019 <span class="comment">% [tracks] = getDataFromEecologyDB(&lt;your-user-name&gt;, &lt;your-password&gt;,...</span>
+0020 <span class="comment">%                               '../data/eecologyqueries.mat', 'sql_gps_acc',...</span>
+0021 <span class="comment">%                                754, '2013-06-08 06:20:00', ...</span>
+0022 <span class="comment">%                                '2013-06-08 07:20:00');</span>
+0023 <span class="comment">% [formatted_tracks] = formatDataStructure(tracks);</span>
+0024 <span class="comment">%</span>
+0025 <span class="comment">% SEE ALSO</span>
+0026 <span class="comment">% getDataFromEecologyDB.m</span>
+0027 <span class="comment">% DBAcc_Texel/FEBO.m scripts from W. Bouten (legacy)</span>
+0028 <span class="comment">%</span>
+0029 <span class="comment">% REFERENCES</span>
+0030 
+0031 <a name="_sub0" href="#_subfunctions" class="code">function [formatted_data] = formatDataStructure(input_data)</a>
+0032 
+0033     <span class="comment">% format or copy each the field of the structure</span>
+0034     formatted_data=input_data;
+0035     formatted_data.datetime=datenum(input_data.date_time);    
+0036     datavecs = datevec(formatted_data.datetime);
+0037     formatted_data.year=datavecs(:,1);
+0038     formatted_data.month=datavecs(:,2);
+0039     formatted_data.day=datavecs(:,3);
+0040     formatted_data.hour=datavecs(:,4);
+0041     formatted_data.minute=datavecs(:,5);
+0042     formatted_data.second=datavecs(:,6);
+0043 
+0044</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

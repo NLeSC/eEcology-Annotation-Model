@@ -1,0 +1,9 @@
+/* Created by mdot for Matlab */
+digraph m2html {
+
+  DBAcc_FEBO_new [URL="DBAcc_FEBO_new.html"];
+  DBAcc_Texel_new [URL="DBAcc_Texel_new.html"];
+  DBAcc_meeuw_all [URL="DBAcc_meeuw_all.html"];
+  addEecologyqueries [URL="addEecologyqueries.html"];
+  classificator [URL="classificator.html"];
+}

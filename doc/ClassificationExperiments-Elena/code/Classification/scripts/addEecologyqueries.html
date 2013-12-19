@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of addEecologyqueries</title>
+  <meta name="keywords" content="addEecologyqueries">
+  <meta name="description" content="% addEecologyqueries - example  script for adding an SQL query to a MAT file">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../../index.html">Home</a> &gt;  <a href="../../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../../index.html">code</a> &gt; <a href="../index.html">Classification</a> &gt; <a href="index.html">scripts</a> &gt; addEecologyqueries.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../../index.html"><img alt="<" border="0" src="../../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Classification/scripts&nbsp;<img alt=">" border="0" src="../../../../right.png"></a></td></tr></table>-->
+
+<h1>addEecologyqueries
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="box"><strong>% addEecologyqueries - example  script for adding an SQL query to a MAT file</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="box"><strong>This is a script file. </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% addEecologyqueries - example  script for adding an SQL query to a MAT file
+ the query store currently resides in ../data/eecologyqueries.mat
+
+ author: Elena Ranguelova, NLeSc
+ date creation: 16.08.2013
+ last modification date:
+ modification details:</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% addEecologyqueries - example  script for adding an SQL query to a MAT file</span>
+0002 <span class="comment">% the query store currently resides in ../data/eecologyqueries.mat</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">% author: Elena Ranguelova, NLeSc</span>
+0005 <span class="comment">% date creation: 16.08.2013</span>
+0006 <span class="comment">% last modification date:</span>
+0007 <span class="comment">% modification details:</span>
+0008 
+0009 sql_gps_acc = strcat(<span class="string">'select s.device_info_serial, s.date_time, a.date_time, '</span>, <span class="keyword">...</span>
+0010                <span class="string">' date_part(''year''::text, s.date_time) AS year, '</span>,<span class="keyword">...</span>
+0011                <span class="string">' date_part(''month''::text, s.date_time) AS month, '</span>,<span class="keyword">...</span>
+0012                <span class="string">' date_part(''day''::text, s.date_time) AS day, '</span>,<span class="keyword">...</span>
+0013                <span class="string">' date_part(''hour''::text, s.date_time) AS hour, '</span>,<span class="keyword">...</span>
+0014                <span class="string">' date_part(''minute''::text, s.date_time) AS minute, '</span>,<span class="keyword">...</span>
+0015                <span class="string">' date_part(''second''::text, s.date_time) AS second, '</span>,<span class="keyword">...</span>
+0016                <span class="string">' s.speed, s.longitude, s.latitude, s.altitude, t.speed as tspeed, '</span>,<span class="keyword">...</span>
+0017                <span class="string">' a.index,(a.x_acceleration-d.x_o)/d.x_s as x_cal, '</span>,<span class="keyword">...</span>
+0018                <span class="string">' (a.y_acceleration-d.y_o)/d.y_s as y_cal, '</span>,<span class="keyword">...</span>
+0019                <span class="string">' (a.z_acceleration-d.z_o)/d.z_s as z_cal '</span>,<span class="keyword">...</span>
+0020                <span class="string">' FROM gps.uva_tracking_speed s '</span>,<span class="keyword">...</span>
+0021                <span class="string">' LEFT join gps.uva_acceleration101 a '</span>,<span class="keyword">...</span><span class="comment">  </span>
+0022                <span class="string">' ON (s.device_info_serial = a.device_info_serial AND s.date_time = a.date_time) '</span>,<span class="keyword">...</span>
+0023                <span class="string">' LEFT join gps.uva_device d '</span>,<span class="keyword">...</span>
+0024                <span class="string">' ON a.device_info_serial = d.device_info_serial '</span>,<span class="keyword">...</span>
+0025                <span class="string">' LEFT join gps.get_uvagps_track_speed (%s,%s,%s) t '</span>,<span class="keyword">...</span>
+0026                <span class="string">' ON s.device_info_serial = t.device_info_serial and s.date_time = t.date_time '</span>,<span class="keyword">...</span>
+0027                <span class="string">' where s.device_info_serial =%s and '</span>,<span class="keyword">...</span>
+0028                <span class="string">' s.date_time &gt;%s and s.date_time &lt;%s and s.latitude is not null and s.userflag &lt;&gt; 1 '</span>,<span class="keyword">...</span>
+0029                <span class="string">' order by  s.date_time, a.index'</span>);
+0030            
+0031 <span class="keyword">if</span> ~exist(<span class="string">'../data/eecologyqueries.mat'</span>,<span class="string">'file'</span>)
+0032     save(<span class="string">'../data/eecologyqueries.mat'</span>,<span class="string">'sql_gps_acc'</span>)
+0033 <span class="keyword">else</span>
+0034     save(<span class="string">'../data/eecologyqueries.mat'</span>,<span class="string">'sql_gps_acc'</span>,<span class="string">'-append'</span>)
+0035 <span class="keyword">end</span>
+0036</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of groupDataByLabels</title>
+  <meta name="keywords" content="groupDataByLabels">
+  <meta name="description" content="% groupDataByLabels- generates files with groups from annotad data by labels">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; groupDataByLabels.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>groupDataByLabels
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% groupDataByLabels- generates files with groups from annotad data by labels</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function [data_groups, labels]=groupDataByLabels(data,label_index) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% groupDataByLabels- generates files with groups from annotad data by labels
+
+ author: Elena Ranguelova, NLeSc
+ date creation: 22-11-2013
+ last modification date:
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ [data_groups, labels]=groupDataByLabels(data,label_index)
+
+ INPUT
+ data- data matrix as output by getDataFromAnnotStruct function
+ label_index -the index in the data where the label info is
+
+ OUPTPUT
+ data_groups- a chunck of the data each of the output arguments should be described
+ labels- a row vector of all possible labels in the annotated data
+
+ EXAMPLE
+ load ./data/Annotated_data/Test2.mat
+ data = getDataFromAnnotStruct(outputStruct)
+ [data_groups, labels]=groupDataByLabels(data,8)
+ 
+ SEE ALSO
+ <a href="getDataFromAnnotStruct.html" class="code" title="function [data]=getDataFromAnnotStruct(annot_struct)">getDataFromAnnotStruct</a>
+
+ REFERENCES
+ Based on  Merijn de Bakker's code <a href="groupD2Label.html" class="code" title="function labels = groupD2Label(data, label)">groupD2Label</a>.m
+
+ NOTES
+ label_index should be 8 (see Merijn's notes and getDataFromAnnotStruct)</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% groupDataByLabels- generates files with groups from annotad data by labels</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 22-11-2013</span>
+0005 <span class="comment">% last modification date:</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% [data_groups, labels]=groupDataByLabels(data,label_index)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% INPUT</span>
+0012 <span class="comment">% data- data matrix as output by getDataFromAnnotStruct function</span>
+0013 <span class="comment">% label_index -the index in the data where the label info is</span>
+0014 <span class="comment">%</span>
+0015 <span class="comment">% OUPTPUT</span>
+0016 <span class="comment">% data_groups- a chunck of the data each of the output arguments should be described</span>
+0017 <span class="comment">% labels- a row vector of all possible labels in the annotated data</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% EXAMPLE</span>
+0020 <span class="comment">% load ./data/Annotated_data/Test2.mat</span>
+0021 <span class="comment">% data = getDataFromAnnotStruct(outputStruct)</span>
+0022 <span class="comment">% [data_groups, labels]=groupDataByLabels(data,8)</span>
+0023 <span class="comment">%</span>
+0024 <span class="comment">% SEE ALSO</span>
+0025 <span class="comment">% getDataFromAnnotStruct</span>
+0026 <span class="comment">%</span>
+0027 <span class="comment">% REFERENCES</span>
+0028 <span class="comment">% Based on  Merijn de Bakker's code groupD2Label.m</span>
+0029 <span class="comment">%</span>
+0030 <span class="comment">% NOTES</span>
+0031 <span class="comment">% label_index should be 8 (see Merijn's notes and getDataFromAnnotStruct)</span>
+0032 
+0033 <a name="_sub0" href="#_subfunctions" class="code">function [data_groups, labels]=groupDataByLabels(data,label_index)</a>
+0034 
+0035 
+0036 <span class="comment">% get the non NaN data</span>
+0037 data = data(~isnan(data(:,label_index)),:);
+0038 
+0039 <span class="comment">% get all unique labels present in the data</span>
+0040 labels = unique(data(:,label_index));
+0041 
+0042 <span class="comment">% for each label create a data chunk</span>
+0043 num_labels = length(labels);
+0044 data_groups = cell(num_labels,1);
+0045 
+0046 <span class="keyword">for</span> l=1:num_labels
+0047     
+0048     [row, col] = find(data(:,label_index)==labels(l));
+0049     
+0050     data_group = data(row,:);
+0051         
+0052     data_groups{l} = data_group;
+0053  <span class="keyword">end</span>
+0054     
+0055   
+0056         
+0057         
+0058</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

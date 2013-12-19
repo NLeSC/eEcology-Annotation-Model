@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calcPosition</title>
+  <meta name="keywords" content="calcPosition">
+  <meta name="description" content="% calcPosition - calculates function position features">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Features</a> &gt; calcPosition.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Features&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>calcPosition
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% calcPosition - calculates function position features</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function PRM = calcPosition(M) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% calcPosition - calculates function position features
+
+ author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc
+ date creation: 11-2011
+ last modification date: 22-08-2013
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ PRM = calcPostition(M)
+
+ INPUT
+ M- 3D matrix containing X,Y,Z for j windows
+
+ OUPTPUT
+ PRM- 3D matrix with [mean pitch, std pitch, mean roll, std roll] for ...
+ each window
+
+ EXAMPLE
+ 
+ SEE ALSO
+ calFeatureVectors.m
+
+ REFERENCES
+ &quot;Automatic Classification of Bird Behaiviour on the baes of Accelerometer
+ Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
+ position.m- original code by M. de Bakker</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="calcFeatureVectors.html" class="code" title="function [FTV,INFO] = calcFeatureVectors(data,  windowSize, overlap, epsilon)">calcFeatureVectors</a>	% calcFeatureVectors - feature vectors computaion for classifiers</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function trend = calcTrend(v,n)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% calcPosition - calculates function position features</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 11-2011</span>
+0005 <span class="comment">% last modification date: 22-08-2013</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% PRM = calcPostition(M)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% INPUT</span>
+0012 <span class="comment">% M- 3D matrix containing X,Y,Z for j windows</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% OUPTPUT</span>
+0015 <span class="comment">% PRM- 3D matrix with [mean pitch, std pitch, mean roll, std roll] for ...</span>
+0016 <span class="comment">% each window</span>
+0017 <span class="comment">%</span>
+0018 <span class="comment">% EXAMPLE</span>
+0019 <span class="comment">%</span>
+0020 <span class="comment">% SEE ALSO</span>
+0021 <span class="comment">% calFeatureVectors.m</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% REFERENCES</span>
+0024 <span class="comment">% &quot;Automatic Classification of Bird Behaiviour on the baes of Accelerometer</span>
+0025 <span class="comment">% Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011</span>
+0026 <span class="comment">% position.m- original code by M. de Bakker</span>
+0027 
+0028 
+0029 <a name="_sub0" href="#_subfunctions" class="code">function PRM = calcPosition(M)</a>
+0030 
+0031 <span class="comment">% statistics over window (mean pitch, standDev pitch, mean roll, standDev</span>
+0032 <span class="comment">% roll)</span>
+0033 x = M(:,1);
+0034 y = M(:,2);
+0035 z = M(:,3);
+0036 
+0037 pitch_rad = atan(x./sqrt(y.^2+z.^2));
+0038 roll_rad = atan(y./sqrt(x.^2+z.^2));
+0039 pitch = (pitch_rad*180)/pi;
+0040 roll = (roll_rad*180)/pi;
+0041 
+0042 PRM = [mean(pitch),std(pitch),mean(roll),std(roll),<a href="#_sub1" class="code" title="subfunction trend = calcTrend(v,n)">calcTrend</a>(roll,3),<span class="keyword">...</span>
+0043     <a href="#_sub1" class="code" title="subfunction trend = calcTrend(v,n)">calcTrend</a>(pitch,3),mean(x),mean(y),mean(z),std(x),std(y),std(z)];
+0044 
+0045 <span class="keyword">end</span>
+0046 
+0047 <a name="_sub1" href="#_subfunctions" class="code">function trend = calcTrend(v,n)</a>
+0048     nOfFrames = length(v);
+0049     movAVG = zeros(1,nOfFrames);    
+0050     
+0051     <span class="comment">%calc moving average with lag of n</span>
+0052     <span class="keyword">for</span> i = n:nOfFrames
+0053         avg = 0;
+0054         <span class="keyword">for</span> j = 0:n-1
+0055             avg = avg+v(i-j);
+0056         <span class="keyword">end</span>    
+0057         movAVG(i) = (1/n) * avg;
+0058     <span class="keyword">end</span>
+0059       
+0060    <span class="comment">%find 1st order least square fit</span>
+0061    coefs = polyfit(movAVG,1:nOfFrames,1);
+0062     
+0063    trend = coefs(1);
+0064 <span class="keyword">end</span>
+0065 
+0066 <span class="comment">%DUMP</span>
+0067 <span class="comment">% function pd = calcPeakDist(v, type)</span>
+0068 <span class="comment">%</span>
+0069 <span class="comment">% i = 2:length(v)-1;</span>
+0070 <span class="comment">%</span>
+0071 <span class="comment">% if strcmp(type,'max')==1</span>
+0072 <span class="comment">%    i1 = find(v(i-1)&lt;v(i) &amp; v(i+1)&lt;v(i))+1;</span>
+0073 <span class="comment">%    v(i)~=i1(1);</span>
+0074 <span class="comment">%    i2 = find(v(i-1)&lt;v(i) &amp; v(i+1)&lt;v(i) &amp; v(i)~= i1)+1;</span>
+0075 <span class="comment">%    space = abs((i1(1)-i2(1))-1);</span>
+0076 <span class="comment">%</span>
+0077 <span class="comment">%</span>
+0078 <span class="comment">% elseif strcmp(type,'min')==1</span>
+0079 <span class="comment">%    i1 = find(v(i-1)+0.01&gt;v(i) &amp; v(i+1)+0.01&gt;v(i))+1;</span>
+0080 <span class="comment">%    i2 = find(v(i-1)+0.1&lt;v(i) &amp; v(i+1)+0.1&lt;v(i) &amp; v(i)~=i1(1))+1;</span>
+0081 <span class="comment">%    space = abs((i1-i2)-1);</span>
+0082 <span class="comment">%</span>
+0083 <span class="comment">%</span>
+0084 <span class="comment">% elseif strcmp(type,'minmax')==1</span>
+0085 <span class="comment">%</span>
+0086 <span class="comment">%    imax = find(v(i-1)+0.1&lt;v(i) &amp; v(i+1)+0.1&lt;v(i))+1;</span>
+0087 <span class="comment">%    imin = find(v(i-1)+0.01&gt;v(i) &amp; v(i+1)+0.01&gt;v(i))+1;</span>
+0088 <span class="comment">%</span>
+0089 <span class="comment">%    i = find(v == max(v(v(imax))));</span>
+0090 <span class="comment">%    i2 = find(v == min(v(v(imin))));</span>
+0091 <span class="comment">%</span>
+0092 <span class="comment">%    diff = abs(max((max(v(v(imax))))-min((v(v(imin))))));</span>
+0093 <span class="comment">%    space = abs((i(1)-i2(end)))/diff;</span>
+0094 <span class="comment">%</span>
+0095 <span class="comment">% end</span>
+0096 <span class="comment">%</span>
+0097 <span class="comment">% pd = space;</span>
+0098 <span class="comment">% end</span>
+0099 
+0100 
+0101 
+0102</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

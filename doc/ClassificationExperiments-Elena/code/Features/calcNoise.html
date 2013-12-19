@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of calcNoise</title>
+  <meta name="keywords" content="calcNoise">
+  <meta name="description" content="% calcNoise - calculates the noise content feature">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Features</a> &gt; calcNoise.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Features&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>calcNoise
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>% calcNoise - calculates the noise content feature</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function noise = calcNoise(M) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">% calcNoise - calculates the noise content feature
+
+ author: Merijn de Bakker, UvA,Elena Ranguelova, NLeSc
+ date creation: 11-2011
+ last modification date: 27-09-2013
+ modification details:
+ -----------------------------------------------------------------------
+ SYNTAX
+ [noise]=calNoise(M)
+
+ INPUT
+ M- 3-D matrix with accelerometer data (frames are rows)
+
+ OUPTPUT
+ noise- measure forthe noise in the signal
+
+ EXAMPLE
+ 
+ SEE ALSO
+ calFeatureVectors.m
+
+ REFERENCES
+ &quot;Automatic Classification of Bird Behaiviour on the baes of Accelerometer
+ Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011
+
+ NOTES</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="calcFeatureVectors.html" class="code" title="function [FTV,INFO] = calcFeatureVectors(data,  windowSize, overlap, epsilon)">calcFeatureVectors</a>	% calcFeatureVectors - feature vectors computaion for classifiers</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%% calcNoise - calculates the noise content feature</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">% author: Merijn de Bakker, UvA,Elena Ranguelova, NLeSc</span>
+0004 <span class="comment">% date creation: 11-2011</span>
+0005 <span class="comment">% last modification date: 27-09-2013</span>
+0006 <span class="comment">% modification details:</span>
+0007 <span class="comment">% -----------------------------------------------------------------------</span>
+0008 <span class="comment">% SYNTAX</span>
+0009 <span class="comment">% [noise]=calNoise(M)</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% INPUT</span>
+0012 <span class="comment">% M- 3-D matrix with accelerometer data (frames are rows)</span>
+0013 <span class="comment">%</span>
+0014 <span class="comment">% OUPTPUT</span>
+0015 <span class="comment">% noise- measure forthe noise in the signal</span>
+0016 <span class="comment">%</span>
+0017 <span class="comment">% EXAMPLE</span>
+0018 <span class="comment">%</span>
+0019 <span class="comment">% SEE ALSO</span>
+0020 <span class="comment">% calFeatureVectors.m</span>
+0021 <span class="comment">%</span>
+0022 <span class="comment">% REFERENCES</span>
+0023 <span class="comment">% &quot;Automatic Classification of Bird Behaiviour on the baes of Accelerometer</span>
+0024 <span class="comment">% Data&quot;, Merijn de Bakker, Bachelor thesis, IBED, UvA, 2011</span>
+0025 <span class="comment">%</span>
+0026 <span class="comment">% NOTES</span>
+0027 
+0028 <a name="_sub0" href="#_subfunctions" class="code">function noise = calcNoise(M)</a>
+0029 
+0030 nOfPoints = size(M,1);
+0031 
+0032 result = zeros(1,3);
+0033 resultDDif = zeros(1,3);
+0034 
+0035 <span class="keyword">for</span> h = 1:3
+0036 
+0037     sns = zeros(nOfPoints,1);
+0038     signal = M(:,h);
+0039 
+0040     
+0041     <span class="keyword">for</span> i = 2:nOfPoints-1
+0042 
+0043         <span class="comment">%linear interpolations</span>
+0044         yi = interp1(1:2,[signal(i-1),signal(i+1)],1:0.5:2);
+0045 
+0046         sns(i) = (signal(i)-yi(2))^2;
+0047     <span class="keyword">end</span>
+0048 
+0049     result(h) = sum(sns);
+0050 
+0051     <span class="comment">%calculate standard deviation or mean of the 'discrete dx/dt'</span>
+0052     diffS = abs(diff(signal));
+0053     resultDDif(h) = mean(diffS);
+0054 <span class="keyword">end</span>
+0055 
+0056 noise = [result,sum(result), resultDDif] ;
+0057     
+0058 <span class="keyword">end</span></pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of treeExperimenter</title>
+  <meta name="keywords" content="treeExperimenter">
+  <meta name="description" content="function for doing experiments with the labelled bird data, using PRTools'">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; treeExperimenter.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>treeExperimenter
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function for doing experiments with the labelled bird data, using PRTools'</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function  [errorTest,confM] = treeExperimenter(fM,testd,crit, pruning, crossValidation, ft, reject,featureSelection,structName) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">function for doing experiments with the labelled bird data, using PRTools'
+classification tree. 
+
+method: 1 vs all.
+
+Merijn de Bakker || merijn.debakker@gmail.com
+
+INPUT: %[trainset,testset,criterium,pruning,cv,featureselection,reject,featureList
+,name for the outputstruct]
+OUTPUT: a struct containing (meta)data and results
+
+pruning
+ Computation of a decision tree classifier out of a dataset A using 
+ a binary splitting criterion CRIT:
+   INFCRIT  -  information gain
+   MAXCRIT  -  purity (default)
+   FISHCRIT -  Fisher criterion
+ 
+ Pruning is defined by prune:
+   PRUNE = -1 pessimistic pruning as defined by Quinlan. 
+   PRUNE = -2 testset pruning using the dataset T, or, if not
+              supplied, an artificially generated testset of 5 x size of
+              the training set based on parzen density estimates.
+              see PARZENML and GENDATP.
+   PRUNE = 0 no pruning (default).
+   PRUNE &gt; 0 early pruning, e.g. prune = 3
+   PRUNE = 10 causes heavy pruning.
+ 
+ If CRIT or PRUNE are set to NaN they are optimised by REGOPTC.
+
+ftSelection
+  METHOD  - 'forward' : selection by featself (default)
+             - 'float'   : selection by featselp
+             - 'backward': selection by featselb
+             - 'b&amp;b'     : branch and bound selection by featselo
+             - 'ind'     : individual
+             - 'lr'      : plus-l-takeaway-r selection by featsellr
+           - 'sparse'  : use sparse untrained classifier CRIT</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="tree_map.html" class="code" title="function [F,lab,N,treeInfo] = tree_map(T,W)">tree_map</a>	TREE_MAP Map a dataset by binary decision tree</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%function for doing experiments with the labelled bird data, using PRTools'</span>
+0002 <span class="comment">%classification tree.</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%method: 1 vs all.</span>
+0005 <span class="comment">%</span>
+0006 <span class="comment">%Merijn de Bakker || merijn.debakker@gmail.com</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%INPUT: %[trainset,testset,criterium,pruning,cv,featureselection,reject,featureList</span>
+0009 <span class="comment">%,name for the outputstruct]</span>
+0010 <span class="comment">%OUTPUT: a struct containing (meta)data and results</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">%pruning</span>
+0013     <span class="comment">% Computation of a decision tree classifier out of a dataset A using</span>
+0014     <span class="comment">% a binary splitting criterion CRIT:</span>
+0015     <span class="comment">%   INFCRIT  -  information gain</span>
+0016     <span class="comment">%   MAXCRIT  -  purity (default)</span>
+0017     <span class="comment">%   FISHCRIT -  Fisher criterion</span>
+0018     <span class="comment">%</span>
+0019     <span class="comment">% Pruning is defined by prune:</span>
+0020     <span class="comment">%   PRUNE = -1 pessimistic pruning as defined by Quinlan.</span>
+0021     <span class="comment">%   PRUNE = -2 testset pruning using the dataset T, or, if not</span>
+0022     <span class="comment">%              supplied, an artificially generated testset of 5 x size of</span>
+0023     <span class="comment">%              the training set based on parzen density estimates.</span>
+0024     <span class="comment">%              see PARZENML and GENDATP.</span>
+0025     <span class="comment">%   PRUNE = 0 no pruning (default).</span>
+0026     <span class="comment">%   PRUNE &gt; 0 early pruning, e.g. prune = 3</span>
+0027     <span class="comment">%   PRUNE = 10 causes heavy pruning.</span>
+0028     <span class="comment">%</span>
+0029     <span class="comment">% If CRIT or PRUNE are set to NaN they are optimised by REGOPTC.</span>
+0030 <span class="comment">%</span>
+0031 <span class="comment">%ftSelection</span>
+0032 <span class="comment">%  METHOD  - 'forward' : selection by featself (default)</span>
+0033 <span class="comment">%             - 'float'   : selection by featselp</span>
+0034 <span class="comment">%             - 'backward': selection by featselb</span>
+0035 <span class="comment">%             - 'b&amp;b'     : branch and bound selection by featselo</span>
+0036 <span class="comment">%             - 'ind'     : individual</span>
+0037 <span class="comment">%             - 'lr'      : plus-l-takeaway-r selection by featsellr</span>
+0038 <span class="comment">%           - 'sparse'  : use sparse untrained classifier CRIT</span>
+0039 <span class="comment">%</span>
+0040 <span class="comment">%</span>
+0041 
+0042 <a name="_sub0" href="#_subfunctions" class="code">function  [errorTest,confM] = treeExperimenter(fM,testd,crit, pruning, crossValidation, ft, reject,featureSelection,structName)</a>
+0043 
+0044 <span class="keyword">if</span> isempty(featureSelection)
+0045     nFeatures = size(fM,2)-1;
+0046     featureSelection = 2:nFeatures+1;
+0047 <span class="keyword">else</span>    
+0048     featureSelection = featureSelection+1;
+0049 <span class="keyword">end</span>
+0050 
+0051     <span class="comment">%generate traindata</span>
+0052     dat = fM(:,featureSelection);
+0053     <span class="comment">%dat = normc(dat);</span>
+0054     labels = fM(:,1);
+0055     train = dataset(dat,labels);
+0056 
+0057     <span class="comment">%generate testdata</span>
+0058     <span class="comment">%testd = testd(:,2:end);</span>
+0059     <span class="comment">%testd = normc(testd);</span>
+0060     testdata = dataset(testd(:,featureSelection),testd(:,1));
+0061 
+0062     <span class="comment">%add noise in order to avoid error (see</span>
+0063     <span class="comment">%http://prsdstudio.com/index.php/forums/viewthread/90/)</span>
+0064     <span class="comment">%summary: add noise to prevent 2 instances with different labels have</span>
+0065     <span class="comment">%identical features.</span>
+0066     <span class="comment">%train = data+randn(nOfI,nOfFt)*1e-8;</span>
+0067  
+0068     <span class="comment">%crit = 'infcrit';</span>
+0069 
+0070         <span class="keyword">if</span> crossValidation== 0
+0071 
+0072             <span class="comment">%[train,testdata, Itrain, Itest] = gendat(data,0.66);</span>
+0073            
+0074             
+0075             <span class="keyword">if</span> strcmp(char(ft),<span class="string">''</span>)==0
+0076                 [Wft,R] = FEATSELF(train,treec([],crit,pruning),0,10);
+0077                 train = train*Wft;
+0078                 testdata = testdata*Wft;
+0079                 <span class="comment">%train the tree</span>
+0080                 W = treec(train,crit,pruning,testdata);
+0081             <span class="keyword">else</span>
+0082                 W = treec(train,crit,pruning,testdata); 
+0083                 R = NaN;
+0084                 Wft = NaN;
+0085               
+0086             <span class="keyword">end</span>
+0087             
+0088             <span class="keyword">if</span> reject==1
+0089                 W = rejectc(train, W, 0.1);  
+0090                 NNtest = NaN;
+0091                 NNtrain = NaN;
+0092                 treeInfo = NaN;
+0093             <span class="keyword">else</span>
+0094                 [~,~,NNtrain, treeInfo] = <a href="tree_map.html" class="code" title="function [F,lab,N,treeInfo] = tree_map(T,W)">tree_map</a>(train,W);
+0095                 [~,~,NNtest,~] = <a href="tree_map.html" class="code" title="function [F,lab,N,treeInfo] = tree_map(T,W)">tree_map</a>(testdata,W); 
+0096             <span class="keyword">end</span>
+0097             
+0098             
+0099             <span class="comment">%assigned labels trainset</span>
+0100             trainClasses = labeld(train*W);
+0101             
+0102             <span class="comment">%testset</span>
+0103             T = testdata*W;
+0104             
+0105             <span class="comment">%assigned labels testset</span>
+0106             classes = T*labeld;
+0107             
+0108             <span class="comment">%error on testset</span>
+0109             errorTest = T*testc;
+0110 
+0111             <span class="comment">%confusion matrix testset</span>
+0112             confmat(T)
+0113             confM = confmat(T);
+0114             
+0115        <span class="keyword">elseif</span> crossValidation~=0
+0116 
+0117             [errorTest,CERR,NLAB_OUT] =<span class="keyword">...</span>
+0118                 crossval(data,treec([],crit,pruning),crossValidation);
+0119             <span class="comment">%[errorTest,CERR,NLAB_OUT] =...</span>
+0120             <span class="comment">%    crossval(data,SVC([],'r',1),cv);</span>
+0121             
+0122            
+0123             <span class="comment">%errorTestT=errorTest;</span>
+0124             
+0125             W = NaN;
+0126             classes = NaN;
+0127             trainClasses =NaN;
+0128             treeInfo = NaN;
+0129             confM = NaN;
+0130             confMT=confM;
+0131             Wft = NaN;
+0132             R = NaN;
+0133             NNtest = NaN;
+0134             NNtrain = NaN;
+0135         <span class="keyword">end</span>
+0136     
+0137 resultStruct = struct(<span class="string">'classP'</span>,<span class="string">'multiclass'</span>, <span class="string">'classN'</span>, <span class="string">'multiclass'</span>,<span class="keyword">...</span>
+0138     <span class="string">'settings'</span>,[pruning, crossValidation, ft],<span class="string">'criterium'</span>, {crit}, <span class="keyword">...</span>
+0139     <span class="string">'traindata'</span>, train, <span class="string">'testdata'</span>, testdata,<span class="string">'mapping'</span>,W, <span class="keyword">...</span>
+0140     <span class="string">'testLabs'</span>, classes, <span class="string">'trainLabs'</span>, trainClasses, <span class="string">'treeInfo'</span>,treeInfo, <span class="keyword">...</span>
+0141     <span class="string">'confM'</span>, confM, <span class="string">'errorTest'</span>, errorTest, <span class="string">'Wft'</span>, Wft, <span class="string">'Rft'</span>, R,<span class="keyword">...</span>
+0142     <span class="string">'NNtrain'</span>, NNtrain, <span class="string">'NNtest'</span>, NNtest,<span class="string">'features'</span>,featureSelection-1);
+0143 name = strcat(<span class="string">'multiclass_results'</span>);
+0144 assignin(<span class="string">'base'</span>,structName, resultStruct);
+0145 
+0146  
+0147 
+0148 
+0149</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

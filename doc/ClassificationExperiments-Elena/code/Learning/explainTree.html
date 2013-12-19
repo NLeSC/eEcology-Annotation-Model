@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of explainTree</title>
+  <meta name="keywords" content="explainTree">
+  <meta name="description" content="Merijn de Bakker || merijn.debakker@gmail.com">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; explainTree.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>explainTree
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>Merijn de Bakker || merijn.debakker@gmail.com</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function explainTree(Matrix, ftList, nodeCount,nodeID,name) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">Merijn de Bakker || merijn.debakker@gmail.com</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+</ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="plotTree.html" class="code" title="function plotTree(Matrix, NNodes, ftList,name)">plotTree</a>	function plotTree</li></ul>
+<!-- crossreference -->
+
+
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001  <span class="comment">%Merijn de Bakker || merijn.debakker@gmail.com</span>
+0002 
+0003 <a name="_sub0" href="#_subfunctions" class="code">function explainTree(Matrix, ftList, nodeCount,nodeID,name)</a>
+0004 
+0005 <span class="comment">%this is a binary tree</span>
+0006 nOfRules = size(Matrix,1);
+0007 ruleN = 0;
+0008 ruleOff = 0;
+0009 als = char(<span class="string">'if'</span>);
+0010 dan = char(<span class="string">'then'</span>);
+0011 groter = char(<span class="string">'&gt;='</span>);
+0012 kleiner = char(<span class="string">'&lt;'</span>);
+0013 regel = char(<span class="string">'rule'</span>);
+0014 anders = char(<span class="string">'else'</span>);
+0015 semic = char(<span class="string">': '</span>);
+0016 klasse = char(<span class="string">'class: '</span>);
+0017 labels = 1:size(nodeCount,2);
+0018 
+0019 <span class="comment">%[filename,path] = uiputfile({'*.txt'},'export rules');</span>
+0020 <span class="comment">%sch.fileName = strcat(path,filename);</span>
+0021 <span class="comment">%file = fopen(sch.fileName,'wt+');</span>
+0022 
+0023 file = fopen(strcat(pwd,<span class="string">'\'</span>,name),<span class="string">'wt+'</span>);
+0024 
+0025 <span class="keyword">for</span> i = 1:2:nOfRules
+0026     
+0027     <span class="keyword">if</span> Matrix(i,2) == 0
+0028         ruleN  = ruleN+1;
+0029         ruleOff = ruleOff+1;
+0030         <span class="keyword">continue</span>
+0031     <span class="keyword">end</span>
+0032 
+0033     
+0034     ruleN = ruleN+1;
+0035     thresh = Matrix(i,3);
+0036     ifS = Matrix(i,4);
+0037     ifG = Matrix(i+1,4);
+0038     Matrix(i,2);
+0039     ft = char(ftList(Matrix(i,2)));
+0040     passes = [<span class="string">'passes: '</span>,num2str(nodeCount(ruleN,:))];
+0041     
+0042     <span class="keyword">if</span> Matrix(ifG*2,2)==0 &amp;&amp; Matrix(ifS*2,2)~=0
+0043         class = Matrix(ifG*2,4);
+0044         
+0045         fprintf(file, <span class="string">'%g %s %s %s %.2f %s %s %g %s %s %g %s \n'</span>, ruleN, als, ft,<span class="keyword">...</span>
+0046             groter, thresh, dan, klasse, class, anders, regel, ifS, passes);
+0047     
+0048     <span class="keyword">elseif</span> Matrix(ifS*2,2)==0 &amp;&amp; Matrix(ifG*2,2)~=0
+0049         class = Matrix(ifS*2,4);
+0050         
+0051         fprintf(file, <span class="string">'%g %s %s %s %.2f %s %s %g %s %s %g %s \n'</span>, ruleN, als, ft,<span class="keyword">...</span>
+0052             kleiner, thresh, dan, klasse, class, anders, regel, ifG, passes);
+0053       
+0054     <span class="keyword">elseif</span> Matrix(ifS*2,2)==0 &amp;&amp; Matrix(ifG*2,2)==0
+0055         classS = Matrix(ifS*2,4);
+0056         classG = Matrix(ifG*2,4);
+0057         fprintf(file, <span class="string">'%g %s %s %s %.2f %s %s %g %s %s %g %s \n'</span>, ruleN, als, ft,<span class="keyword">...</span>
+0058             kleiner, thresh, dan, klasse, classS, anders, klasse, classG, passes);
+0059     <span class="keyword">end</span>
+0060         
+0061     <span class="keyword">if</span> Matrix(ifS*2,2)~=0 &amp;&amp; Matrix(ifG*2,2)~=0
+0062         fprintf(file, <span class="string">'%g %s %s %s %.2f %s %s %g %s %s %g %s \n'</span>, ruleN, als, ft,<span class="keyword">...</span>
+0063             groter, thresh, dan, regel, ifG, anders, regel, ifS, passes);
+0064         
+0065     <span class="keyword">end</span>
+0066     
+0067     
+0068 <span class="keyword">end</span>
+0069 
+0070 <span class="comment">%make table of node passes</span>
+0071 fprintf(file, <span class="string">'\n\n\n%s\n\n'</span>, <span class="string">'NUMBER OF NODE PASSES PER LABEL'</span>);
+0072 
+0073 fprintf(file, <span class="string">'\t%s\t'</span>, <span class="string">'LABEL'</span>);
+0074 
+0075 <span class="keyword">for</span> j = 1:length(labels)
+0076     fprintf(file, <span class="string">'%s%g%s\t'</span>,<span class="string">'|'</span>, labels(j), <span class="string">'|'</span>) ;  
+0077 <span class="keyword">end</span>
+0078 
+0079 fprintf(file, <span class="string">'\n%s\n'</span>, <span class="string">'NODE'</span>);
+0080 
+0081 <span class="keyword">for</span> i = 1:ruleN
+0082     fprintf(file, <span class="string">'%d\t\t'</span>, i);
+0083     <span class="keyword">for</span> j = 1:length(labels)
+0084         fprintf(file, <span class="string">'%d\t'</span>,nodeCount(nodeID(i),j));  
+0085     <span class="keyword">end</span>
+0086     fprintf(file, <span class="string">'\n'</span>);
+0087 <span class="keyword">end</span>
+0088      
+0089 
+0090 fclose(file);
+0091 
+0092 
+0093</pre></div>
+<hr><address>Generated on Wed 18-Dec-2013 13:05:51 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

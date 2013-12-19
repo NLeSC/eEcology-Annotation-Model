@@ -1,0 +1,599 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of treec</title>
+  <meta name="keywords" content="treec">
+  <meta name="description" content="TREEC Build a decision tree classifier">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../../../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../../../index.html">Home</a> &gt;  <a href="../../index.html">ClassificationExperiments-Elena</a> &gt; <a href="../index.html">code</a> &gt; <a href="index.html">Learning</a> &gt; treec.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../../../index.html"><img alt="<" border="0" src="../../../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for ClassificationExperiments-Elena/code/Learning&nbsp;<img alt=">" border="0" src="../../../right.png"></a></td></tr></table>-->
+
+<h1>treec
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>TREEC Build a decision tree classifier</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="box"><strong>function w = treec(a,crit,prune,t) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre class="comment">TREEC Build a decision tree classifier
+ 
+   W = TREEC(A,CRIT,PRUNE,T)
+ 
+ Computation of a decision tree classifier out of a dataset A using 
+ a binary splitting criterion CRIT:
+   INFCRIT  -  information gain
+   MAXCRIT  -  purity (default)
+   FISHCRIT -  Fisher criterion
+ 
+ Pruning is defined by prune:
+   PRUNE = -1 pessimistic pruning as defined by Quinlan. 
+   PRUNE = -2 testset pruning using the dataset T, or, if not
+              supplied, an artificially generated testset of 5 x size of
+              the training set based on parzen density estimates.
+              see PARZENML and GENDATP.
+   PRUNE = 0 no pruning (default).
+   PRUNE &gt; 0 early pruning, e.g. prune = 3
+   PRUNE = 10 causes heavy pruning.
+ 
+ If CRIT or PRUNE are set to NaN they are optimised by REGOPTC.
+
+ see also DATASETS, MAPPINGS, <a href="tree_map.html" class="code" title="function [F,lab,N,treeInfo] = tree_map(T,W)">TREE_MAP</a>, REGOPTC</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="tree_map.html" class="code" title="function [F,lab,N,treeInfo] = tree_map(T,W)">tree_map</a>	TREE_MAP Map a dataset by binary decision tree</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="treeExperimenter.html" class="code" title="function  [errorTest,confM] = treeExperimenter(fM,testd,crit, pruning, cv, ft, reject,ftList,structName)">treeExperimenter</a>	function for doing experiments with the labelled bird data, using PRTools'</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<ul style="list-style-image:url(../../../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function tree = maketree(a,nlab,c,crit,stop)</a></li><li><a href="#_sub2" class="code">function [f,j,t] = maxcrit(a,nlab)</a></li><li><a href="#_sub3" class="code">function [g,j,t] = infcrit(a,nlab)</a></li><li><a href="#_sub4" class="code">function [f,j,t] = fishcrit(a,nlab)</a></li><li><a href="#_sub5" class="code">function crt = infstop(a,nlab,j,t)</a></li><li><a href="#_sub6" class="code">function tree = prunep(tree,a,nlab,num)</a></li><li><a href="#_sub7" class="code">function tree = prunet(tree,a)</a></li><li><a href="#_sub8" class="code">function number = nleaves(tree,num)</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../../../up.png"></a></h2>
+<div class="fragment"><pre>0001 <span class="comment">%TREEC Build a decision tree classifier</span>
+0002 <span class="comment">%</span>
+0003 <span class="comment">%   W = TREEC(A,CRIT,PRUNE,T)</span>
+0004 <span class="comment">%</span>
+0005 <span class="comment">% Computation of a decision tree classifier out of a dataset A using</span>
+0006 <span class="comment">% a binary splitting criterion CRIT:</span>
+0007 <span class="comment">%   INFCRIT  -  information gain</span>
+0008 <span class="comment">%   MAXCRIT  -  purity (default)</span>
+0009 <span class="comment">%   FISHCRIT -  Fisher criterion</span>
+0010 <span class="comment">%</span>
+0011 <span class="comment">% Pruning is defined by prune:</span>
+0012 <span class="comment">%   PRUNE = -1 pessimistic pruning as defined by Quinlan.</span>
+0013 <span class="comment">%   PRUNE = -2 testset pruning using the dataset T, or, if not</span>
+0014 <span class="comment">%              supplied, an artificially generated testset of 5 x size of</span>
+0015 <span class="comment">%              the training set based on parzen density estimates.</span>
+0016 <span class="comment">%              see PARZENML and GENDATP.</span>
+0017 <span class="comment">%   PRUNE = 0 no pruning (default).</span>
+0018 <span class="comment">%   PRUNE &gt; 0 early pruning, e.g. prune = 3</span>
+0019 <span class="comment">%   PRUNE = 10 causes heavy pruning.</span>
+0020 <span class="comment">%</span>
+0021 <span class="comment">% If CRIT or PRUNE are set to NaN they are optimised by REGOPTC.</span>
+0022 <span class="comment">%</span>
+0023 <span class="comment">% see also DATASETS, MAPPINGS, TREE_MAP, REGOPTC</span>
+0024 
+0025 <span class="comment">% Copyright: R.P.W. Duin, r.p.w.duin@prtools.org</span>
+0026 <span class="comment">% Faculty EWI, Delft University of Technology</span>
+0027 <span class="comment">% P.O. Box 5031, 2600 GA Delft, The Netherlands</span>
+0028 
+0029 <span class="comment">% $Id: treec.m,v 1.9 2009/07/26 18:52:08 duin Exp $</span>
+0030 
+0031 <a name="_sub0" href="#_subfunctions" class="code">function w = treec(a,crit,prune,t)</a>
+0032 
+0033     prtrace(mfilename);
+0034 
+0035     <span class="comment">% When no input data is given, an empty tree is defined:</span>
+0036     <span class="keyword">if</span> nargin == 0 | isempty(a)
+0037         <span class="keyword">if</span> nargin &lt;2, 
+0038             w = mapping(<span class="string">'treec'</span>);
+0039         <span class="keyword">elseif</span> nargin &lt; 3, w = mapping(<span class="string">'treec'</span>,{crit});
+0040         <span class="keyword">elseif</span> nargin &lt; 4, w = mapping(<span class="string">'treec'</span>,{crit,prune});
+0041         <span class="keyword">else</span>, w = mapping(<span class="string">'treec'</span>,{crit,prune,t});
+0042         <span class="keyword">end</span>
+0043         w = setname(w,<span class="string">'Decision Tree'</span>);
+0044         <span class="keyword">return</span>
+0045     <span class="keyword">end</span>
+0046     
+0047     <span class="keyword">if</span> nargin &lt; 3, prune = []; <span class="keyword">end</span>
+0048     <span class="keyword">if</span> nargin &lt; 2, crit = []; <span class="keyword">end</span>
+0049     parmin_max = [1,3;-1,10];
+0050     optcrit = inf;
+0051     <span class="keyword">if</span> isnan(crit) &amp; isnan(prune)        <span class="comment">% optimize criterion and pruning, grid search</span>
+0052         <span class="keyword">global</span> REGOPT_OPTCRIT REGOPT_PARS
+0053         <span class="keyword">for</span> n = 1:3
+0054             defs = {n,0};
+0055             v = regoptc(a,mfilename,{crit,prune},defs,[2],parmin_max,testc([],<span class="string">'soft'</span>),[0,0]);
+0056             <span class="keyword">if</span> REGOPT_OPTCRIT &lt; optcrit
+0057                 w = v; optcrit = REGOPT_OPTCRIT; regoptpars = REGOPT_PARS;
+0058             <span class="keyword">end</span>
+0059         <span class="keyword">end</span>
+0060         REGOPT_PARS = regoptpars;
+0061     <span class="keyword">elseif</span> isnan(crit)                    <span class="comment">% optimize criterion</span>
+0062         defs = {1,0};
+0063         w = regoptc(a,mfilename,{crit,prune},defs,[1],parmin_max,testc([],<span class="string">'soft'</span>),[0,0]);
+0064     <span class="keyword">elseif</span> isnan(prune)                    <span class="comment">% optimize pruning</span>
+0065         defs = {1,0};
+0066         w = regoptc(a,mfilename,{crit,prune},defs,[2],parmin_max,testc([],<span class="string">'soft'</span>),[0,0]);
+0067         
+0068     <span class="keyword">else</span> <span class="comment">%  training for given parameters</span>
+0069     
+0070         islabtype(a,<span class="string">'crisp'</span>);
+0071         isvaldfile(a,1,2); <span class="comment">% at least 1 object per class, 2 classes</span>
+0072         <span class="comment">%a = testdatasize(a);</span>
+0073         a = dataset(a);
+0074 
+0075         <span class="comment">% First get some useful parameters:</span>
+0076         [m,k,c] = getsize(a);
+0077         nlab = getnlab(a);
+0078 
+0079         <span class="comment">% Define the splitting criterion:</span>
+0080         <span class="keyword">if</span> nargin == 1 | isempty(crit), crit = 2; <span class="keyword">end</span>
+0081         <span class="keyword">if</span> ~isstr(crit)
+0082             <span class="keyword">if</span> crit == 0 | crit == 1, crit = <span class="string">'infcrit'</span>; 
+0083             <span class="keyword">elseif</span> crit == 2, crit = <span class="string">'maxcrit'</span>;
+0084             <span class="keyword">elseif</span> crit == 3, crit = <span class="string">'fishcrit'</span>;
+0085             <span class="keyword">else</span>, error(<span class="string">'Unknown criterion value'</span>);
+0086             <span class="keyword">end</span>
+0087         <span class="keyword">end</span>
+0088 
+0089         <span class="comment">% Now the training can really start:</span>
+0090         <span class="keyword">if</span> (nargin == 1) | (nargin == 2)
+0091             tree = <a href="#_sub1" class="code" title="subfunction tree = maketree(a,nlab,c,crit,stop)">maketree</a>(+a,nlab,c,crit);
+0092         <span class="keyword">elseif</span> nargin &gt; 2
+0093             <span class="comment">% We have to apply a pruning strategy:</span>
+0094             <span class="keyword">if</span> prune == -1, prune = <span class="string">'prunep'</span>; <span class="keyword">end</span>
+0095             <span class="keyword">if</span> prune == -2, prune = <span class="string">'prunet'</span>; <span class="keyword">end</span>
+0096             <span class="comment">% The strategy can be prunep/prunet:</span>
+0097             <span class="keyword">if</span> isstr(prune)
+0098                 tree = <a href="#_sub1" class="code" title="subfunction tree = maketree(a,nlab,c,crit,stop)">maketree</a>(+a,nlab,c,crit);
+0099                 <span class="keyword">if</span> prune == <span class="string">'prunep'</span>
+0100                     tree = <a href="#_sub6" class="code" title="subfunction tree = prunep(tree,a,nlab,num)">prunep</a>(tree,a,nlab);
+0101                 <span class="keyword">elseif</span> prune == <span class="string">'prunet'</span>
+0102                     <span class="keyword">if</span> nargin &lt; 4
+0103                         t = gendatp(a,5*sum(nlab==1));
+0104                     <span class="keyword">end</span>
+0105                     tree = <a href="#_sub7" class="code" title="subfunction tree = prunet(tree,a)">prunet</a>(tree,t);
+0106                 <span class="keyword">else</span>
+0107                     error(<span class="string">'unknown pruning option defined'</span>);
+0108                 <span class="keyword">end</span>
+0109             <span class="keyword">else</span>
+0110                 <span class="comment">% otherwise the tree is just cut after level 'prune'</span>
+0111                 tree = <a href="#_sub1" class="code" title="subfunction tree = maketree(a,nlab,c,crit,stop)">maketree</a>(+a,nlab,c,crit,prune);
+0112             <span class="keyword">end</span>
+0113         <span class="keyword">else</span>
+0114             error(<span class="string">'Wrong number of parameters'</span>)
+0115         <span class="keyword">end</span>
+0116 
+0117         <span class="comment">% Store the results:</span>
+0118         w = mapping(<span class="string">'tree_map'</span>,<span class="string">'trained'</span>,{tree,1},getlablist(a),k,c);
+0119         w = setname(w,<span class="string">'Decision Tree'</span>);
+0120         w = setcost(w,a);
+0121         
+0122     <span class="keyword">end</span>
+0123     <span class="keyword">return</span>
+0124 
+0125 <span class="comment">%MAKETREE General tree building algorithm</span>
+0126 <span class="comment">%</span>
+0127 <span class="comment">%     tree = maketree(A,nlab,c,crit,stop)</span>
+0128 <span class="comment">%</span>
+0129 <span class="comment">% Constructs a binary decision tree using the criterion function</span>
+0130 <span class="comment">% specified in the string crit ('maxcrit', 'fishcrit' or 'infcrit'</span>
+0131 <span class="comment">% (default)) for a set of objects A. stop is an optional argument</span>
+0132 <span class="comment">% defining early stopping according to the Chi-squared test as</span>
+0133 <span class="comment">% defined by Quinlan [1]. stop = 0 (default) gives a perfect tree</span>
+0134 <span class="comment">% (no pruning) stop = 3 gives a pruned version stop = 10 a heavily</span>
+0135 <span class="comment">% pruned version.</span>
+0136 <span class="comment">%</span>
+0137 <span class="comment">% Definition of the resulting tree:</span>
+0138 <span class="comment">%</span>
+0139 <span class="comment">%     tree(n,1) - feature number to be used in node n</span>
+0140 <span class="comment">%     tree(n,2) - threshold t to be used</span>
+0141 <span class="comment">%     tree(n,3) - node to be processed if value &lt;= t</span>
+0142 <span class="comment">%     tree(n,4) - node to be processed if value &gt; t</span>
+0143 <span class="comment">%     tree(n,5:4+c) - aposteriori probabilities for all classes in</span>
+0144 <span class="comment">%             node n</span>
+0145 <span class="comment">%</span>
+0146 <span class="comment">% If tree(n,3) == 0, stop, class in tree(n,1)</span>
+0147 <span class="comment">%</span>
+0148 <span class="comment">% This is a low-level routine called by treec.</span>
+0149 <span class="comment">%</span>
+0150 <span class="comment">% See also infstop, infcrit, maxcrit, fishcrit and mapt.</span>
+0151 
+0152 <span class="comment">% Authors: Guido te Brake, TWI/SSOR, Delft University of Technology</span>
+0153 <span class="comment">%     R.P.W. Duin, TN/PH, Delft University of Technology</span>
+0154 <span class="comment">% Copyright: R.P.W. Duin, duin@ph.tn.tudelft.nl</span>
+0155 <span class="comment">% Faculty of Applied Physics, Delft University of Technology</span>
+0156 <span class="comment">% P.O. Box 5046, 2600 GA Delft, The Netherlands</span>
+0157 
+0158 <a name="_sub1" href="#_subfunctions" class="code">function tree = maketree(a,nlab,c,crit,stop) </a>
+0159     prtrace(mfilename);
+0160     [m,k] = size(a); 
+0161     <span class="keyword">if</span> nargin &lt; 5, stop = 0; <span class="keyword">end</span>;
+0162     <span class="keyword">if</span> nargin &lt; 4, crit = []; <span class="keyword">end</span>;
+0163     <span class="keyword">if</span> isempty(crit), crit = <span class="string">'infcrit'</span>; <span class="keyword">end</span>;
+0164 
+0165     <span class="comment">% Construct the tree:</span>
+0166 
+0167     <span class="comment">% When all objects have the same label, create an end-node:</span>
+0168     <span class="keyword">if</span> all([nlab == nlab(1)]) 
+0169         <span class="comment">% Avoid giving 0-1 probabilities, but 'regularize' them a bit using</span>
+0170         <span class="comment">% a 'uniform' Bayesian prior:</span>
+0171         p = ones(1,c)/(m+c); p(nlab(1)) = (m+1)/(m+c);
+0172         tree = [nlab(1),0,0,0,p];
+0173     <span class="keyword">else</span>
+0174         <span class="comment">% now the tree is recursively constructed further:</span>
+0175         [f,j,t] = feval(crit,+a,nlab); <span class="comment">% use desired split criterion</span>
+0176         <span class="keyword">if</span> isempty(t)
+0177             crt = 0;
+0178         <span class="keyword">else</span>
+0179             crt = <a href="#_sub5" class="code" title="subfunction crt = infstop(a,nlab,j,t)">infstop</a>(+a,nlab,j,t);    <span class="comment">% use desired early stopping criterion</span>
+0180         <span class="keyword">end</span>
+0181         p = sum(expandd(nlab),1);
+0182         <span class="keyword">if</span> length(p) &lt; c, p = [p,zeros(1,c-length(p))]; <span class="keyword">end</span>
+0183         <span class="comment">% When the stop criterion is not reached yet, we recursively split</span>
+0184         <span class="comment">% further:</span>
+0185         <span class="keyword">if</span> crt &gt; stop
+0186             <span class="comment">% Make the left branch:</span>
+0187             J = find(a(:,j) &lt;= t);
+0188             tl = <a href="#_sub1" class="code" title="subfunction tree = maketree(a,nlab,c,crit,stop)">maketree</a>(+a(J,:),nlab(J),c,crit,stop);
+0189             <span class="comment">% Make the right branch:</span>
+0190             K = find(a(:,j) &gt; t);
+0191             tr = <a href="#_sub1" class="code" title="subfunction tree = maketree(a,nlab,c,crit,stop)">maketree</a>(+a(K,:),nlab(K),c,crit,stop);
+0192             <span class="comment">% Fix the node labelings before the branches can be 'glued'</span>
+0193             <span class="comment">% together to a big tree:</span>
+0194             [t1,t2] = size(tl);
+0195             tl = tl + [zeros(t1,2) tl(:,[3 4])&gt;0 zeros(t1,c)];
+0196             [t3,t4] = size(tr);
+0197             tr = tr + (t1+1)*[zeros(t3,2) tr(:,[3 4])&gt;0 zeros(t3,c)];
+0198             <span class="comment">% Make the complete tree: the split-node and the branches:</span>
+0199             tree= [[j,t,2,t1+2,(p+1)/(m+c)]; tl; tr]; 
+0200         <span class="keyword">else</span>
+0201             <span class="comment">% We reached the stop criterion, so make an end-node:</span>
+0202             [mt,cmax] = max(p);
+0203             tree = [cmax,0,0,0,(p+1)/(m+c)];
+0204         <span class="keyword">end</span>
+0205         
+0206         
+0207     <span class="keyword">end</span>
+0208     
+0209     <span class="keyword">return</span>
+0210 
+0211 <span class="comment">%MAXCRIT Maximum entropy criterion for best feature split.</span>
+0212 <span class="comment">%</span>
+0213 <span class="comment">%     [f,j,t] = maxcrit(A,nlabels)</span>
+0214 <span class="comment">%</span>
+0215 <span class="comment">% Computes the value of the maximum purity f for all features over</span>
+0216 <span class="comment">% the data set A given its numeric labels. j is the optimum feature,</span>
+0217 <span class="comment">% t its threshold. This is a low level routine called for constructing</span>
+0218 <span class="comment">% decision trees.</span>
+0219 <span class="comment">%</span>
+0220 <span class="comment">% [1] L. Breiman, J.H. Friedman, R.A. Olshen, and C.J. Stone,</span>
+0221 <span class="comment">% Classification and regression trees, Wadsworth, California, 1984.</span>
+0222 
+0223 <span class="comment">% Copyright: R.P.W. Duin, duin@ph.tn.tudelft.nl</span>
+0224 <span class="comment">% Faculty of Applied Physics, Delft University of Technology</span>
+0225 <span class="comment">% P.O. Box 5046, 2600 GA Delft, The Netherlands</span>
+0226 
+0227 <a name="_sub2" href="#_subfunctions" class="code">function [f,j,t] = maxcrit(a,nlab)</a>
+0228     prtrace(mfilename);
+0229     [m,k] = size(a);
+0230     c = max(nlab);
+0231     <span class="comment">% -variable T is an (2c)x k matrix containing:</span>
+0232     <span class="comment">%      minimum feature values class 1</span>
+0233     <span class="comment">%      maximum feature values class 1</span>
+0234     <span class="comment">%      minimum feature values class 2</span>
+0235     <span class="comment">%      maximum feature values class 2</span>
+0236     <span class="comment">%            etc.</span>
+0237     <span class="comment">% -variable R (same size) contains:</span>
+0238     <span class="comment">%      fraction of objects which is &lt; min. class 1.</span>
+0239     <span class="comment">%      fraction of objects which is &gt; max. class 1.</span>
+0240     <span class="comment">%      fraction of objects which is &lt; min. class 2.</span>
+0241     <span class="comment">%      fraction of objects which is &gt; max. class 2.</span>
+0242     <span class="comment">%            etc.</span>
+0243     <span class="comment">% These values are collected and computed in the next loop:</span>
+0244     T = zeros(2*c,k); R = zeros(2*c,k);
+0245     <span class="keyword">for</span> j = 1:c
+0246         L = (nlab == j);
+0247         <span class="keyword">if</span> sum(L) == 0
+0248             T([2*j-1:2*j],:) = zeros(2,k);
+0249             R([2*j-1:2*j],:) = zeros(2,k);
+0250         <span class="keyword">else</span>
+0251             T(2*j-1,:) = min(a(L,:),[],1);
+0252             R(2*j-1,:) = sum(a &lt; ones(m,1)*T(2*j-1,:),1);
+0253             T(2*j,:) = max(a(L,:),[],1);
+0254             R(2*j,:) = sum(a &gt; ones(m,1)*T(2*j,:),1);
+0255         <span class="keyword">end</span>
+0256     <span class="keyword">end</span>
+0257     <span class="comment">% From R the purity index for all features is computed:</span>
+0258     G = R .* (m-R);
+0259     <span class="comment">% and the best feature is found:</span>
+0260     [gmax,tmax] = max(G,[],1);
+0261     [f,j] = max(gmax);
+0262     Tmax = tmax(j);
+0263     <span class="keyword">if</span> Tmax ~= 2*floor(Tmax/2)
+0264         t = (T(Tmax,j) + max(a(find(a(:,j) &lt; T(Tmax,j)),j)))/2;
+0265     <span class="keyword">else</span>
+0266         t = (T(Tmax,j) + min(a(find(a(:,j) &gt; T(Tmax,j)),j)))/2;
+0267     <span class="keyword">end</span>
+0268     <span class="keyword">if</span> isempty(t)
+0269         [f,j,t] = <a href="#_sub3" class="code" title="subfunction [g,j,t] = infcrit(a,nlab)">infcrit</a>(a,nlab);
+0270         prwarning(3,<span class="string">'Maxcrit not feasible for decision tree, infcrit is used'</span>)
+0271     <span class="keyword">end</span>
+0272     <span class="keyword">return</span>
+0273 
+0274 <span class="comment">%INFCRIT The information gain and its the best feature split.</span>
+0275 <span class="comment">%</span>
+0276 <span class="comment">%     [f,j,t] = infcrit(A,nlabels)</span>
+0277 <span class="comment">%</span>
+0278 <span class="comment">% Computes over all features the information gain f for its best</span>
+0279 <span class="comment">% threshold from the dataset A and its numeric labels. For f=1:</span>
+0280 <span class="comment">% perfect discrimination, f=0: complete mixture. j is the optimum</span>
+0281 <span class="comment">% feature, t its threshold. This is a lowlevel routine called for</span>
+0282 <span class="comment">% constructing decision trees.</span>
+0283 
+0284 <span class="comment">% Copyright: R.P.W. Duin, duin@ph.tn.tudelft.nl</span>
+0285 <span class="comment">% Faculty of Applied Physics, Delft University of Technology</span>
+0286 <span class="comment">% P.O. Box 5046, 2600 GA Delft, The Netherlands</span>
+0287 
+0288 <a name="_sub3" href="#_subfunctions" class="code">function [g,j,t] = infcrit(a,nlab)</a>
+0289     prtrace(mfilename);
+0290     [m,k] = size(a);
+0291     c = max(nlab);
+0292     mininfo = ones(k,2);
+0293     <span class="comment">% determine feature domains of interest</span>
+0294     [sn,ln] = min(a,[],1); 
+0295     [sx,lx] = max(a,[],1);
+0296     JN = (nlab(:,ones(1,k)) == ones(m,1)*nlab(ln)') * realmax;
+0297     JX = -(nlab(:,ones(1,k)) == ones(m,1)*nlab(lx)') * realmax;
+0298     S = sort([sn; min(a+JN,[],1); max(a+JX,[],1); sx]);
+0299     <span class="comment">% S(2,:) to S(3,:) are interesting feature domains</span>
+0300     P = sort(a);
+0301     Q = (P &gt;= ones(m,1)*S(2,:)) &amp; (P &lt;= ones(m,1)*S(3,:));
+0302     <span class="comment">% these are the feature values in those domains</span>
+0303     <span class="keyword">for</span> f=1:k,        <span class="comment">% repeat for all features</span>
+0304         af = a(:,f);
+0305         JQ = find(Q(:,f));
+0306         SET = P(JQ,f)';
+0307         <span class="keyword">if</span> JQ(1) ~= 1
+0308             SET = [P(JQ(1)-1,f), SET];
+0309         <span class="keyword">end</span>
+0310         n = length(JQ);
+0311         <span class="keyword">if</span> JQ(n) ~= m
+0312             SET = [SET, P(JQ(n)+1,f)];
+0313         <span class="keyword">end</span>
+0314         n = length(SET) -1;
+0315         T = (SET(1:n) + SET(2:n+1))/2; <span class="comment">% all possible thresholds</span>
+0316         L = zeros(c,n); R = L;     <span class="comment">% left and right node object counts per class</span>
+0317         <span class="keyword">for</span> j = 1:c
+0318             J = find(nlab==j); mj = length(J);
+0319             <span class="keyword">if</span> mj == 0
+0320                 L(j,:) = realmin*ones(1,n); R(j,:) = L(j,:);
+0321             <span class="keyword">else</span>
+0322                 L(j,:) = sum(repmat(af(J),1,n) &lt;= repmat(T,mj,1)) + realmin;
+0323                 R(j,:) = sum(repmat(af(J),1,n) &gt; repmat(T,mj,1)) + realmin;
+0324             <span class="keyword">end</span>
+0325         <span class="keyword">end</span>
+0326         infomeas =  - (sum(L .* log10(L./(ones(c,1)*sum(L)))) <span class="keyword">...</span>
+0327                    + sum(R .* log10(R./(ones(c,1)*sum(R))))) <span class="keyword">...</span>
+0328             ./ (log10(2)*(sum(L)+sum(R))); <span class="comment">% criterion value for all thresholds</span>
+0329         [mininfo(f,1),j] = min(infomeas);     <span class="comment">% finds the best</span>
+0330         mininfo(f,2) = T(j);     <span class="comment">% and its threshold</span>
+0331     <span class="keyword">end</span>   
+0332     g = 1-mininfo(:,1)';
+0333     [finfo,j] = min(mininfo(:,1));        <span class="comment">% best over all features</span>
+0334     t = mininfo(j,2);            <span class="comment">% and its threshold</span>
+0335     <span class="keyword">return</span>
+0336 
+0337 <span class="comment">%FISHCRIT Fisher's Criterion and its best feature split</span>
+0338 <span class="comment">%</span>
+0339 <span class="comment">%     [f,j,t] = fishcrit(A,nlabels)</span>
+0340 <span class="comment">%</span>
+0341 <span class="comment">% Computes the value of the Fisher's criterion f for all features</span>
+0342 <span class="comment">% over the dataset A with given numeric labels. Two classes only. j</span>
+0343 <span class="comment">% is the optimum feature, t its threshold. This is a lowlevel</span>
+0344 <span class="comment">% routine called for constructing decision trees.</span>
+0345 
+0346 <span class="comment">% Copyright R.P.W. Duin, duin@ph.tn.tudelft.nl</span>
+0347 <span class="comment">% Faculty of Applied Physics, Delft University of Technology</span>
+0348 <span class="comment">% P.O. Box 5046, 2600 GA Delft, The Netherlands</span>
+0349 
+0350 <a name="_sub4" href="#_subfunctions" class="code">function [f,j,t] = fishcrit(a,nlab)</a>
+0351     prtrace(mfilename);
+0352     [m,k] = size(a);
+0353     c = max(nlab);
+0354     <span class="keyword">if</span> c &gt; 2
+0355         error(<span class="string">'Not more than 2 classes allowed for Fisher Criterion'</span>)
+0356     <span class="keyword">end</span>
+0357     <span class="comment">% Get the mean and variances of both the classes:</span>
+0358     J1 = find(nlab==1);
+0359     J2 = find(nlab==2);
+0360     u = (mean(a(J1,:),1) - mean(a(J2,:),1)).^2;
+0361     s = std(a(J1,:),0,1).^2 + std(a(J2,:),0,1).^2 + realmin;
+0362     <span class="comment">% The Fisher ratio becomes:</span>
+0363     f = u ./ s;
+0364     <span class="comment">% Find then the best feature:</span>
+0365     [ff,j] = max(f);
+0366     <span class="comment">% Given the feature, compute the threshold:</span>
+0367     m1 = mean(a(J1,j),1);
+0368     m2 = mean(a(J2,j),1);
+0369     w1 = m1 - m2; w2 = (m1*m1-m2*m2)/2;
+0370     <span class="keyword">if</span> abs(w1) &lt; eps <span class="comment">% the means are equal, so the Fisher</span>
+0371              <span class="comment">% criterion (should) become 0. Let us set the thresold</span>
+0372              <span class="comment">% halfway the domain</span>
+0373              t = (max(a(J1,j),[],1) + min(a(J2,j),[],1)) / 2;
+0374     <span class="keyword">else</span>
+0375         t = w2/w1;
+0376     <span class="keyword">end</span>
+0377     <span class="keyword">return</span>
+0378 
+0379 <span class="comment">%INFSTOP Quinlan's Chi-square test for early stopping</span>
+0380 <span class="comment">%</span>
+0381 <span class="comment">%     crt = infstop(A,nlabels,j,t)</span>
+0382 <span class="comment">%</span>
+0383 <span class="comment">% Computes the Chi-square test described by Quinlan [1] to be used</span>
+0384 <span class="comment">% in maketree for forward pruning (early stopping) using dataset A</span>
+0385 <span class="comment">% and its numeric labels. j is the feature used for splitting and t</span>
+0386 <span class="comment">% the threshold.</span>
+0387 <span class="comment">%</span>
+0388 <span class="comment">% [1] J.R. Quinlan, Simplifying Decision Trees,</span>
+0389 <span class="comment">% Int. J. Man - Machine Studies, vol. 27, 1987, pp. 221-234.</span>
+0390 <span class="comment">%</span>
+0391 <span class="comment">% See maketree, treec, classt, prune</span>
+0392 
+0393 <span class="comment">% Guido te Brake, TWI/SSOR, TU Delft.</span>
+0394 <span class="comment">% Copyright: R.P.W. Duin, duin@ph.tn.tudelft.nl</span>
+0395 <span class="comment">% Faculty of Applied Physics, Delft University of Technology</span>
+0396 <span class="comment">% P.O. Box 5046, 2600 GA Delft, The Netherlands</span>
+0397 
+0398 <a name="_sub5" href="#_subfunctions" class="code">function crt = infstop(a,nlab,j,t)</a>
+0399     prtrace(mfilename);
+0400     [m,k] = size(a);
+0401     c = max(nlab);
+0402     aj = a(:,j);
+0403     ELAB = expandd(nlab); 
+0404     L = sum(ELAB(aj &lt;= t,:),1) + 0.001;
+0405     R = sum(ELAB(aj &gt; t,:),1) + 0.001;
+0406     LL = (L+R) * sum(L) / m;
+0407     RR = (L+R) * sum(R) / m;
+0408     crt = sum(((L-LL).^2)./LL + ((R-RR).^2)./RR);
+0409     <span class="keyword">return</span>
+0410 
+0411 <span class="comment">%PRUNEP Pessimistic pruning of a decision tree</span>
+0412 <span class="comment">%</span>
+0413 <span class="comment">%     tree = prunep(tree,a,nlab,num)</span>
+0414 <span class="comment">%</span>
+0415 <span class="comment">% Must be called by giving a tree and the training set a. num is the</span>
+0416 <span class="comment">% starting node, if omitted pruning starts at the root. Pessimistic</span>
+0417 <span class="comment">% pruning is defined by Quinlan.</span>
+0418 <span class="comment">%</span>
+0419 <span class="comment">% See also maketree, treec, mapt</span>
+0420 
+0421 <span class="comment">% Guido te Brake, TWI/SSOR, TU Delft.</span>
+0422 <span class="comment">% Copyright: R.P.W. Duin, duin@ph.tn.tudelft.nl</span>
+0423 <span class="comment">% Faculty of Applied Physics, Delft University of Technology</span>
+0424 <span class="comment">% P.O. Box 5046, 2600 GA Delft, The Netherlands</span>
+0425 
+0426 <a name="_sub6" href="#_subfunctions" class="code">function tree = prunep(tree,a,nlab,num)</a>
+0427     prtrace(mfilename);
+0428     <span class="keyword">if</span> nargin &lt; 4, num = 1; <span class="keyword">end</span>;
+0429     [N,k] = size(a);
+0430     c = size(tree,2)-4;
+0431     <span class="keyword">if</span> tree(num,3) == 0, <span class="keyword">return</span>, <span class="keyword">end</span>;
+0432     w = mapping(<span class="string">'treec'</span>,<span class="string">'trained'</span>,{tree,num},[1:c]',k,c);
+0433     ttt=<a href="tree_map.html" class="code" title="function [F,lab,N,treeInfo] = tree_map(T,W)">tree_map</a>(dataset(a,nlab),w);
+0434     J = testc(ttt)*N;
+0435     EA = J + <a href="#_sub8" class="code" title="subfunction number = nleaves(tree,num)">nleaves</a>(tree,num)./2;   <span class="comment">% expected number of errors in tree</span>
+0436     P = sum(expandd(nlab,c),1);     <span class="comment">% distribution of classes</span>
+0437                     <span class="comment">%disp([length(P) c])</span>
+0438                     [pm,cm] = max(P);     <span class="comment">% most frequent class</span>
+0439                     E = N - pm;     <span class="comment">% errors if substituted by leave</span>
+0440                     SD = sqrt((EA * (N - EA))/N);
+0441                     <span class="keyword">if</span> (E + 0.5) &lt; (EA + SD)         <span class="comment">% clean tree while removing nodes</span>
+0442                         [mt,kt] = size(tree);
+0443                         nodes = zeros(mt,1); nodes(num) = 1; n = 0;
+0444                         <span class="keyword">while</span> sum(nodes) &gt; n;         <span class="comment">% find all nodes to be removed</span>
+0445                             n = sum(nodes);
+0446                             J = find(tree(:,3)&gt;0 &amp; nodes==1);
+0447                             nodes(tree(J,3)) = ones(length(J),1); 
+0448                             nodes(tree(J,4)) = ones(length(J),1); 
+0449                         <span class="keyword">end</span>
+0450                         tree(num,:) = [cm 0 0 0 P/N];
+0451                         nodes(num) = 0; nc = cumsum(nodes);
+0452                         J = find(tree(:,3)&gt;0);<span class="comment">% update internal references</span>
+0453                         tree(J,[3 4]) = tree(J,[3 4]) - reshape(nc(tree(J,[3 4])),length(J),2);
+0454                         tree = tree(~nodes,:);<span class="comment">% remove obsolete nodes</span>
+0455                     <span class="keyword">else</span> 
+0456                         K1 = find(a(:,tree(num,1)) &lt;= tree(num,2));
+0457                         K2 = find(a(:,tree(num,1)) &gt;  tree(num,2));
+0458 
+0459                         tree = <a href="#_sub6" class="code" title="subfunction tree = prunep(tree,a,nlab,num)">prunep</a>(tree,a(K1,:),nlab(K1),tree(num,3));
+0460                         tree = <a href="#_sub6" class="code" title="subfunction tree = prunep(tree,a,nlab,num)">prunep</a>(tree,a(K2,:),nlab(K2),tree(num,4));
+0461                     <span class="keyword">end</span>
+0462                     <span class="keyword">return</span>
+0463 
+0464 <span class="comment">%PRUNET Prune tree by testset</span>
+0465 <span class="comment">%</span>
+0466 <span class="comment">%     tree = prunet(tree,a)</span>
+0467 <span class="comment">%</span>
+0468 <span class="comment">% The test set a is used to prune a decision tree.</span>
+0469 
+0470 <span class="comment">% Copyright: R.P.W. Duin, duin@ph.tn.tudelft.nl</span>
+0471 <span class="comment">% Faculty of Applied Physics, Delft University of Technology</span>
+0472 <span class="comment">% P.O. Box 5046, 2600 GA Delft, The Netherlands</span>
+0473 
+0474 <a name="_sub7" href="#_subfunctions" class="code">function tree = prunet(tree,a)</a>
+0475     prtrace(mfilename);
+0476     [m,k] = size(a);
+0477     [n,s] = size(tree);
+0478     c = s-4;
+0479     erre = zeros(1,n);
+0480     deln = zeros(1,n);
+0481     w = mapping(<span class="string">'treec'</span>,<span class="string">'trained'</span>,{tree,1},[1:c]',k,c);
+0482     [f,lab,nn] = <a href="tree_map.html" class="code" title="function [F,lab,N,treeInfo] = tree_map(T,W)">tree_map</a>(a,w);  <span class="comment">% bug, this works only if a is dataset, labels ???</span>
+0483     [fmax,cmax] = max(tree(:,[5:4+c]),[],2);
+0484     nngood = nn([1:n]'+(cmax-1)*n);
+0485     errn = sum(nn,2) - nngood;<span class="comment">% errors in each node</span>
+0486     sd = 1;
+0487     <span class="keyword">while</span> sd &gt; 0
+0488         erre = zeros(n,1);
+0489         deln = zeros(1,n);
+0490         endn = find(tree(:,3) == 0)';    <span class="comment">% endnodes</span>
+0491         pendl = max(tree(:,3*ones(1,length(endn)))' == endn(ones(n,1),:)');
+0492         pendr = max(tree(:,4*ones(1,length(endn)))' == endn(ones(n,1),:)');
+0493         pend = find(pendl &amp; pendr);        <span class="comment">% parents of two endnodes</span>
+0494         erre(pend) = errn(tree(pend,3)) + errn(tree(pend,4));
+0495         deln = pend(find(erre(pend) &gt;= errn(pend))); <span class="comment">% nodes to be leaved</span>
+0496         sd = length(deln);
+0497         <span class="keyword">if</span> sd &gt; 0
+0498             tree(tree(deln,3),:) = -1*ones(sd,s);
+0499             tree(tree(deln,4),:) = -1*ones(sd,s);
+0500             tree(deln,[1,2,3,4]) = [cmax(deln),zeros(sd,3)];
+0501         <span class="keyword">end</span>
+0502     <span class="keyword">end</span>
+0503     <span class="keyword">return</span>
+0504 
+0505 <span class="comment">%NLEAVES Computes the number of leaves in a decision tree</span>
+0506 <span class="comment">%</span>
+0507 <span class="comment">%     number = nleaves(tree,num)</span>
+0508 <span class="comment">%</span>
+0509 <span class="comment">% This procedure counts the number of leaves in a (sub)tree of the</span>
+0510 <span class="comment">% tree by using num. If num is omitted, the root is taken (num = 1).</span>
+0511 <span class="comment">%</span>
+0512 <span class="comment">% This is a utility used by maketree.</span>
+0513 
+0514 <span class="comment">% Guido te Brake, TWI/SSOR, TU Delft</span>
+0515 <span class="comment">% Copyright: R.P.W. Duin, duin@ph.tn.tudelft.nl</span>
+0516 <span class="comment">% Faculty of Applied Physics, Delft University of Technology</span>
+0517 <span class="comment">% P.O. Box 5046, 2600 GA Delft, The Netherlands</span>
+0518 
+0519 <a name="_sub8" href="#_subfunctions" class="code">function number = nleaves(tree,num)</a>
+0520     prtrace(mfilename);
+0521     <span class="keyword">if</span> nargin &lt; 2, num = 1; <span class="keyword">end</span>
+0522     <span class="keyword">if</span> tree(num,3) == 0
+0523         number = 1 ;
+0524     <span class="keyword">else</span>
+0525         number = <a href="#_sub8" class="code" title="subfunction number = nleaves(tree,num)">nleaves</a>(tree,tree(num,3)) + <a href="#_sub8" class="code" title="subfunction number = nleaves(tree,num)">nleaves</a>(tree,tree(num,4));
+0526     <span class="keyword">end</span>
+0527     <span class="keyword">return</span>
+0528</pre></div>
+<hr><address>Generated on Tue 17-Dec-2013 13:15:50 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>

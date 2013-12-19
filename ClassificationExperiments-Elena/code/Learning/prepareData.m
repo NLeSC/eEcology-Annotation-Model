@@ -3,7 +3,7 @@
 %labvec is a vector containing the desired labels in the dataset. an empty
 %vector means that all labels will be included to the dataset.
 
-function [train,test,permutation] = prepareData(annot_struct,frac,labvec)
+function [trainSet,testSet] = prepareData(annot_struct,frac,labelVector)
 
 %assignin('base', 'files', dataStructs);
 data = [];
@@ -26,10 +26,10 @@ olap = 0;
     allLabels = groupD2Label(alldata,8);
 
     %only add the selected labels to the dataset.
-    if isempty(labvec)
+    if isempty(labelVector)
         labels = allLabels;
     else
-        [~,pos] = ismember(labvec,allLabels);
+        [~,pos] = ismember(labelVector,allLabels);
         labels = allLabels(pos(pos~=0));
     end
         
@@ -58,7 +58,7 @@ olap = 0;
 
 %end
 
-[train,test,permutation] = splitset(data,frac);
+[trainSet,testSet] = splitset(data,frac);
 % metadata = struct('data',{datestr(today)},'author', {'Elena'},...
 %     'files',{dataStructs},'mode',{windowingMode}, 'wSize', {ws}, 'step', {olap},...
 %     'filter',{''},'ftSet',{''});

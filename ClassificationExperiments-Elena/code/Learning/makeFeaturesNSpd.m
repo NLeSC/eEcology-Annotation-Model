@@ -94,10 +94,11 @@ windows = {WM{:,1}}';
 
     if ~isempty(WM)
 
+        addpath ../Features
         %create pitch/roll feature matrix for window set
         %SPRM = position(WM);
-        SPRM = cellfun(@calcPosition, windows, 'uniformoutput', false);
-
+        SPRM = cellfun(@calcPosition, windows, 'uniformoutput', false);        
+        
         %correlation features
         %CM = correlation(WM);
         CM = cellfun(@calcCorrelation, windows, 'uniformoutput', false);
@@ -126,7 +127,7 @@ windows = {WM{:,1}}';
         %ODBA
         %ODBA = calcODBA(WM,20);
         ODBA = cellfun(@(x) calcODBA(x,windowSize/2), windows, 'uniformoutput', false);
-
+        rmpath ../Features
 
     % 
     %     featureMatrix = [WM{:,2}, SPRM, CM, MLM, FM, SPD];

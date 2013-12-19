@@ -1,9 +1,11 @@
 %% calcFeatureVectors - feature vectors computaion for classifiers
 %
-% author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc
+% author: Merijn de Bakker, UvA, Elena Ranguelova, NLeSc, Christiaan
+% Meijer, NLeSc
 % date creation: 11-2011
-% last modification date: 27-09-2013
-% modification details: added extra parameters
+% last modification date: 17-12-2013
+% modification details: refactored: changed variable names to improve
+% readability. 
 % -----------------------------------------------------------------------
 % SYNTAX
 % [FTV, INFO]=calFeatureVectors(data, windowSize, overlap, epsilon)
@@ -12,7 +14,7 @@
 % data- NxM matrix containing unlabelled data. Format:
 %       [device,datetime,index,x,y,z,spd]
 % windowSize- thesegmentaiton window size
-% overlap- the overlap ofthe windows
+% overlap- the proportion of overlap of the windows (range [0 - 1])
 % epsilon- tolerance parameter for the motionlessness feature
 %
 % OUPTPUT
@@ -104,40 +106,40 @@ end
 
 end
 
-function windows = windowing(M, wSize, oLap)
+function windows = windowing(M, wSize, overlapFraction)
 
 windows = {};
 mLength = size(M,1);
 
-if oLap>0
-    step = wSize*oLap;
+if overlapFraction>0
+    step = wSize * overlapFraction;
 else
     step = wSize;
 end
 
 %start position
-i=1;
+startPos=1;
 %windownr
-j=1;
+windowNo=1;
 
-while i+wSize<=mLength+1;
+while startPos+wSize<=mLength+1;
              
-     [r,~] = find(isnan(M(i:i+wSize-1,4:6)));
+     [r,~] = find(isnan(M(startPos:startPos+wSize-1,4:6)));
      if ~isempty(r)
-         i = i+step;
+         startPos = startPos+step;
          continue
      else
-         windows{j,1} = M(i:i+wSize-1,4:6);
+         windows{windowNo,1} = M(startPos:startPos+wSize-1,4:6);
          %label, not used here
-         windows{j,2} = NaN;
-         windows{j,3} = M(i,1);
-         windows{j,4} = M(i,2);
-         windows{j,5} = M(i+wSize-1,2);
-         windows{j,6} = M(i,3);
-         windows{j,7} = M(i+wSize-1,3);
-         windows{j,8} = M(i,7); 
-         i = i+step;
-         j = j+1;
+         windows{windowNo,2} = NaN;
+         windows{windowNo,3} = M(startPos,1);
+         windows{windowNo,4} = M(startPos,2);
+         windows{windowNo,5} = M(startPos+wSize-1,2);
+         windows{windowNo,6} = M(startPos,3);
+         windows{windowNo,7} = M(startPos+wSize-1,3);
+         windows{windowNo,8} = M(startPos,7); 
+         startPos = startPos+step;
+         windowNo = windowNo+1;
      end
 
 end
