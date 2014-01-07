@@ -37,10 +37,10 @@ olap = 0;
     %calculate the features for each label
     for i = 1:length(labels)
         
-        thisLab = labels(i);
+        currentLabel = labels(i);
         
         %labDat = evalin('base', strcat('f',num2str(j),'_label_',num2str(thisLab)));
-        labDat = evalin('base', strcat('label_',num2str(thisLab)));
+        labDat = evalin('base', strcat('label_',num2str(currentLabel)));
 
         [ft, info] = makeFeaturesNSpd(labDat, ws, olap,0,8, 'norm', windowingMode);
         %[ft, info] = calcFeatureVectors(labDat, ws, olap,0.3);

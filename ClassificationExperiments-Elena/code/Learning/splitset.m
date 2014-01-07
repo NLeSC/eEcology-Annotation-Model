@@ -9,14 +9,14 @@
 %varargin: train-filename (csv), test-filename (csv)
 %OUTPUT: train- validationset as a matrix, and if desired as a csv-file. 
 
-function [trainSet, validationSet] = splitset(featureM, validationSize)
+function [trainSet, validationSet] = splitset(featureMatrix, validationSize)
 
-trainsetSize = round(validationSize*size(featureM,1));
+trainsetSize = round(validationSize*size(featureMatrix,1));
 
-P = randperm(size(featureM,1));
-RandomFeatureM = featureM(P,:);
+P = randperm(size(featureMatrix,1));
+shuffledFeatureMatrix = featureMatrix(P,:);
 
-trainSet = RandomFeatureM(1:trainsetSize,:);
-validationSet = RandomFeatureM(trainsetSize+1:end,:);
+trainSet = shuffledFeatureMatrix(1:trainsetSize,:);
+validationSet = shuffledFeatureMatrix(trainsetSize+1:end,:);
 
 end

@@ -56,10 +56,13 @@ data = [];
         sp(1:maxN,1) = annot_struct.gpsSpd(i);
         index1 = 0:maxN-1;
 
+        
+        x=annot_struct.accX{i}';
+        y=annot_struct.accY{i}';
+        z=annot_struct.accZ{i}';
+        t = annot_struct.tags{i};
         data       = [data; ...
-                     id da index1' ...
-                     annot_struct.accX{i}' annot_struct.accY{i}' annot_struct.accZ{i}' ...
-                     sp annot_struct.tags{i}];
+                     id da index1' x y z sp t];
 
     end
 

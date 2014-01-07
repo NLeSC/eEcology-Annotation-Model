@@ -27,8 +27,8 @@ function [featureMatrix,infoMatrix]  = makeFeaturesNSpd(M, windowSize,overlap,..
 %M = M(:,2:end);
 
 
-r1 = find(M(:,3)==0);
-r2 = find(diff(M(:,3))~=1)+1;
+r1 = find(M(:,3)==0); %Find rows with a start index.
+r2 = find(diff(M(:,3))~=1)+1; %Find rows with index that doesn't increment the last row's by 1.
 r = unique(sort([1;r1;r2]));
 %nOfMeasurements = size(r)
 %windowSize = 20;
