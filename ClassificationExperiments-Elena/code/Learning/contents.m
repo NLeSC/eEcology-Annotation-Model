@@ -1,7 +1,8 @@
 %% contents.m- contents of the current directory
 %
 %--------------------------------------------------------------------------
-
+%% SCRIPTS
+% learning - script for machine learning using difference algorithms
 %--------------------------------------------------------------------------
 %% FUNCTIONS
 %--------------------------------------------------------------------------
