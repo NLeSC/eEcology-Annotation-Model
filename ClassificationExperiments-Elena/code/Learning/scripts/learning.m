@@ -1,15 +1,34 @@
-%% Script for machine learning using different algorithms.
+%% learning - script for machine learning using difference algorithms
 %
-% The dataset that was used for the very few results is (probably)
-% D320_08062010.mat.
+% author: Christiaan Meijer, NLeDc
+% co-author: Elena Ranguelova, NLeSc
+% date creation: December 2013
+% last modification date: 09 January 2014 
+% modification details: added new header, loading data and chosing a 
+%                       proper model
+% -----------------------------------------------------------------------
+% SYNTAX
+% learning
 %
+% INPUT
 % 
-% Author: Christiaan Meijer, NLeSc
-% Created: December 2013
+% OUPTPUT
+% 
+% EXAMPLE
+% 
+% SEE ALSO
+% prepareData, PRTools 5.0 classifiers
 %
+% REFERENCES
 %
-%
-%
+% NOTES
+% the script should be started from the Leaning/scripts directory
+
+%% load some test data
+clc
+fname = '../../../data/AnnotatedData/D320_09062010.mat';
+load(fname);
+disp(['Data from file: ', fname, ' were loaded!'])
 
 %% prepare the data
 % set the seed for the random generator
@@ -49,38 +68,70 @@ components = 7;
     reduceDimensionality(trainDataSet, testDataSet, '', components);
 
 %% Train model W using one of the algorithms below.
+classifiers{1} = 'treec';
+classifiers{2} = 'knn';
+classifiers{3} = 'neurc';
+classifiers{4} = 'randomforestsc';
+classifiers{5} = 'dtc';
+classifiers{6} = 'vpc';
+classifiers{7} = 'drbmc';
+celldisp(classifiers)
+index = input('Select a classifier index from the list above: ');
+
+tic
+switch index
+    case 1
+        pruning = 0;
+        crit = 'infcrit';
+        W = treec(trainDataSet,crit,pruning,testDataSet);
+    case 2
+        W = knnc(trainDataSet);
+    case 3
+        nHiddenPerLayer = 5;
+        W = neurc(trainDataSet,nHiddenPerLayer);
+    case 4
+        W = randomforestc(trainDataSet);
+    case 5
+        W = dtc(trainDataSet);
+    case 6
+        W = vpc(trainDataSet, 1000);
+    case 7
+        W = drbmc(trainDataSet);
+end
+toc    
+    
 %% tree classifier (8 errors)
-tic
-pruning = 0;
-crit = 'infcrit';
-W = treec(trainDataSet,crit,pruning,testDataSet);
-toc
+% tic
+% pruning = 0;
+% crit = 'infcrit';
+% W = treec(trainDataSet,crit,pruning,testDataSet);
+% toc
 %% knn (12 errors)
-tic
-W = knnc(trainDataSet);
-toc
+% tic
+% W = knnc(trainDataSet);
+% toc
 %% neural network with backpropagation (need neural network toolkit to work)
-tic
-nHiddenPerLayer = 5;
-W = neurc (trainDataSet,nHiddenPerLayer);
-toc
+% tic
+% nHiddenPerLayer = 5;
+% W = neurc(trainDataSet,nHiddenPerLayer);
+% toc
 %% random forest (8 errors)
-tic
-W = randomforestc(trainDataSet);
-toc
+% tic
+% W = randomforestc(trainDataSet);
+% toc
 %% Verzakov tree (terrible performance)
-tic
-W = dtc(trainDataSet);
-toc
+% tic
+% W = dtc(trainDataSet);
+% toc
 %% Voted Perceptron (seems broken, assigns all instances the same class)
-tic
-W = vpc(trainDataSet, 1000);
-toc
+% tic
+% W = vpc(trainDataSet, 1000);
+% toc
 %% Discriminitive Restricted Boltzmann Machine 
 % (seems broken, assigns almost all instances the same class)
-tic
-W = drbmc(trainDataSet);
-toc
+% tic
+% W = drbmc(trainDataSet);
+% toc
 
 %% Evaluate the trained model W using the test data.
 %assigned labels trainset
