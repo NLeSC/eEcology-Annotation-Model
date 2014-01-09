@@ -22,16 +22,31 @@ toc
 %% Prepare test/train instances and labels
 nFeatures = size(trainSet,2)-1;
 featureSelection = 2:nFeatures+1;
+nTrain = size(trainSet,1);
+nTest = size(testSet,1);
 
-%Prepare train dataset
-trainInstances = trainSet(:,featureSelection);
+%Filter out rows that contain NaN's in selected features
+validRows = setdiff(1:nTrain, find(sum(isnan(trainSet(:,featureSelection)), 2)));
+trainSet = trainSet(validRows, :);
+validRows = setdiff(1:nTest, find(sum(isnan(testSet(:,featureSelection)), 2)));
+testSet = testSet(validRows, :);
+
 trainLabels = trainSet(:,1);
+testLabels = testSet(:,1);
+trainInstances = trainSet(:,featureSelection);
+testInstances = testSet(:,featureSelection);
+
+%% Prepare datasets
+%Prepare train dataset
 trainDataSet = dataset(trainInstances,trainLabels);
 
 %Prepare test dataset
-testInstances = testSet(:,featureSelection);
-testLabels = testSet(:,1);
 testDataSet = dataset(testInstances,testLabels);
+
+%Dimensionality reduction
+components = 7;
+[trainDataSet, testDataSet, mapping] = ...
+    reduceDimensionality(trainDataSet, testDataSet, '', components);
 
 %% Train model W using one of the algorithms below.
 %% tree classifier (8 errors)

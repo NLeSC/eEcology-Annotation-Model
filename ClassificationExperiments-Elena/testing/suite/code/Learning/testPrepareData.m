@@ -4,7 +4,7 @@ initTestSuite;
 function testprepareData_allTrainSet_noTestSet
 % Arrange
 expected = 0;
-testData = getTestDataFor4Windows;
+testData = getTestDataFor4Windows();
 
 % Act
 profile resume
@@ -17,7 +17,7 @@ assertEqual(expected, size(testSet, 1));
 function testprepareData_noTrainSet_noTrainSet
 % Arrange
 expected = 0;
-testData = getTestDataFor4Windows;
+testData = getTestDataFor4Windows();
 
 % Act
 profile resume
