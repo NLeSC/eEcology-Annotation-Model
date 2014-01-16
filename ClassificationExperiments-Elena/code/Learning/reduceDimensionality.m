@@ -1,5 +1,8 @@
 function [ reducedTrainSet, reducedTestSet, mapping ] ...
     = reduceDimensionality( trainSet, testSet, kind, varargin)
+% Reduces the dimensionality of the instances by means of PCA or LDA.
+% Author: Christiaan Meijer, NLeSc
+% Creation date: ??-01-2014
 
 if (size(varargin) >= 1)
         targetDimensionality = varargin{1};

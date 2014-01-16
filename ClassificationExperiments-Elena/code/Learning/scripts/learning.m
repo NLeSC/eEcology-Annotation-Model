@@ -57,10 +57,10 @@ testInstances = testSet(:,featureSelection);
 
 %% Prepare datasets
 %Prepare train dataset
-trainDataSet = dataset(trainInstances,trainLabels);
+trainDataSet = prdataset(trainInstances,trainLabels);
 
 %Prepare test dataset
-testDataSet = dataset(testInstances,testLabels);
+testDataSet = prdataset(testInstances,testLabels);
 
 %Dimensionality reduction
 components = 7;
@@ -98,40 +98,8 @@ switch index
     case 7
         W = drbmc(trainDataSet);
 end
-toc    
-    
-%% tree classifier (8 errors)
-% tic
-% pruning = 0;
-% crit = 'infcrit';
-% W = treec(trainDataSet,crit,pruning,testDataSet);
-% toc
-%% knn (12 errors)
-% tic
-% W = knnc(trainDataSet);
-% toc
-%% neural network with backpropagation (need neural network toolkit to work)
-% tic
-% nHiddenPerLayer = 5;
-% W = neurc(trainDataSet,nHiddenPerLayer);
-% toc
-%% random forest (8 errors)
-% tic
-% W = randomforestc(trainDataSet);
-% toc
-%% Verzakov tree (terrible performance)
-% tic
-% W = dtc(trainDataSet);
-% toc
-%% Voted Perceptron (seems broken, assigns all instances the same class)
-% tic
-% W = vpc(trainDataSet, 1000);
-% toc
-%% Discriminitive Restricted Boltzmann Machine 
-% (seems broken, assigns almost all instances the same class)
-% tic
-% W = drbmc(trainDataSet);
-% toc
+toc      
+
 
 %% Evaluate the trained model W using the test data.
 %assigned labels trainset
