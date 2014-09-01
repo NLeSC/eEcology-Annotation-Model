@@ -56,7 +56,7 @@ fclose(inpFile);
 AccM = [sc{1} datevec(sc{2},'yyyy-mm-dd HH:MM:SS') sc{3}];
 
 %check unique days 
-[~,mD,~] = unique(AccM(:,4));
+[~,mD,~] = unique(AccM(:,4),'legacy');
 
 if (AccM(1,8) == 0)
     ids = find(AccM(:,8)==0);

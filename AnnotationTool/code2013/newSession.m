@@ -98,7 +98,13 @@ function openAcc_Callback(hObject, eventdata, handles)
     if isequal(filename,0)
        VARS.loadedAcc=0;
     else
-        [~,~,ext] = fileparts(filename);
+        % ------------ by Elena Ranguelova, 31.07.2014--------------
+        if verLessThan('MATLAB','7.11') 
+            [~,~,ext,~] = fileparts(filename); 
+        else
+            [~,~,ext] = fileparts(filename);
+        end
+        %----------------------------------------------------------
         try
             
             VARS.accFilename = strcat(path,filename);
@@ -192,13 +198,26 @@ function openAcc_Callback(hObject, eventdata, handles)
                 
             VARS.loadedAcc= 1;
             s = ['Loaded data-file: ' VARS.accFilename];
-            set(handles.accFileText, 'String', s)
+            % ------------ by Elena Ranguelova, 31.07.2014--------------
+            if length(s)<45       
+                set(handles.accFileText, 'String', s)
+            else                
+                if verLessThan('MATLAB','7.11') x
+                     [~,name,ext,~] = fileparts(s); 
+                else
+                     [~,name,ext] = fileparts(s);
+                end     
+                set(handles.accFileText, 'String', strcat(name,ext))
+            end
+            %----------------------------------------------------------   
 
             %VARS.accData = accStruct;
             clear('accStruct')
             
        catch E1
-            errordlg('error loading file','File Error')
+           % ------------ by Elena Ranguelova, 31.07.2014--------------
+            errordlg('error loading acc. data file','File Error')
+            %-----------------------------------------------------------
            
             VARS.loadedAcc = 0;
        end
@@ -234,26 +253,46 @@ function openMov_Callback(hObject, eventdata, handles)
        VARS.loadedMovie=0;
    else
        try
-       VARS.movFileName = strcat(path,filename);
-       VARS.VID = mmreader(VARS.movFileName);
+           VARS.movFileName = strcat(path,filename);
+           % ------------ by Elena Ranguelova, 31.07.2014--------------
+           if verLessThan('MATLAB','7.11')
+                VARS.VID = mmreader(VARS.movFileName);
+           else
+                VARS.VID = VideoReader(VARS.movFileName);
+           end     
+           %------------------------------------------------------------
+           s = ['Loaded movie: ' VARS.movFileName];
 
-       s = ['Loaded movie: ' VARS.movFileName];
-       set(handles.movieFileText, 'String', s);
-       %MOV.fileName = s;
-             
-       if VARS.VID.FrameRate~=25
-   %        errordlg('Wrong framerate');
-           str = ['fps: ', num2str(VARS.VID.FrameRate)];
-           set(handles.fpsError, 'String', str,'ForegroundColor',[1,0,0]);
-   %        VARS.loadedMovie = 0;
-            VARS.loadedMovie = 1;
-       else
-           set(handles.fpsError, 'String', 'fps: 25','ForegroundColor',[0,1,0]);  
-           VARS.loadedMovie = 1;
-       end
+           % ------------ by Elena Ranguelova, 31.07.2014--------------
+           if length(s)<45       
+               set(handles.movieFileText, 'String', s)
+           else                
+               if verLessThan('MATLAB','7.11') x
+                    [~,name,ext,~] = fileparts(s); 
+               else
+                    [~,name,ext] = fileparts(s);
+               end     
+               set(handles.movieFileText, 'String', strcat(name,ext))
+           end
+           %----------------------------------------------------------   
+
+           %MOV.fileName = s;
+
+           if VARS.VID.FrameRate~=25
+       %        errordlg('Wrong framerate');
+               str = ['fps: ', num2str(VARS.VID.FrameRate)];
+               set(handles.fpsError, 'String', str,'ForegroundColor',[1,0,0]);
+       %        VARS.loadedMovie = 0;
+                VARS.loadedMovie = 1;
+           else
+               set(handles.fpsError, 'String', 'fps: 25','ForegroundColor',[0,1,0]);  
+               VARS.loadedMovie = 1;
+           end
        
        catch E1
-           errordlg('Error loading file', 'File Error');
+           % ------------ by Elena Ranguelova, 31.07.2014--------------
+           errordlg('Error loading movie file', 'File Error');
+           %-----------------------------------------------------------
            VARS.loadedMovie = 0;
        end
       
@@ -296,9 +335,20 @@ function buttonAnnscheme_Callback(hObject, eventdata, handles)
            fclose(inpFile);
 
            SCHEME.data = {sc{1} sc{2} sc{3}};
-           set(handles.textAnn, 'String', SCHEME.fileName);
+
+            % ------------ by Elena Ranguelova, 31.07.2014--------------
+            if length(SCHEME.fileName)<45       
+               set(handles.textAnn, 'String', SCHEME.fileName);
+            else                
+               set(handles.textAnn, 'String', filename);
+            end
+            %---------------------------------------------------------- 
+            
+           
        catch E1
-           errordlg('Error reading file', 'File Error');
+           % ------------ by Elena Ranguelova, 31.07.2014--------------
+           errordlg('Error reading scheme file', 'File Error');
+           %-----------------------------------------------------------
            VARS.loadedAnn = 0;
        end
            VARS.loadedAnn = 1;

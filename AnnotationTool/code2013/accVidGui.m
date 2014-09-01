@@ -1342,7 +1342,14 @@ function SessionImport_Callback(hObject, eventdata, handles)
           
           if MAIN.accOnly == 0
               ACCDAT = sessionStruct.accdat;
-              MAIN.VID = mmreader(sessionStruct.movF);
+              % ------------ by Elena Ranguelova, 31.07.2014--------------
+              if verLessThan('MATLAB','7.11') 
+                MAIN.VID = mmreader(sessionStruct.movF);
+              else
+                MAIN.VID = VideoReader(sessionStruct.movF);
+              end     
+              %-----------------------------------------------------------
+              
               MOV.fileName = sessionStruct.movF;
               ACC = sessionStruct.acc;
               SAMPLE = sessionStruct.samples;
